@@ -1,0 +1,8 @@
+node_modules
+.expo
+dist
+assets
+docs
+*.md
+package-lock.json
+.claude
