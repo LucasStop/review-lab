@@ -6,5 +6,5 @@ pre-commit:
     segredo:
       run: gitleaks git --staged --redact --no-banner
     formato:
-      glob: "*.{js,jsx,ts,tsx,json}"
+      glob: '*.{js,jsx,ts,tsx,json}'
       run: npx prettier --check {staged_files}
