@@ -21,7 +21,9 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint ."
   },
   "private": true
 }
