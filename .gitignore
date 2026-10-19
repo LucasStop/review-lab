@@ -13,3 +13,7 @@ web-build/
 CLAUDE.local.md
 .claude/settings.local.json
 docs/handoff/
+
+# lockfiles: nenhum é versionado (yarn gera yarn.lock, npm geraria package-lock.json)
+yarn.lock
+package-lock.json

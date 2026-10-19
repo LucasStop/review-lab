@@ -4,5 +4,6 @@ dist
 assets
 docs
 *.md
-package-lock.json
 .claude
+yarn.lock
+package-lock.json

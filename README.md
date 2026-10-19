@@ -8,13 +8,13 @@ Projeto do Somativo 2 de Desenvolvimento Mobile Híbrido (PUCPR, 2026/2). Fonte 
 
 ## Como rodar
 
-Pré-requisitos: Node 22 (veja `.nvmrc`), npm, e o app Expo Go no celular ou um emulador.
+Pré-requisitos: Node 22 (veja `.nvmrc`), yarn, e o app Expo Go no celular ou um emulador.
 
 ```bash
 nvm use            # Node 22
-npm install
+yarn install
 cp .env.example .env   # opcional, veja abaixo
-npx expo start
+yarn start        # equivale a `npx expo start`
 ```
 
 Depois escaneie o QR code com o Expo Go, ou pressione `i` (iOS) ou `a` (Android) no terminal.
@@ -34,9 +34,9 @@ Atenção: tudo que começa com `EXPO_PUBLIC_` é embutido no bundle do app e fi
 
 | Comando | O que faz |
 |---|---|
-| `npm run typecheck` | `tsc --noEmit` |
-| `npm run lint` | ESLint |
-| `npm run format` / `npm run format:check` | Prettier (escreve / só confere) |
+| `yarn typecheck` | `tsc --noEmit` |
+| `yarn lint` | ESLint |
+| `yarn format` / `yarn format:check` | Prettier (escreve / só confere) |
 
 Antes de commitar: `brew install lefthook gitleaks` e `lefthook install`. O hook barra segredo (gitleaks) e código fora do formato. O CI repete typecheck, lint, formato e gitleaks em cada PR.
 
