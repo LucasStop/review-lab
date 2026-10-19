@@ -1,0 +1,15 @@
+node_modules/
+.expo/
+dist/
+web-build/
+*.tsbuildinfo
+.DS_Store
+
+# segredos: só o exemplo é versionado
+.env*
+!.env.example
+
+# contexto local, fora do git
+CLAUDE.local.md
+.claude/settings.local.json
+docs/handoff/
