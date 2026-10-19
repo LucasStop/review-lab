@@ -25,18 +25,17 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
-          cache: npm
 
-      - run: npm ci
+      - run: yarn install
 
       - name: Typecheck
-        run: npm run typecheck
+        run: yarn typecheck
 
       - name: Lint
-        run: npm run lint
+        run: yarn lint
 
       - name: Formato
-        run: npm run format:check
+        run: yarn format:check
 
       - name: Segredos (gitleaks)
         uses: gitleaks/gitleaks-action@v2
@@ -44,4 +43,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # Sem testes ainda: nenhum código de regra de negócio existe. Entra com
-      # `npm test` quando chegarem hash, sanitizador e parser do Link.
+      # `yarn test` quando chegarem hash, sanitizador e parser do Link.

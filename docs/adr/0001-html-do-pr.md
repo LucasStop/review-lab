@@ -18,4 +18,4 @@ Pedir `body_html`, passar por um sanitizador com lista de tags permitidas e rend
 
 ## Consequências
 
-Parser próprio pequeno (ou `htmlparser2`, a decidir na issue após checar versão, licença e `npm audit`). Teste primeiro com entradas hostis. Perde-se imagem e tabela do corpo; aceitável para o objetivo de estudo.
+Parser próprio pequeno (ou `htmlparser2`, a decidir na issue após checar versão, licença e `yarn audit`). Teste primeiro com entradas hostis. Perde-se imagem e tabela do corpo; aceitável para o objetivo de estudo.

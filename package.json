@@ -25,5 +25,6 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint ."
   },
-  "private": true
+  "private": true,
+  "packageManager": "yarn@1.22.22"
 }
