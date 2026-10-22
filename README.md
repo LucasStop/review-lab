@@ -51,3 +51,5 @@ Este projeto foi desenvolvido com apoio de agentes de IA (Claude Code, da Anthro
 ## Autor
 
 Lucas Stopinski da Silva
+
+<!-- Throwaway change to test Copilot code review; do not merge. -->
