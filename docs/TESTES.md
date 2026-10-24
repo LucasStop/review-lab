@@ -178,3 +178,4 @@ Rodar no simulador iOS com o Expo Go, sem token no `.env`, salvo o que o passo p
 | Data | Marco | Unitário | Componente | Maestro | Manual | Observação |
 |---|---|---|---|---|---|---|
 | 24/10/2026 | Fase 1 | 59 ok | — | — | — | base antes das telas |
+| 24/10/2026 | Fim da Fase 1 (`b86f359`) | 63 ok | 1 ok (ErrorState) | smoke ok | protótipo, 7 telas | contrato real 3 de 3, rodado uma vez no #117 |
