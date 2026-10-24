@@ -2,6 +2,7 @@ import { create } from 'axios';
 
 import { config } from '../config';
 import type { PullRequest, PullRequestPage } from '../types/github';
+import { toAppError } from '../utils/appError';
 import { parseLinkHeader } from '../utils/linkHeader';
 import { toSummary } from '../utils/pullRequest';
 
@@ -15,6 +16,8 @@ export const api = create({
     ...(config.token ? { Authorization: `Bearer ${config.token}` } : {}),
   },
 });
+
+api.interceptors.response.use(undefined, (error) => Promise.reject(toAppError(error)));
 
 export async function listPullRequests(page: number): Promise<PullRequestPage> {
   const response = await api.get<PullRequest[]>(`/repos/${config.repo}/pulls`, {
