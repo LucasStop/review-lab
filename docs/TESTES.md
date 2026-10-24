@@ -8,14 +8,14 @@ O Canvas não pede teste, mas o MVP (#52) só vale se cada RF for provado. Este 
 |---|---|---|---|---|
 | Estático | sim, já existe | TypeScript, ESLint, Prettier, gitleaks: `yarn typecheck`, `yarn lint`, `yarn format:check` | CI e lefthook | pega erro de tipo, de lint, de formato e segredo antes do review |
 | Unitário | sim, já existe | `node:test` com type stripping: `yarn test` | `src/**/*.test.ts` | lógica pura (sanitizador, hash, cache, erros); roda em menos de 1 s e não precisa de nativo |
-| Componente | sim | jest-expo + React Native Testing Library: `yarn test:ui` | `src/**/*.test.tsx` | prova o que o usuário vê e toca: texto, role, label, `onPress` |
-| Integração | sim | jest-expo + RNTL, com storage falso e serviço mockado | `src/**/*.test.tsx` | Context + serviço + storage juntos: hidratação, sessão, favoritos por usuário |
+| Componente | sim (ferramenta em #115) | jest-expo + React Native Testing Library: `yarn test:ui` | `src/**/*.test.tsx` | prova o que o usuário vê e toca: texto, role, label, `onPress` |
+| Integração | sim (ferramenta em #115) | jest-expo + RNTL, com storage falso e serviço mockado | `src/**/*.test.tsx` | Context + serviço + storage juntos: hidratação, sessão, favoritos por usuário |
 | Acessibilidade automatizada | sim | RNTL (`getByRole`, `accessibilityState`, tamanho mínimo) e teste de contraste dos tokens (`node:test`) | junto do componente e em `src/theme/` | o RF10 vale 10% e regressão de contraste ou de label é silenciosa |
 | Segurança do sanitizador | sim, já existe | corpus fixo de HTML hostil no `node:test` | `src/utils/sanitizeHtml.test.ts` | `body_html` é dado não confiável |
-| E2E e cenário em tela | sim, local | Maestro + Expo Go no simulador iOS: `maestro test .maestro/` | `.maestro/*.yaml` | prova o fluxo real de toque, navegação e persistência; fora do CI porque precisa de simulador |
-| Smoke | sim | `maestro test .maestro/smoke.yaml` | `.maestro/smoke.yaml` | conferência de 30 s de que o app abre, antes de qualquer demo |
+| E2E e cenário em tela | sim, local (ferramenta em #115) | Maestro + Expo Go no simulador iOS: `maestro test .maestro/` | `.maestro/*.yaml` | prova o fluxo real de toque, navegação e persistência; fora do CI porque precisa de simulador |
+| Smoke | sim (#115) | `maestro test .maestro/smoke.yaml` | `.maestro/smoke.yaml` | conferência de 30 s de que o app abre, antes de qualquer demo |
 | Regressão | sim, como política | CI obrigatório nos PRs e suíte Maestro antes dos marcos | — | ver a política abaixo |
-| Contrato com a API real | sim, manual | `yarn test:contract` (3 GETs reais) | `scripts/contract.test.ts` | os mocks podem divergir da API; gasta 3 das 60 req/h, por isso fica fora do CI |
+| Contrato com a API real | sim, manual (#115) | `yarn test:contract` (3 GETs reais) | `scripts/contract.test.ts` | os mocks podem divergir da API; gasta 3 das 60 req/h, por isso fica fora do CI |
 | Exploratório e manual | sim | roteiro abaixo | este arquivo | fonte ampliada, VoiceOver, modo avião e limite de requisições não se automatizam bem no Expo Go |
 | Snapshot | não | — | — | quebra a cada ajuste visual e ninguém lê o diff |
 | Mutação (Stryker) | não | — | — | custo alto para o prazo; o cético faz a versão manual (mudar uma linha e ver o teste falhar) |
@@ -36,7 +36,7 @@ Regra prática: o que dá para testar sem renderizar desce para o unitário. A t
 ## Política de regressão
 
 - Todo bug achado, seja no roteiro, no review ou pelo cético, vira primeiro um teste vermelho. Só depois vem o conserto, no mesmo PR.
-- O CI roda `yarn typecheck`, `yarn lint`, `yarn format:check`, `yarn test`, `yarn test:ui` e o gitleaks em todo PR. Nenhum merge acontece com CI vermelho.
+- O CI roda `yarn typecheck`, `yarn lint`, `yarn format:check`, `yarn test` e o gitleaks em todo PR; `yarn test:ui` entra com o #115. Nenhum merge acontece com CI vermelho.
 - A suíte Maestro inteira e o roteiro manual rodam antes do #52 (MVP), do #51 (vídeo) e do #56 (envio). O resultado e a data entram na tabela de execuções.
 - Todo PR passa por um subagente cético. Ele tenta quebrar o PR com entrada hostil, offline, limite de requisições e app reaberto, e muda uma linha do código para ver se algum teste falha.
 
@@ -60,6 +60,7 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 | C03 | Senha com menos de 6 caracteres ou e-mail sem `@` é recusado antes de gravar | U, C | U ok; C F2 #31 |
 | C04 | Senha errada e e-mail desconhecido recebem a mesma mensagem | U | ok |
 | C05 | Senha e e-mail em texto puro nunca chegam ao store | U | ok |
+| C51 | Sem sessão, o app abre no Login e não chega à AppStack (login obrigatório) | I, E2E | F2 #32 |
 | C06 | Fechar e reabrir o app mantém a sessão | I, E2E | F2 #32 |
 | C07 | Logout volta ao login e apaga a sessão | U, E2E | U ok; E2E F2 #32 |
 | C08 | `ActivityIndicator` durante o login e o cadastro | C | F2 #31 |
@@ -71,15 +72,17 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 | C09 | Grade em 2 colunas com avatar e título | C, E2E | F2 #34, #35 |
 | C10 | Autor apagado (`ghost`) ou sem avatar mostra placeholder | U, C | U ok; C F2 #34 |
 | C11 | Rolagem infinita anexa a próxima página, com loader no rodapé | I, E2E | F2 #35 |
-| C12 | Na última página não há mais pedidos (`hasNext` falso) | U, I | U ok; I F2 #35 |
-| C13 | Pull-to-refresh recarrega a página 1 ignorando o TTL | U, E2E | U ok; E2E F2 #35 |
+| C12 | Na última página não há mais pedidos (`hasNext` falso) | U, I | U parcial (só o parser de `Link`); I F2 #35 |
+| C13 | Pull-to-refresh recarrega a página 1 ignorando o TTL | U, E2E | U parcial (só o `force` do cache); E2E F2 #35 |
 | C14 | Anexar uma página não duplica chave (`keyExtractor` estável) | I | F2 #35 |
+| C52 | Catálogo vazio mostra `ListEmptyComponent` | C | F2 #35 |
 
 ### Navegação e detalhe (RF02, RF03)
 
 | ID | Cenário | Nível | Status |
 |---|---|---|---|
-| C15 | Tocar no card abre o detalhe com o número em `route.params` e o título no header | E2E | F2 #36 |
+| C15 | Tocar no card abre o detalhe com o número em `route.params` | E2E | F2 #36 |
+| C53 | O detalhe faz a segunda requisição pelo número e põe o título do PR no header com `navigation.setOptions` (hoje o `AppStack` mostra só "PR #n") | C | F2 #36 |
 | C16 | O detalhe mostra avatar maior, estatísticas (comentários, arquivos, +/-) e os blocos de texto | C | F2 #36 |
 | C17 | PR sem descrição mostra "Sem descrição", não erro | U, C | U ok; C F2 #36 |
 | C18 | HTML hostil (`script`, `on*`, `javascript:`, `iframe`, `img`) não chega à tela | U | ok |
@@ -92,7 +95,8 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 |---|---|---|---|
 | C21 | Salvar no detalhe muda o ícone do mesmo PR no card do catálogo | I, E2E | F2 #24, #26 |
 | C22 | A tela de salvos lista os salvos e atualiza ao remover | C, E2E | F2 #38 |
-| C23 | Salvos vazio mostra `EmptyState` amigável | C | F2 #38 |
+| C23 | Salvos vazio mostra `EmptyState` amigável (`ListEmptyComponent`) | C | F2 #38 |
+| C54 | Salvos, Estudados e Busca são acessíveis a partir do Catálogo | E2E | F2 #35 |
 
 ### Persistência (RF06)
 
@@ -101,7 +105,7 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 | C24 | Salvos e estudados sobrevivem ao fechar e reabrir | I, E2E | F2 #24, #25 |
 | C25 | JSON corrompido no storage abre vazio, sem quebrar | U, I | U ok; I F2 #24 |
 | C26 | Durante a hidratação não aparece lista zerada (loader até carregar) | I | F2 #45 |
-| C27 | Dois usuários no mesmo aparelho não veem os dados um do outro | U, I | U ok (`userKey`); I F2 #24, #25 |
+| C27 | Dois usuários no mesmo aparelho não veem os dados um do outro | U, I | U parcial (só o formato de `userKey`); I F2 #24, #25 |
 
 ### Estudados com nota (RF07)
 
@@ -110,6 +114,7 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 | C28 | Marcar como estudado com nota de 1 a 5 no detalhe | C, E2E | F2 #27 (`StarRating` em #28) |
 | C29 | Mudar a nota ou desmarcar atualiza a lista | I | F2 #25, #27 |
 | C30 | A tela de estudados lista cada PR com a sua nota | C, E2E | F2 #39 |
+| C55 | Estudados vazio mostra `EmptyState` | C | F2 #39 |
 
 ### Busca (RF08)
 
@@ -125,11 +130,11 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 
 | ID | Cenário | Nível | Status |
 |---|---|---|---|
-| C36 | Carga inicial do catálogo e do detalhe com `ActivityIndicator` | C | F2 #35, #36, #41 |
+| C36 | `ActivityIndicator` na carga inicial do catálogo e do detalhe e na próxima página (`ListFooterComponent`) | C | F2 #35, #36, #41 |
 | C37 | Erro de rede mostra `ErrorState`, e "Tentar novamente" recarrega | C, I, M | C em #115; I F2 #41; M no roteiro |
 | C38 | `useFetch`: carregando, depois dados; erro, depois retry; cancela ao desmontar | I | F2 #41 |
-| C39 | Limite de requisições mostra o horário de volta | U, M | U ok; M no roteiro |
-| C40 | Offline com cache vencido mostra o valor vencido em vez de erro | U, M | U ok; M no roteiro |
+| C39 | Limite de requisições mostra o horário de volta (só onde não há cache: busca, PR nunca aberto, página nova) | U, M | U ok; M no roteiro |
+| C40 | Com cache, qualquer falha (offline, 403, 5xx) mostra o valor vencido em vez de erro | U, M | U ok; M no roteiro |
 | C41 | Mensagem de erro nunca carrega token nem URL | U | ok |
 | C42 | Timeout vira mensagem própria | U | ok |
 
@@ -141,7 +146,7 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 | C44 | Botão de estado informa o estado (`selected` ou label que muda) | C | F2 #26, #42 |
 | C45 | Alvo de toque de pelo menos 44x44 | C | F2 #43 |
 | C46 | Pares de cor dos tokens com contraste de pelo menos 4.5:1 | U | #114 |
-| C47 | Fonte do sistema no máximo não corta texto nem sobrepõe | M | roteiro |
+| C47 | Fonte do sistema no máximo não corta texto nem sobrepõe; nenhum `allowFontScaling={false}` no código (`git grep`) | M | roteiro |
 | C48 | VoiceOver lê card, botões e estrelas numa ordem que faz sentido | M | roteiro |
 
 ### Transversais
@@ -150,6 +155,8 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 |---|---|---|---|
 | C49 | A API real ainda devolve os campos que `toSummary` e `toDetail` leem | contrato | #115 |
 | C50 | O app abre no Expo Go sem erro vermelho | E2E smoke | #115 |
+
+Os IDs C51 a C55 vieram da revisão do catálogo e ficam no fim da numeração para não renumerar os outros.
 
 ## Roteiro manual
 
@@ -162,7 +169,7 @@ Rodar no simulador iOS com o Expo Go, sem token no `.env`, salvo o que o passo p
 5. Sair, cadastrar `b@b.com` e conferir que salvos e estudados estão vazios (C27).
 6. Buscar `fix` e um termo sem resultado como `zzzqqq` (C31, C32).
 7. Ligar o modo avião (Network Link Conditioner ou o Wi-Fi do Mac desligado), abrir um PR já visto e depois um novo (C37, C40).
-8. Esgotar o limite da rede do Mac com `for i in $(seq 60); do curl -s -o /dev/null https://api.github.com/repos/expo/expo/pulls?per_page=1; done`. O limite é por IP, e o `/rate_limit` não gasta, então serve para conferir o `remaining`. Depois, puxar para atualizar no app e ver a mensagem com o horário (C39).
+8. Esgotar o limite da rede do Mac (é por IP): `until [ "$(curl -s https://api.github.com/rate_limit | python3 -c 'import sys,json;print(json.load(sys.stdin)["rate"]["remaining"])')" = 0 ]; do curl -s -o /dev/null 'https://api.github.com/repos/expo/expo/pulls?per_page=1'; done`. O `/rate_limit` não gasta. Depois, buscar um termo novo ou abrir um PR nunca aberto e ver a mensagem com o horário (C39). Puxar para atualizar a grade já em cache mostra a lista vencida, não o erro (C40).
 9. Em Ajustes > Acessibilidade > Tela e Tamanho do Texto, colocar o texto no máximo e percorrer as 7 telas (C47).
 10. Ligar o VoiceOver e percorrer o login, o card, o detalhe, o botão de salvar e as estrelas (C48).
 

@@ -47,7 +47,7 @@ Antes de commitar: `brew install lefthook gitleaks` e `lefthook install`. O hook
 yarn test          # unitários: sanitizador, hash, sessão, cache, erros
 ```
 
-Estratégia, cenários C01-C50 e roteiro manual em [docs/TESTES.md](docs/TESTES.md).
+Estratégia, cenários C01-C55 e roteiro manual em [docs/TESTES.md](docs/TESTES.md).
 
 ## Documentação
 

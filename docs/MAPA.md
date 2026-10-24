@@ -9,7 +9,7 @@ Legenda: **base** quer dizer que a lógica existe e está testada, mas falta a t
 | RF | Peso | Já existe | Falta | Dono |
 |---|---|---|---|---|
 | RF01 Catálogo | 15% | `listPullRequests` com paginação por `Link` e cache ([services/github.ts](../src/services/github.ts), PR #103); `toSummary` com autor `ghost` e avatar ausente ([utils/pullRequest.ts](../src/utils/pullRequest.ts)) | #34 card e avatar, #35 grade com rolagem infinita e pull-to-refresh | Luc-Bruno |
-| RF02 Navegação | 10% com RF03 | `AuthStack` e `AppStack`, `Detail: { number }` ([navigation/](../src/navigation/), PR #112) | montar em `App.tsx` (#32), `setOptions` no detalhe (#36) | LucasStop, Luc-Bruno |
+| RF02 Navegação | 10% com RF03 | `AuthStack` e `AppStack`, `Detail: { number }` ([navigation/](../src/navigation/), PR #112); o header mostra "PR #n" | montar em `App.tsx` (#32), título do PR via `setOptions` no detalhe (#36) | LucasStop, Luc-Bruno |
 | RF03 Detalhe | 10% com RF02 | `getPullRequest` com ETag (PR #105); `sanitizeHtml` em blocos tipados ([utils/sanitizeHtml.ts](../src/utils/sanitizeHtml.ts), PR #101) | #36 tela e render dos blocos | Luc-Bruno |
 | RF04 Favoritos (Context) | 15% com RF05 | storage por usuário ([services/storage.ts](../src/services/storage.ts), PR #108) | #24 `FavoritesContext`, #26 botão e ícone no card | Luc-Bruno |
 | RF05 Tela de favoritos | 15% com RF04 | `EmptyState` (PR #99) | #38 | Luc-Bruno |
@@ -30,11 +30,11 @@ Padrão do projeto: a lógica fica numa fábrica `create*` pura, que recebe as d
 | [src/config.ts](../src/config.ts) | lê `EXPO_PUBLIC_GITHUB_REPO` (padrão `expo/expo`) e `EXPO_PUBLIC_GITHUB_TOKEN` | — |
 | [src/types/github.ts](../src/types/github.ts) | tipos crus da API e as views `PullRequestSummary`, `PullRequestPage` e `PullRequestDetailView` | — |
 | [src/services/github.ts](../src/services/github.ts) | cliente axios (15 s, Bearer só com token) com lista, detalhe e busca | pelas funções puras |
-| [src/services/cache.ts](../src/services/cache.ts) | TTL, ETag, volta ao valor vencido quando a rede falha, limite de 50 entradas | 8 |
+| [src/services/cache.ts](../src/services/cache.ts) | TTL, ETag, limite de 50 entradas; com a chave em cache, qualquer falha (rede, 403, 5xx) devolve o valor vencido | 8 |
 | [src/services/appCache.ts](../src/services/appCache.ts) | instância do cache sobre o AsyncStorage | binding |
 | [src/services/storage.ts](../src/services/storage.ts) | `read`, `write` e `remove` em JSON com fallback; `userKey` | 6 |
 | [src/services/appStorage.ts](../src/services/appStorage.ts) | AsyncStorage | binding |
-| [src/services/credentials.ts](../src/services/credentials.ts) | cadastro e login com SHA-256 com sal (2000 iterações) e comparação em tempo constante | 9 |
+| [src/services/credentials.ts](../src/services/credentials.ts) | cadastro e login com SHA-256 com sal (2000 iterações) e comparação sem saída antecipada (tempo constante dentro do possível em JS) | 9 |
 | [src/services/secureCredentials.ts](../src/services/secureCredentials.ts) | expo-crypto e expo-secure-store | binding |
 | [src/services/session.ts](../src/services/session.ts) | `restore`, `signIn`, `signUp` e `signOut` | 5 |
 | [src/services/appAuth.ts](../src/services/appAuth.ts) | sessão em SecureStore | binding |
@@ -47,13 +47,13 @@ Padrão do projeto: a lógica fica numa fábrica `create*` pura, que recebe as d
 | [src/components/](../src/components/) | `StarRating`, `ErrorState` e `EmptyState` | `ErrorState` em #115, o resto na Fase 2 |
 | [src/navigation/](../src/navigation/) | tipos de rota, `AuthStack`, `AppStack` e `Placeholder` | E2E na Fase 2 |
 
-Total na main: 59 testes unitários (`yarn test`), rodando no CI.
+Total: 59 testes unitários (`yarn test`), rodando no CI.
 
 ## Issues por categoria e pessoa
 
 | Categoria | Dono | Fechadas | Abertas |
 |---|---|---|---|
-| `cat:fundacao` | LucasStop | #5-#14, #68, #7, #94 | #113, #115 |
+| `cat:fundacao` | LucasStop | #5-#14, #68, #94 | #113, #115 |
 | `cat:dados` | LucasStop | #15-#22 | — |
 | `cat:auth` | LucasStop | #29, #30 | #31, #32 |
 | `cat:entrega` | LucasStop | — | #46-#56, #111 (com Luc-Bruno) |

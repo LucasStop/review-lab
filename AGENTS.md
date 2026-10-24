@@ -51,7 +51,7 @@ Mapeamento fixado em 19/10/2026 contra o Canvas, detalhe em [docs/ENUNCIADO.md](
 | [docs/adr/](docs/adr/) | uma decisão por arquivo (HTML do PR, cache, hash e sessão, armazenamento) |
 | [docs/ENTREGA.md](docs/ENTREGA.md) | roteiro do vídeo e esqueleto do PDF |
 | [docs/MAPA.md](docs/MAPA.md) | estado por RF, módulos, issues por categoria e pessoa, fases |
-| [docs/TESTES.md](docs/TESTES.md) | tipos de teste, pirâmide, regressão, cenários C01-C50, roteiro manual |
+| [docs/TESTES.md](docs/TESTES.md) | tipos de teste, pirâmide, regressão, cenários C01-C55, roteiro manual |
 
 ## Convenções
 
