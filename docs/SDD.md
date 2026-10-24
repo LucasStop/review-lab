@@ -67,7 +67,7 @@ Decisão em [ADR 0004](adr/0004-asyncstorage-vs-sqlite.md) e [ADR 0003](adr/0003
 
 | Dado | Onde | Chave |
 |---|---|---|
-| Credencial (salt + hash) | expo-secure-store | `rl.cred.<email>` |
+| Credencial (salt + hash) | expo-secure-store | `rl.cred.<sha256 do e-mail>` |
 | Sessão (userId) | expo-secure-store | `rl.session` |
 | Salvos | AsyncStorage | `rl.<userId>.favorites` (snapshot do PR) |
 | Estudados e nota | AsyncStorage | `rl.<userId>.studied` |
