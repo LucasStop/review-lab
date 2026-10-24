@@ -14,7 +14,7 @@ Legenda: **base** quer dizer que a lógica existe e está testada, mas falta a t
 | RF04 Favoritos (Context) | 15% com RF05 | storage por usuário ([services/storage.ts](../src/services/storage.ts), PR #108) | #24 `FavoritesContext`, #26 botão e ícone no card | Luc-Bruno |
 | RF05 Tela de favoritos | 15% com RF04 | `EmptyState` (PR #99) | #38 | Luc-Bruno |
 | RF06 Persistência | 10% | `createStorage` com hidratação segura (PR #108) e chave `rl.<userId>.<nome>` | #24, #25 e #45 (sem dado zerado na carga) | Luc-Bruno |
-| RF07 Login, sessão, estudados | 10% | credenciais com hash e sal em SecureStore (PR #102); `createAuth` e `AuthContext` (PR #110); `StarRating` (PR #98) | #31 telas de login e cadastro, #32 navegação condicional e logout, #25 e #27 estudados com nota, #39 tela | LucasStop, Luc-Bruno |
+| RF07 Login, sessão, estudados | 10% | credenciais com hash e sal em SecureStore (PR #102); `createAuth` e `AuthContext` (PR #110); `StarRating` (PR #98) | #31 telas de login e cadastro, #32 navegação condicional e logout, #25 e #27 estudados com nota, #39 tela; Perfil com Sair e Excluir conta (#124 serviço, #125 tela, além da rubrica) | LucasStop, Luc-Bruno |
 | RF08 Busca | 10% | `searchPullRequests` e `buildSearchQuery` (PR #106) | #37 | Luc-Bruno |
 | RF09 Feedback | 10% | `useFetch` (PR #107), `AppError` com mensagens pt-BR e horário de volta do limite (PR #104), `ErrorState` (PR #99) | #41, que confere o `ActivityIndicator` em todo fluxo | Luc-Bruno |
 | RF10 Acessibilidade | 10% | `StarRating` e `ErrorState` com label, role e toque 44x44 | tokens (#114), #42, #43 e #44 | Luc-Bruno |
@@ -63,6 +63,15 @@ Total: 59 testes unitários (`yarn test`), rodando no CI.
 | `cat:nuvem-bonus` | a definir depois do MVP | — | #57-#59 |
 
 Lista viva: [issues](https://github.com/LucasStop/review-lab/issues), [PRs mergeados](https://github.com/LucasStop/review-lab/pulls?q=is%3Apr+is%3Amerged), [milestones](https://github.com/LucasStop/review-lab/milestones).
+
+## Pendente com o professor
+
+Duas ideias de UX aguardam a resposta antes de mudar o desenho. Enquanto isso valem as telas separadas.
+
+- Salvos e Estudados como filtro do Catálogo, na mesma tela. O RF05 (15%) pede a "Tela de Favoritos", acessível pela tela principal.
+- Busca como campo de pesquisa no topo do Catálogo. O RF08 (10%) pede `TextInput` controlado com botão "Buscar" e lista de resultados.
+
+Se o professor aceitar, atualizam-se o [DESIGN-SYSTEM.md](design/DESIGN-SYSTEM.md), o protótipo e as issues #34, #35, #37, #38 e #39.
 
 ## Fases
 

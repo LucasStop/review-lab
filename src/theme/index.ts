@@ -24,6 +24,7 @@ export const textPairs = [
   ['onPrimary', 'primary'],
   ['link', 'background'],
   ['danger', 'dangerSurface'],
+  ['onPrimary', 'danger'],
   ['star', 'background'],
   ['star', 'surface'],
 ] as const satisfies readonly (readonly [keyof typeof colors, keyof typeof colors])[];

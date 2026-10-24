@@ -62,7 +62,7 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 | C05 | Senha e e-mail em texto puro nunca chegam ao store | U | ok |
 | C51 | Sem sessão, o app abre no Login e não chega à AppStack (login obrigatório) | I, E2E | F2 #32 |
 | C06 | Fechar e reabrir o app mantém a sessão | I, E2E | F2 #32 |
-| C07 | Logout volta ao login e apaga a sessão | U, E2E | U ok; E2E F2 #32 |
+| C07 | Logout volta ao login e apaga a sessão (o botão Sair fica no Perfil, #125) | U, E2E | U ok; E2E F2 #32, #125 |
 | C08 | `ActivityIndicator` durante o login e o cadastro | C | F2 #31 |
 
 ### Catálogo (RF01)
@@ -96,7 +96,7 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 | C21 | Salvar no detalhe muda o ícone do mesmo PR no card do catálogo | I, E2E | F2 #24, #26 |
 | C22 | A tela de salvos lista os salvos e atualiza ao remover | C, E2E | F2 #38 |
 | C23 | Salvos vazio mostra `EmptyState` amigável (`ListEmptyComponent`) | C | F2 #38 |
-| C54 | Salvos, Estudados e Busca são acessíveis a partir do Catálogo | E2E | F2 #35 |
+| C54 | Salvos, Estudados, Busca e Perfil são acessíveis a partir do Catálogo | E2E | F2 #35 |
 
 ### Persistência (RF06)
 
@@ -115,6 +115,18 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 | C29 | Mudar a nota ou desmarcar atualiza a lista | I | F2 #25, #27 |
 | C30 | A tela de estudados lista cada PR com a sua nota | C, E2E | F2 #39 |
 | C55 | Estudados vazio mostra `EmptyState` | C | F2 #39 |
+
+### Perfil, sair e excluir conta (RF07, além da rubrica)
+
+| ID | Cenário | Nível | Status |
+|---|---|---|---|
+| C56 | O Perfil mostra o e-mail, o total de salvos, o total de estudados e a nota média (traço sem estudados) | C, E2E | F2 #125 |
+| C57 | Sair pede confirmação; Cancelar mantém a sessão e a tela | C, E2E | F2 #125 |
+| C58 | Confirmar Sair limpa só a sessão: salvos e estudados voltam no próximo login | I | F2 #125 |
+| C59 | Excluir conta com senha errada recusa, mostra "Senha incorreta." e não apaga nada | U, C | F2 #124, #125 |
+| C60 | Excluir conta com a senha certa apaga credencial, sessão e as chaves `rl.<userId>.*` e volta ao Login | U, I, E2E | F2 #124, #125 |
+| C61 | Excluir conta não toca nos dados de outro usuário do aparelho; cadastrar o mesmo e-mail depois funciona | U, I | F2 #124 |
+| C62 | O foco entra no diálogo de confirmação e volta ao botão que o abriu ao cancelar ou fechar com Esc | C | F2 #125 |
 
 ### Busca (RF08)
 
@@ -156,7 +168,7 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 | C49 | A API real ainda devolve os campos que `toSummary` e `toDetail` leem | contrato | #115 |
 | C50 | O app abre no Expo Go sem erro vermelho | E2E smoke | #115 |
 
-Os IDs C51 a C55 vieram da revisão do catálogo e ficam no fim da numeração para não renumerar os outros.
+Os IDs C51 a C55 vieram da revisão do catálogo e C56 a C62 do Perfil; ficam no fim da numeração para não renumerar os outros.
 
 ## Roteiro manual
 
