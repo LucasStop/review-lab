@@ -74,7 +74,7 @@
     font: inherit; font-size: 14px; min-height: 44px; padding: 0 14px; border-radius: 8px;
     border: 1px solid var(--line); background: var(--panel); color: var(--fg); cursor: pointer;
   }
-  .chip[aria-pressed='true'] { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
+  .chip[aria-pressed='true'], .chip[aria-current='page'] { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
   .chip:disabled { opacity: 0.4; cursor: not-allowed; }
   .chip:focus-visible, .app button:focus-visible, .app input:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
   .notes { font-size: 14px; line-height: 1.55; color: var(--muted); }
@@ -101,6 +101,8 @@
   .btn { min-height: 44px; border-radius: 8px; border: 0; padding: 0 20px; font: inherit; font-size: 16px; font-weight: 600; cursor: pointer; background: var(--a-primary); color: var(--a-on-primary); display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
   .btn.secondary { background: var(--a-surface); color: var(--a-text); }
   .btn.block { width: 100%; }
+  .btn.danger { background: var(--a-danger-surface); color: var(--a-danger); border: 1px solid var(--a-danger); }
+  .btn.danger-solid { background: var(--a-danger); color: var(--a-on-primary); }
   .btn:disabled { opacity: 0.6; cursor: default; }
   .link { background: none; border: 0; color: var(--a-link); font: inherit; font-size: 16px; min-height: 44px; cursor: pointer; text-decoration: underline; }
   .field label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 4px; }
@@ -134,9 +136,21 @@
   .stars { display: flex; }
   .stars button { min-width: 44px; min-height: 44px; border: 0; background: none; font-size: 28px; color: var(--a-star); cursor: pointer; }
   .ro { display: flex; align-items: center; gap: 2px; color: var(--a-star); font-size: 18px; }
+  .avatar.big { width: 56px; height: 56px; font-size: 22px; }
+  .tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .tile { background: var(--a-surface); border-radius: 12px; padding: 12px; min-height: 44px; }
+  .tile .n { font-size: 22px; font-weight: 700; }
+  .tile .l { font-size: 14px; color: var(--a-muted); }
+  .scrim { position: absolute; inset: 0; background: rgba(17, 24, 39, 0.55); display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 5; }
+  .dialog { width: 100%; background: var(--a-bg); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+  .dialog h4 { margin: 0; font-size: 18px; }
+  .dialog p { margin: 0; font-size: 16px; line-height: 1.45; color: var(--a-text); }
+  .dlg-actions { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
   .actions { display: flex; gap: 8px; flex-wrap: wrap; }
-  .searchbar { display: flex; gap: 8px; padding: 12px 16px; }
+  .searchbar { display: flex; align-items: flex-end; gap: 8px; padding: 12px 16px; }
   .searchbar .field { flex: 1; min-width: 0; }
+  #toast:empty { display: none; }
+  .vw, .col { flex: 1; display: flex; flex-direction: column; min-height: 0; }
   .toast { position: absolute; left: 16px; right: 16px; bottom: 16px; background: var(--a-primary); color: var(--a-on-primary); border-radius: 8px; padding: 12px 14px; font-size: 14px; }
 </style>
 
@@ -163,13 +177,14 @@
         <li>Catálogo: 2 colunas, avatar, título, número e autor. O ícone de salvar é um botão à parte do card.</li>
         <li>Detalhe: salvar e estudado mudam de label e de estado. A nota vale de 1 a 5.</li>
         <li>Carregando, Erro e Vazio mostram <code>ActivityIndicator</code>, <code>ErrorState</code> e <code>EmptyState</code>.</li>
+        <li>Perfil: Sair e Excluir conta pedem confirmação. Excluir pede a senha (no protótipo, <code>segredo123</code>).</li>
         <li>Alvo de toque mínimo de 44 pt em tudo que se toca.</li>
       </ul>
     </div>
   </div>
 
   <div class="phone-col">
-    <div class="phone"><div class="app" id="app" aria-live="polite"></div></div>
+    <div class="phone"><div class="app" id="app"><div class="vw" id="view"></div><div class="toast" id="toast" role="status" aria-live="polite"></div></div></div>
   </div>
 </div>
 
@@ -182,8 +197,9 @@
     search: { label: 'Busca', states: ['dados', 'carregando', 'erro', 'vazio'], scn: 'C31-C35' },
     favorites: { label: 'Salvos', states: ['dados', 'vazio'], scn: 'C22 C23' },
     studied: { label: 'Estudados', states: ['dados', 'vazio'], scn: 'C30 C55' },
+    profile: { label: 'Perfil', states: ['dados', 'sair', 'excluir', 'carregando', 'erro'], scn: 'C07 C56-C62' },
   };
-  var STATE_LABEL = { dados: 'Dados', carregando: 'Carregando', erro: 'Erro', vazio: 'Vazio' };
+  var STATE_LABEL = { dados: 'Dados', carregando: 'Carregando', erro: 'Erro', vazio: 'Vazio', sair: 'Confirmar saída', excluir: 'Confirmar exclusão' };
   var PRS = [
     { n: 31204, t: 'Fix Android navigation bar flicker on resume', a: 'tsapeta', c: '#0f766e' },
     { n: 31187, t: 'Add expo-image blurhash placeholder for lists', a: 'kudo', c: '#7c3aed' },
@@ -200,14 +216,17 @@
     ['code', 'if (insets.equals(last)) return;'],
     ['p', 'More context in the linked issue.'],
   ];
-  var st = { screen: 'login', state: 'dados', saved: {}, studied: {}, query: '', searched: false, open: PRS[0], toast: '' };
-  var app = document.getElementById('app');
+  var st = { screen: 'login', state: 'dados', saved: {}, studied: {}, query: '', searched: false, open: PRS[0], toast: '', email: 'ana@exemplo.com', pass: 'segredo123', pw: '', focusSel: null };
+  var app = document.getElementById('app'), viewEl = document.getElementById('view'), toastEl = document.getElementById('toast');
+  var focusReset = false;
 
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
-  function go(screen, state) {
+  function go(screen, state, toast) {
     st.screen = screen;
     st.state = state || 'dados';
-    st.toast = '';
+    st.toast = toast || '';
+    st.pw = '';
+    focusReset = true;
     if (screen === 'search') { st.query = ''; st.searched = false; }
     render();
   }
@@ -236,19 +255,37 @@
     return '<button class="list-row" data-pr="' + pr.n + '">' + avatar(pr) + '<span class="grow"><div class="title">' + esc(pr.t) + '</div><div class="meta">#' + pr.n + ' · ' + esc(pr.a) + '</div></span>' + (extra || '') + '</button>';
   }
 
+  function dialog(kind) {
+    if (kind === 'sair') {
+      return '<div class="scrim"><div class="dialog" role="alertdialog" aria-modal="true" aria-labelledby="dlg-t" aria-describedby="dlg-d"><h4 id="dlg-t">Sair da conta?</h4><p id="dlg-d">Seus salvos e estudados continuam guardados neste aparelho.</p>' +
+        '<div class="dlg-actions"><button class="btn secondary" data-cancel data-autofocus>Cancelar</button><button class="btn" data-logout>Sair</button></div></div></div>';
+    }
+    return '<div class="scrim"><div class="dialog" role="alertdialog" aria-modal="true" aria-labelledby="dlg-t" aria-describedby="dlg-d"><h4 id="dlg-t">Excluir conta?</h4><p id="dlg-d">Apaga seu cadastro, salvos e estudados deste aparelho. Não dá para desfazer.</p>' +
+      '<div class="field"><label for="p-pw">Senha</label><input id="p-pw" type="password" autocomplete="off" value="' + esc(st.pw) + '" data-autofocus></div>' +
+      (kind === 'erro' ? '<div class="err" role="alert">Senha incorreta.</div>' : '') +
+      '<div class="dlg-actions"><button class="btn secondary" data-cancel>Cancelar</button><button class="btn danger-solid" data-del' + (st.pw ? '' : ' disabled') + '>Excluir</button></div></div></div>';
+  }
+  function keyOf(el) {
+    if (!el || !el.attributes) return '';
+    if (el.id) return '#' + el.id;
+    var k = '';
+    for (var i = 0; i < el.attributes.length; i++) { var a = el.attributes[i]; if (a.name.indexOf('data-') === 0) k += a.name + '=' + a.value + ';'; }
+    return k ? el.tagName + ':' + k : '';
+  }
+
   function view() {
     var s = st.screen, state = st.state;
     if (s === 'login' || s === 'signup') {
       var isLogin = s === 'login';
       if (state === 'carregando') return nav(isLogin ? 'Entrar' : 'Criar conta') + loading();
       return nav(isLogin ? 'Entrar' : 'Criar conta') + '<div class="body"><div class="pad">' +
-        '<div class="field"><label for="p-email">E-mail</label><input id="p-email" type="email" value="ana@exemplo.com"></div>' +
-        '<div class="field"><label for="p-pass">Senha</label><input id="p-pass" type="password" value="segredo123"></div>' +
+        '<div class="field"><label for="p-email">E-mail</label><input id="p-email" type="email" value="' + esc(st.email) + '"></div>' +
+        '<div class="field"><label for="p-pass">Senha</label><input id="p-pass" type="password" value="' + esc(st.pass) + '"></div>' +
         (state === 'erro' ? '<div class="err" role="alert">' + (isLogin ? 'E-mail ou senha incorretos.' : 'Esse e-mail já tem conta.') + '</div>' : '') +
         '<button class="btn block" data-submit>' + (isLogin ? 'Entrar' : 'Criar conta') + '</button>' +
         '<button class="link" data-go="' + (isLogin ? 'signup' : 'login') + '">' + (isLogin ? 'Não tenho conta' : 'Já tenho conta') + '</button></div></div>';
     }
-    var bar = '<button class="icon-btn" data-go="search" aria-label="Buscar">Buscar</button><button class="icon-btn" data-go="favorites" aria-label="Salvos">Salvos</button><button class="icon-btn" data-go="studied" aria-label="Estudados">Estudados</button><button class="icon-btn" data-go="login" aria-label="Sair">Sair</button>';
+    var bar = '<button class="icon-btn" data-go="search" aria-label="Buscar">Buscar</button><button class="icon-btn" data-go="favorites" aria-label="Salvos">Salvos</button><button class="icon-btn" data-go="studied" aria-label="Estudados">Estudados</button><button class="icon-btn" data-go="profile" aria-label="Perfil">Perfil</button>';
     if (s === 'catalog') {
       var h = nav('Review Lab') + '<div class="navbar" style="border-top:0;padding-left:8px">' + bar + '</div>';
       if (state === 'carregando') return h + loading();
@@ -275,7 +312,7 @@
         '<div class="block">' + blocks + '</div></div></div>';
     }
     if (s === 'search') {
-      var sb = nav('Buscar', true) + '<div class="searchbar"><div class="field"><label for="p-q" class="sr" style="position:absolute;left:-9999px">Termo</label><input id="p-q" placeholder="Termo de busca" value="' + esc(st.query) + '"></div><button class="btn" data-run>Buscar</button></div>';
+      var sb = nav('Buscar', true) + '<div class="searchbar"><div class="field"><label for="p-q">Termo de busca</label><input id="p-q" placeholder="Ex.: navigation bar" value="' + esc(st.query) + '"></div><button class="btn" data-run>Buscar</button></div>';
       if (state === 'carregando') return sb + loading();
       if (state === 'erro') return sb + error('Sem conexão. Verifique a internet e tente de novo.');
       if (state === 'vazio') return sb + empty('Nenhum resultado para “' + (st.query || 'zzzqqq') + '”', 'Tente outro termo.');
@@ -287,32 +324,79 @@
       if (state === 'vazio' || !ids.length) return fb + empty('Você ainda não salvou nenhum PR', 'Toque em ☆ no catálogo ou no detalhe.');
       return fb + '<div class="body">' + ids.map(function (p) { return row(p, '<span style="color:var(--a-star);font-size:20px" aria-hidden="true">★</span>'); }).join('') + '</div>';
     }
+    if (s === 'profile') {
+      var pn = nav('Perfil', true);
+      if (state === 'carregando') return pn + '<div class="center" role="status" aria-label="Excluindo conta"><div class="spin"></div><div class="s">Excluindo conta…</div></div>';
+      var nSaved = Object.keys(st.saved).filter(function (k) { return st.saved[k]; }).length;
+      var vals = Object.keys(st.studied).map(function (k) { return st.studied[k]; });
+      var avg = vals.length ? (vals.reduce(function (a, b) { return a + b; }, 0) / vals.length).toFixed(1).replace('.', ',') : '—';
+      var dlg = state === 'sair' || state === 'excluir' || state === 'erro';
+      var page = pn + '<div class="body"><div class="pad">' +
+        '<div style="display:flex;gap:12px;align-items:center">' + '<div class="avatar big" style="background:#1d4ed8" aria-hidden="true">' + esc(st.email[0].toUpperCase()) + '</div>' +
+        '<div style="min-width:0"><div style="font-size:18px;font-weight:600;overflow-wrap:anywhere">' + esc(st.email) + '</div><div style="font-size:14px;color:var(--a-muted)">Conta neste aparelho</div></div></div>' +
+        '<div class="tiles"><div class="tile"><div class="n">' + nSaved + '</div><div class="l">salvos</div></div><div class="tile"><div class="n">' + vals.length + '</div><div class="l">estudados</div></div><div class="tile"><div class="n">' + avg + '</div><div class="l">nota média</div></div></div>' +
+        '<div class="actions"><button class="btn secondary" data-dlg="sair">Sair</button><button class="btn danger" data-dlg="excluir">Excluir conta</button></div></div></div>';
+      return '<div class="col"' + (dlg ? ' inert' : '') + '>' + page + '</div>' + (dlg ? dialog(state) : '');
+    }
     var sd = PRS.filter(function (p) { return st.studied[p.n]; });
     var tb = nav('Estudados', true);
     if (state === 'vazio' || !sd.length) return tb + empty('Você ainda não marcou nenhum PR como estudado');
     return tb + '<div class="body">' + sd.map(function (p) { return row(p, stars(st.studied[p.n], false)); }).join('') + '</div>';
   }
 
-  function render() {
-    app.innerHTML = '<div class="status"><span>9:41</span><span aria-hidden="true">●●●</span></div>' + view() + (st.toast ? '<div class="toast" role="status">' + esc(st.toast) + '</div>' : '');
-    var sc = document.getElementById('screens'); sc.innerHTML = '';
-    Object.keys(SCREENS).forEach(function (k) {
-      var b = document.createElement('button'); b.className = 'chip'; b.textContent = SCREENS[k].label; b.setAttribute('aria-pressed', String(k === st.screen));
-      b.onclick = function () { go(k); }; sc.appendChild(b);
-    });
-    var stt = document.getElementById('states'); stt.innerHTML = '';
-    ['dados', 'carregando', 'erro', 'vazio'].forEach(function (k) {
-      var b = document.createElement('button'); b.className = 'chip'; b.textContent = STATE_LABEL[k];
-      b.disabled = SCREENS[st.screen].states.indexOf(k) < 0; b.setAttribute('aria-pressed', String(k === st.state));
-      b.onclick = function () { st.state = k; render(); }; stt.appendChild(b);
+  var scEl = document.getElementById('screens'), stEl = document.getElementById('states');
+  Object.keys(SCREENS).forEach(function (k) {
+    var b = document.createElement('button'); b.className = 'chip'; b.textContent = SCREENS[k].label; b.dataset.k = k;
+    b.onclick = function () { go(k); }; scEl.appendChild(b);
+  });
+  Object.keys(STATE_LABEL).forEach(function (k) {
+    var b = document.createElement('button'); b.className = 'chip'; b.textContent = STATE_LABEL[k]; b.dataset.k = k;
+    b.onclick = function () { st.state = k; st.pw = ''; render(); }; stEl.appendChild(b);
+  });
+  function bench() {
+    Array.prototype.forEach.call(scEl.children, function (b) { if (b.dataset.k === st.screen) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
+    Array.prototype.forEach.call(stEl.children, function (b) {
+      b.disabled = SCREENS[st.screen].states.indexOf(b.dataset.k) < 0; b.setAttribute('aria-pressed', String(b.dataset.k === st.state));
     });
     document.getElementById('scn').textContent = SCREENS[st.screen].scn;
+  }
+
+  // Re-renderizar troca o DOM inteiro: guarda o foco e o cursor e devolve ao mesmo elemento depois.
+  function render() {
+    var cur = document.activeElement, key = '', sel = null;
+    if (!focusReset && cur && app.contains(cur)) {
+      key = keyOf(cur);
+      if (cur.selectionStart != null) sel = [cur.selectionStart, cur.selectionEnd];
+    }
+    viewEl.innerHTML = '<div class="status"><span>9:41</span><span aria-hidden="true">●●●</span></div>' + view();
+    toastEl.textContent = st.toast;
+    bench();
+    var target = null;
+    if (st.focusSel) { target = viewEl.querySelector(st.focusSel); st.focusSel = null; }
+    else if (key) {
+      var els = viewEl.querySelectorAll('button, input');
+      for (var i = 0; i < els.length; i++) if (keyOf(els[i]) === key) { target = els[i]; break; }
+    }
+    if (target) {
+      target.focus();
+      if (sel && target.setSelectionRange) { try { target.setSelectionRange(sel[0], sel[1]); } catch (e) {} }
+    }
+    focusReset = false;
   }
 
   app.addEventListener('click', function (e) {
     var t = e.target.closest('button'); if (!t) return;
     if (t.dataset.go) return go(t.dataset.go);
     if (t.dataset.submit !== undefined) return go('catalog');
+    if (t.dataset.dlg) { st.state = t.dataset.dlg; st.pw = ''; st.focusSel = '[data-autofocus]'; return render(); }
+    if (t.dataset.cancel !== undefined) { var was = st.state; st.state = 'dados'; st.pw = ''; st.focusSel = '[data-dlg="' + (was === 'sair' ? 'sair' : 'excluir') + '"]'; return render(); }
+    if (t.dataset.logout !== undefined) return go('login', 'dados', 'Você saiu da conta');
+    if (t.dataset.del !== undefined) {
+      if (st.pw !== st.pass) { st.state = 'erro'; st.focusSel = '[data-autofocus]'; return render(); }
+      st.state = 'carregando'; render();
+      setTimeout(function () { if (st.screen === 'profile' && st.state === 'carregando') { st.saved = {}; st.studied = {}; go('login', 'dados', 'Conta excluída'); } }, 900);
+      return;
+    }
     if (t.dataset.retry !== undefined) { st.state = 'dados'; return render(); }
     if (t.dataset.pr) { st.open = PRS.filter(function (p) { return String(p.n) === t.dataset.pr; })[0]; return go('detail'); }
     if (t.dataset.save) {
@@ -327,6 +411,18 @@
     if (t.dataset.run !== undefined) {
       st.query = document.getElementById('p-q').value.trim();
       st.state = st.query && st.query.toLowerCase() !== 'zzzqqq' ? 'dados' : 'vazio'; return render();
+    }
+  });
+  app.addEventListener('input', function (e) {
+    var i = e.target;
+    if (i.id === 'p-email') st.email = i.value;
+    else if (i.id === 'p-pass') st.pass = i.value;
+    else if (i.id === 'p-q') st.query = i.value;
+    else if (i.id === 'p-pw') { st.pw = i.value; var d = app.querySelector('[data-del]'); if (d) d.disabled = !i.value; }
+  });
+  app.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && st.screen === 'profile' && (st.state === 'sair' || st.state === 'excluir' || st.state === 'erro')) {
+      var was = st.state; st.state = 'dados'; st.pw = ''; st.focusSel = '[data-dlg="' + (was === 'sair' ? 'sair' : 'excluir') + '"]'; render();
     }
   });
   render();
