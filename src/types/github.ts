@@ -22,3 +22,15 @@ export type PullRequestDetail = PullRequest & {
   additions: number;
   deletions: number;
 };
+
+export type PullRequestSummary = {
+  number: number;
+  title: string;
+  author: string;
+  avatarUrl?: string;
+};
+
+export type PullRequestPage = {
+  items: PullRequestSummary[];
+  hasNext: boolean;
+};
