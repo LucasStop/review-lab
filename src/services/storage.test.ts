@@ -8,6 +8,7 @@ function setup(initial: Record<string, string> = {}) {
   const storage = createStorage({
     get: async (key) => data.get(key) ?? null,
     set: async (key, value) => void data.set(key, value),
+    remove: async (key) => void data.delete(key),
   });
   return { data, storage };
 }
@@ -44,6 +45,7 @@ test('a kv that throws on read returns the fallback', async () => {
       throw new Error('disco cheio');
     },
     set: async () => {},
+    remove: async () => {},
   });
   assert.deepEqual(await storage.read('rl.u.favorites', [] as string[]), []);
 });
