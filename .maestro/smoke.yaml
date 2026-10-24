@@ -1,0 +1,22 @@
+# C50: o app abre no Expo Go sem tela vermelha. Precisa do Metro em localhost:8081 (ver README.md).
+appId: host.exp.Exponent
+name: smoke
+---
+- launchApp:
+    stopApp: true
+- openLink: exp://localhost:8081
+- tapOn:
+    text: 'Open'
+    optional: true
+- tapOn:
+    text: 'Continue'
+    optional: true
+# Na primeira abertura o Expo Go mostra o menu de dev por cima do app; tocar no fundo fecha.
+- tapOn:
+    point: '50%,20%'
+    optional: true
+# Até o #32 o App.tsx é o template do Expo; depois a âncora passa a ser o testID `login.screen`.
+- extendedWaitUntil:
+    visible: 'Open up App.tsx.*'
+    timeout: 90000
+- assertNotVisible: 'Render Error'

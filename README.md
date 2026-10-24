@@ -38,13 +38,18 @@ Atenção: tudo que começa com `EXPO_PUBLIC_` é embutido no bundle do app e fi
 | `yarn lint` | ESLint |
 | `yarn format` / `yarn format:check` | Prettier (escreve / só confere) |
 | `yarn test` | testes unitários (`node:test`) |
+| `yarn test:ui` | testes de componente e integração (jest-expo + RNTL) |
+| `yarn test:contract` | 3 GETs reais na API do GitHub; manual, gasta 3 das 60 req/h |
 
 Antes de commitar: `brew install lefthook gitleaks` e `lefthook install`. O hook barra segredo (gitleaks) e código fora do formato. O CI repete typecheck, lint, formato e gitleaks em cada PR.
 
 ## Como testar
 
 ```bash
-yarn test          # unitários: sanitizador, hash, sessão, cache, erros
+yarn test           # unitários: sanitizador, hash, sessão, cache, erros
+yarn test:ui        # componentes e integração
+yarn test:contract  # API real do GitHub, à mão
+maestro test .maestro/smoke.yaml   # E2E no simulador, ver .maestro/README.md
 ```
 
 Estratégia, cenários C01-C55 e roteiro manual em [docs/TESTES.md](docs/TESTES.md).
