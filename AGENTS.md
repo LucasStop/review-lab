@@ -7,7 +7,8 @@ Este arquivo é o contexto de qualquer agente que trabalhe aqui. Plano em [docs/
 ## Equipe
 
 - Lucas Stopinski da Silva (`LucasStop`), dono do repositório.
-- Grupo 10 do Canvas, ainda em formação (até 4 pessoas). A divisão é por categoria, não por pessoa.
+- Lucas Bruno e Silva (`Luc-Bruno`), colaborador com escrita.
+- Grupo 10 do Canvas, 2 integrantes (o limite é 4). A divisão é por categoria; cada agente trabalha só nas issues do seu dono.
 
 ## Prazos
 
@@ -24,18 +25,18 @@ GitHub REST, só GET: `/repos/{o}/{r}/pulls?state=closed&per_page&page` (pagina�
 
 ## Categorias
 
-Cada categoria é um label `cat:*` e um conjunto de issues. Com uma pessoa, ela segue todas; com mais gente, cada um pega uma ou mais. Review cruzado em todo PR.
+Cada categoria é um label `cat:*`, um conjunto de issues e um dono. Review cruzado em todo PR: o autor não aprova o próprio PR e ninguém mergeia sem a aprovação do outro.
 
-| Label | Escopo | RF e peso |
-|---|---|---|
-| `cat:fundacao` | repo, Expo, TypeScript, lint, CI, README base, estrutura de pastas | código e organização 5% |
-| `cat:dados` | cliente axios, paginação, HTML limpo, erro e rate limit, cache | base de RF01, RF03, RF08, RF09 |
-| `cat:navegacao-telas` | native-stack, grade, rolagem infinita, pull-to-refresh, detalhe, busca, tela de favoritos | RF01 15%, RF02/RF03 10%, RF05 (com RF04, 15%), RF08 10% |
-| `cat:estado` | Context de favoritos e "estudados" com nota, AsyncStorage | RF04 (com RF05, 15%), RF06 10%, consumidos do RF07 |
-| `cat:auth` | `AuthContext`, login local, hash, expo-secure-store, sessão, logout | RF07 10% |
-| `cat:ux-acessibilidade` | `ActivityIndicator`, erro com "Tentar novamente", toque 44x44, labels, fonte grande | RF09 10%, RF10 10%, UI/UX 5% |
-| `cat:entrega` | PDF, autoavaliação, Flutter x RN, roteiro e vídeo, screenshots, conferência de penalidades | evita -20% por item, -30%, -5%/min |
-| `cat:nuvem-bonus` | nuvem e auth real, só se sobrar tempo | +10% RF06, +10% RF07 |
+| Label | Dono | Escopo | RF e peso |
+|---|---|---|---|
+| `cat:fundacao` | LucasStop | repo, Expo, TypeScript, lint, CI, README base, estrutura de pastas | código e organização 5% |
+| `cat:dados` | LucasStop | cliente axios, paginação, HTML limpo, erro e rate limit, cache | base de RF01, RF03, RF08, RF09 |
+| `cat:navegacao-telas` | Luc-Bruno | native-stack, grade, rolagem infinita, pull-to-refresh, detalhe, busca, tela de favoritos | RF01 15%, RF02/RF03 10%, RF05 (com RF04, 15%), RF08 10% |
+| `cat:estado` | Luc-Bruno | Context de favoritos e "estudados" com nota, AsyncStorage | RF04 (com RF05, 15%), RF06 10%, consumidos do RF07 |
+| `cat:auth` | LucasStop | `AuthContext`, login local, hash, expo-secure-store, sessão, logout | RF07 10% |
+| `cat:ux-acessibilidade` | Luc-Bruno | `ActivityIndicator`, erro com "Tentar novamente", toque 44x44, labels, fonte grande | RF09 10%, RF10 10%, UI/UX 5% |
+| `cat:entrega` | LucasStop | PDF, autoavaliação, Flutter x RN, roteiro e vídeo, screenshots, conferência de penalidades | evita -20% por item, -30%, -5%/min |
+| `cat:nuvem-bonus` | a definir depois do MVP | nuvem e auth real, só se sobrar tempo | +10% RF06, +10% RF07 |
 
 Mapeamento fixado em 19/10/2026 contra o Canvas, detalhe em [docs/ENUNCIADO.md](docs/ENUNCIADO.md).
 

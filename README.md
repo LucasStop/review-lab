@@ -48,6 +48,7 @@ Antes de commitar: `brew install lefthook gitleaks` e `lefthook install`. O hook
 
 Este projeto foi desenvolvido com apoio de agentes de IA (Claude Code, da Anthropic) para planejamento, documentação e código. Toda alteração passa por revisão e verificação (typecheck, lint, CI) antes do merge.
 
-## Autor
+## Autores
 
-Lucas Stopinski da Silva
+- Lucas Stopinski da Silva
+- Lucas Bruno e Silva

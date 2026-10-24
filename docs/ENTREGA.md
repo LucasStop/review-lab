@@ -4,11 +4,11 @@ Regras de [ENUNCIADO.md](ENUNCIADO.md). Prazo: 02/11/2026 23:59 (trava 09/11 23:
 
 ## Vídeo (YouTube, público, 6 a 9 min; meta 8:00)
 
-Cada pessoa aparece e fala; no grupo de 4, ~50 s por pessoa no bloco de código. Menos de 6 ou mais de 9 min custa -5% por minuto.
+Os dois integrantes (Lucas Stopinski e Lucas Bruno e Silva) aparecem e falam; ~1:45 por pessoa no bloco de código. Menos de 6 ou mais de 9 min custa -5% por minuto.
 
 | Janela | Conteúdo | RF mostrado |
 |---|---|---|
-| 0:00-0:30 | Cada integrante diz o nome completo, igual ao da capa | |
+| 0:00-0:30 | Lucas Stopinski da Silva e Lucas Bruno e Silva dizem o nome completo, igual ao da capa | |
 | 0:30-2:00 | Demo: cadastro, login, grade com rolagem infinita, pull-to-refresh, detalhe, salvar, marcar estudado com nota, busca com e sem resultado, tela de salvos, de estudados, fechar e reabrir o app (sessão e dados persistem), logout | RF01 a RF08 |
 | 2:00-5:30 | Código por pessoa, cada um ligando o trecho ao RF: `services/github.ts` e `hooks/` (RF01, RF03), `navigation/` (RF02, RF07), `contexts/` (RF04, RF06), `screens/Search` (RF08), `components/` e acessibilidade (RF09, RF10) | |
 | 5:30-8:00 | Explicação técnica (tema abaixo) ligada ao código | |
