@@ -1,3 +1,5 @@
+import type { Block } from '../utils/sanitizeHtml';
+
 export type GitHubUser = {
   login: string;
   avatar_url: string;
@@ -33,4 +35,15 @@ export type PullRequestSummary = {
 export type PullRequestPage = {
   items: PullRequestSummary[];
   hasNext: boolean;
+};
+
+export type PullRequestDetailView = PullRequestSummary & {
+  htmlUrl: string;
+  merged: boolean;
+  comments: number;
+  reviewComments: number;
+  changedFiles: number;
+  additions: number;
+  deletions: number;
+  blocks: Block[];
 };
