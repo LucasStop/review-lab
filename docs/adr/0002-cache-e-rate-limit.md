@@ -9,7 +9,7 @@ Sem token, a API do GitHub dá 60 requisições por hora por IP (medido: `x-rate
 ## Decisão
 
 - Cache em AsyncStorage por URL: TTL de 10 min na lista, 1 h no detalhe; cache expirado serve de fallback se a rede ou o limite falharem.
-- Requisição condicional com `ETag`/`If-None-Match`; resposta 304 não consome limite.
+- Requisição condicional com `ETag`/`If-None-Match`; resposta 304 economiza banda e renova a cópia. Medido em 24/10/2026: sem token o 304 ainda desconta do limite (remaining 53 para 52); a gratuidade vale só autenticado, então quem protege os 60/h sem token é o TTL.
 - Interceptor axios lê `x-ratelimit-remaining` e `x-ratelimit-reset`. Com 403/429 e remaining 0, o erro vira mensagem amigável com a hora de reset.
 - Token opcional em `EXPO_PUBLIC_GITHUB_TOKEN` (5.000/h), somente leitura e sem escopo, porque vai no bundle.
 - Busca só pelo botão "Buscar", nunca a cada tecla.
