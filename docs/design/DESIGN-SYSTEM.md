@@ -20,6 +20,7 @@ Princípio: nenhuma tela escreve cor, tamanho ou espaçamento solto. Tudo vem de
 | `danger` | `#b91c1c` | texto de erro | 5.91 sobre `dangerSurface` |
 | `dangerSurface` | `#fef2f2` | fundo de erro | |
 | `star` | `#b45309` | estrela da nota | 5.02 sobre `background`, 4.56 sobre `surface` |
+| `danger` como fundo | `#b91c1c` | botão "Excluir" do diálogo | 6.47 de `onPrimary` sobre `danger` |
 | `border` | `#6b7280` | borda de campo | 4.83 sobre `background` (mínimo 3:1 para controle) |
 
 Cor nunca é o único sinal: o estado "salvo" muda ícone e label, a nota usa ★ e ☆, o erro traz texto.
@@ -47,6 +48,7 @@ Regras de texto (RF10): nunca `allowFontScaling={false}`, nunca `height` ou `lin
 | `PullRequestCard` | `pr: PullRequestSummary`, `saved`, `onPress`, `onToggleSave` | o card inteiro é um botão com label "PR #n: título, de autor"; o ícone de salvar é outro botão com `accessibilityState={{ selected: saved }}` e label que muda ("Salvar para estudar" e "Remover dos salvos"); `hitSlop` no ícone | Fase 2 (#34) |
 | `ErrorState` | `message`, `onRetry` | `accessibilityRole="alert"` no texto da mensagem (no `View` o role não é exposto); botão "Tentar novamente" 44x44 | feito (#99, role corrigido no #117) |
 | `EmptyState` | `title`, `text?` | só texto; a tela decide se há ação | feito (#99) |
+| `ConfirmDialog` | `title`, `message`, `confirmLabel`, `onConfirm`, `onCancel`, `danger?`, `children?` (campo de senha) | `accessibilityRole="alert"` no texto; o foco entra no diálogo e volta ao botão de origem; fundo inerte; Esc cancela; ação de perigo usa `danger` com `onPrimary`; Cancelar vem antes e leva o foco inicial; alvo 44x44 | Fase 2 (#125) |
 | `StarRating` | `value`, `onChange?` | editável: 5 botões "Dar nota N de 5" com `selected`; somente leitura: um único elemento "Nota N de 5"; alvo 44x44 | feito (#98) |
 
 Os componentes feitos ainda têm cores soltas. Migram para os tokens no PR da primeira tela que os usa, sem mudar comportamento.
@@ -64,6 +66,7 @@ Formato `tela.elemento`, em minúsculas, para o Maestro e para os testes de comp
 | Busca | `search.input`, `search.submit`, `search.result.<n>`, `search.empty` |
 | Salvos | `favorites.list`, `favorites.item.<n>`, `favorites.empty` |
 | Estudados | `studied.list`, `studied.item.<n>`, `studied.empty` |
+| Perfil | `profile.email`, `profile.saved-count`, `profile.studied-count`, `profile.avg`, `profile.logout`, `profile.delete`, `profile.password`, `profile.confirm`, `profile.cancel`, `profile.error` |
 | Comum | `error.retry`, `loading` |
 
 ## Telas e estados
@@ -79,8 +82,9 @@ Toda tela tem estes estados, e cada um aparece no protótipo: **carregando** (`A
 | Busca | App | campo, botão "Buscar", lista de resultados | "Nenhum resultado para {termo}" | `ErrorState`; limite de requisições com o horário | C31-C35 |
 | Salvos | App | lista | "Você ainda não salvou nenhum PR" | n/a (vem do Context) | C22, C23 |
 | Estudados | App | lista com nota | "Você ainda não marcou nenhum PR como estudado" | n/a | C30, C55 |
+| Perfil | App | e-mail, totais de salvos e estudados, nota média, Sair, Excluir conta | n/a | "Senha incorreta." no diálogo de exclusão; "Excluindo conta…" enquanto apaga | C07, C56-C62 |
 
-Navegação: o Catálogo é a tela principal e leva a Busca, Salvos, Estudados e Sair pelo header. Sem sessão, só a AuthStack existe.
+Navegação: o Catálogo é a tela principal e leva a Busca, Salvos, Estudados e Perfil pelo header; Sair e Excluir conta ficam dentro do Perfil. Sem sessão, só a AuthStack existe.
 
 ## Protótipo
 

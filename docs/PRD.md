@@ -17,6 +17,7 @@ App React Native (Expo, TypeScript) que cataloga PRs fechados de um repositório
 | Capacidade | RF |
 |---|---|
 | Login e cadastro locais, sessão persistente, logout | RF07 |
+| Perfil com contagens, Sair e Excluir conta locais, cada um com confirmação (além da rubrica, só depois do núcleo) | RF07 |
 | Grade de PRs com avatar do autor e título, rolagem infinita, pull-to-refresh | RF01 |
 | Detalhe do PR por número, descrição em texto limpo | RF02, RF03 |
 | Salvar PR para estudar (favorito), tela de salvos | RF04, RF05 |

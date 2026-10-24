@@ -116,6 +116,18 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 | C30 | A tela de estudados lista cada PR com a sua nota | C, E2E | F2 #39 |
 | C55 | Estudados vazio mostra `EmptyState` | C | F2 #39 |
 
+### Perfil, sair e excluir conta (RF07, além da rubrica)
+
+| ID | Cenário | Nível | Status |
+|---|---|---|---|
+| C56 | O Perfil mostra o e-mail, o total de salvos, o total de estudados e a nota média (traço sem estudados) | C, E2E | F2 #125 |
+| C57 | Sair pede confirmação; Cancelar mantém a sessão e a tela | C, E2E | F2 #125 |
+| C58 | Confirmar Sair limpa só a sessão: salvos e estudados voltam no próximo login | I | F2 #125 |
+| C59 | Excluir conta com senha errada recusa, mostra "Senha incorreta." e não apaga nada | U, C | F2 #124, #125 |
+| C60 | Excluir conta com a senha certa apaga credencial, sessão e as chaves `rl.<userId>.*` e volta ao Login | U, I, E2E | F2 #124, #125 |
+| C61 | Excluir conta não toca nos dados de outro usuário do aparelho; cadastrar o mesmo e-mail depois funciona | U, I | F2 #124 |
+| C62 | O foco entra no diálogo de confirmação e volta ao botão que o abriu ao cancelar ou fechar com Esc | C | F2 #125 |
+
 ### Busca (RF08)
 
 | ID | Cenário | Nível | Status |
@@ -156,7 +168,7 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 | C49 | A API real ainda devolve os campos que `toSummary` e `toDetail` leem | contrato | #115 |
 | C50 | O app abre no Expo Go sem erro vermelho | E2E smoke | #115 |
 
-Os IDs C51 a C55 vieram da revisão do catálogo e ficam no fim da numeração para não renumerar os outros.
+Os IDs C51 a C55 vieram da revisão do catálogo e C56 a C62 do Perfil; ficam no fim da numeração para não renumerar os outros.
 
 ## Roteiro manual
 
