@@ -68,7 +68,7 @@ Lista viva: [issues](https://github.com/LucasStop/review-lab/issues), [PRs merge
 
 Duas ideias de UX aguardam a resposta antes de mudar o desenho. Enquanto isso valem as telas separadas.
 
-- Salvos e Estudados como filtro do Catálogo, na mesma tela. O RF05 (15%) pede "Tela de Favoritos acessível pela tela principal".
+- Salvos e Estudados como filtro do Catálogo, na mesma tela. O RF05 (15%) pede a "Tela de Favoritos", acessível pela tela principal.
 - Busca como campo de pesquisa no topo do Catálogo. O RF08 (10%) pede `TextInput` controlado com botão "Buscar" e lista de resultados.
 
 Se o professor aceitar, atualizam-se o [DESIGN-SYSTEM.md](design/DESIGN-SYSTEM.md), o protótipo e as issues #34, #35, #37, #38 e #39.

@@ -48,7 +48,7 @@ Regras de texto (RF10): nunca `allowFontScaling={false}`, nunca `height` ou `lin
 | `PullRequestCard` | `pr: PullRequestSummary`, `saved`, `onPress`, `onToggleSave` | o card inteiro é um botão com label "PR #n: título, de autor"; o ícone de salvar é outro botão com `accessibilityState={{ selected: saved }}` e label que muda ("Salvar para estudar" e "Remover dos salvos"); `hitSlop` no ícone | Fase 2 (#34) |
 | `ErrorState` | `message`, `onRetry` | `accessibilityRole="alert"` no texto da mensagem (no `View` o role não é exposto); botão "Tentar novamente" 44x44 | feito (#99, role corrigido no #117) |
 | `EmptyState` | `title`, `text?` | só texto; a tela decide se há ação | feito (#99) |
-| `ConfirmDialog` | `title`, `message`, `confirmLabel`, `onConfirm`, `onCancel`, `danger?`, `children?` (campo de senha) | `accessibilityRole="alert"` no texto; o foco entra no diálogo e volta ao botão de origem; fundo inerte; Esc cancela; ação de perigo usa `danger` com `onPrimary`; Cancelar vem antes e leva o foco inicial; alvo 44x44 | Fase 2 (#125) |
+| `ConfirmDialog` | `title`, `message`, `confirmLabel`, `onConfirm`, `onCancel`, `danger?`, `children?` (campo de senha) | `accessibilityRole="alert"` no texto; o foco entra no diálogo e volta ao botão de origem; fundo inerte (o RN `Modal` já prende o foco; o protótipo web não); Esc cancela; ação de perigo usa `danger` com `onPrimary`; o foco inicial vai para Cancelar em Sair e para o campo de senha em Excluir; alvo 44x44 | Fase 2 (#125) |
 | `StarRating` | `value`, `onChange?` | editável: 5 botões "Dar nota N de 5" com `selected`; somente leitura: um único elemento "Nota N de 5"; alvo 44x44 | feito (#98) |
 
 Os componentes feitos ainda têm cores soltas. Migram para os tokens no PR da primeira tela que os usa, sem mudar comportamento.
@@ -61,7 +61,7 @@ Formato `tela.elemento`, em minúsculas, para o Maestro e para os testes de comp
 |---|---|
 | Login | `login.email`, `login.password`, `login.submit`, `login.signup`, `login.error` |
 | Cadastro | `signup.email`, `signup.password`, `signup.submit`, `signup.error` |
-| Catálogo | `catalog.list`, `catalog.card.<n>`, `catalog.save.<n>`, `catalog.search`, `catalog.favorites`, `catalog.studied`, `catalog.logout`, `catalog.footer-loader`, `catalog.empty` |
+| Catálogo | `catalog.list`, `catalog.card.<n>`, `catalog.save.<n>`, `catalog.search`, `catalog.favorites`, `catalog.studied`, `catalog.profile`, `catalog.footer-loader`, `catalog.empty` |
 | Detalhe | `detail.title`, `detail.body`, `detail.save`, `detail.studied`, `detail.rating`, `detail.error` |
 | Busca | `search.input`, `search.submit`, `search.result.<n>`, `search.empty` |
 | Salvos | `favorites.list`, `favorites.item.<n>`, `favorites.empty` |

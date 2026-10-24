@@ -62,7 +62,7 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 | C05 | Senha e e-mail em texto puro nunca chegam ao store | U | ok |
 | C51 | Sem sessão, o app abre no Login e não chega à AppStack (login obrigatório) | I, E2E | F2 #32 |
 | C06 | Fechar e reabrir o app mantém a sessão | I, E2E | F2 #32 |
-| C07 | Logout volta ao login e apaga a sessão | U, E2E | U ok; E2E F2 #32 |
+| C07 | Logout volta ao login e apaga a sessão (o botão Sair fica no Perfil, #125) | U, E2E | U ok; E2E F2 #32, #125 |
 | C08 | `ActivityIndicator` durante o login e o cadastro | C | F2 #31 |
 
 ### Catálogo (RF01)
@@ -96,7 +96,7 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 | C21 | Salvar no detalhe muda o ícone do mesmo PR no card do catálogo | I, E2E | F2 #24, #26 |
 | C22 | A tela de salvos lista os salvos e atualiza ao remover | C, E2E | F2 #38 |
 | C23 | Salvos vazio mostra `EmptyState` amigável (`ListEmptyComponent`) | C | F2 #38 |
-| C54 | Salvos, Estudados e Busca são acessíveis a partir do Catálogo | E2E | F2 #35 |
+| C54 | Salvos, Estudados, Busca e Perfil são acessíveis a partir do Catálogo | E2E | F2 #35 |
 
 ### Persistência (RF06)
 

@@ -332,7 +332,7 @@
       var avg = vals.length ? (vals.reduce(function (a, b) { return a + b; }, 0) / vals.length).toFixed(1).replace('.', ',') : '—';
       var dlg = state === 'sair' || state === 'excluir' || state === 'erro';
       var page = pn + '<div class="body"><div class="pad">' +
-        '<div style="display:flex;gap:12px;align-items:center">' + '<div class="avatar big" style="background:#1d4ed8" aria-hidden="true">' + esc(st.email[0].toUpperCase()) + '</div>' +
+        '<div style="display:flex;gap:12px;align-items:center">' + '<div class="avatar big" style="background:var(--a-link)" aria-hidden="true">' + esc(st.email[0].toUpperCase()) + '</div>' +
         '<div style="min-width:0"><div style="font-size:18px;font-weight:600;overflow-wrap:anywhere">' + esc(st.email) + '</div><div style="font-size:14px;color:var(--a-muted)">Conta neste aparelho</div></div></div>' +
         '<div class="tiles"><div class="tile"><div class="n">' + nSaved + '</div><div class="l">salvos</div></div><div class="tile"><div class="n">' + vals.length + '</div><div class="l">estudados</div></div><div class="tile"><div class="n">' + avg + '</div><div class="l">nota média</div></div></div>' +
         '<div class="actions"><button class="btn secondary" data-dlg="sair">Sair</button><button class="btn danger" data-dlg="excluir">Excluir conta</button></div></div></div>';
@@ -420,7 +420,7 @@
     else if (i.id === 'p-q') st.query = i.value;
     else if (i.id === 'p-pw') { st.pw = i.value; var d = app.querySelector('[data-del]'); if (d) d.disabled = !i.value; }
   });
-  app.addEventListener('keydown', function (e) {
+  document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape' && st.screen === 'profile' && (st.state === 'sair' || st.state === 'excluir' || st.state === 'erro')) {
       var was = st.state; st.state = 'dados'; st.pw = ''; st.focusSel = '[data-dlg="' + (was === 'sair' ? 'sair' : 'excluir') + '"]'; render();
     }
