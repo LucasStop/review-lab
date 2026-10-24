@@ -25,6 +25,7 @@ export const textPairs = [
   ['link', 'background'],
   ['danger', 'dangerSurface'],
   ['star', 'background'],
+  ['star', 'surface'],
 ] as const satisfies readonly (readonly [keyof typeof colors, keyof typeof colors])[];
 
 // Escala de 4.

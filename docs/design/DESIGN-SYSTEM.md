@@ -19,7 +19,7 @@ Princípio: nenhuma tela escreve cor, tamanho ou espaçamento solto. Tudo vem de
 | `link` | `#1d4ed8` | link do corpo do PR | 6.70 sobre `background` |
 | `danger` | `#b91c1c` | texto de erro | 5.91 sobre `dangerSurface` |
 | `dangerSurface` | `#fef2f2` | fundo de erro | |
-| `star` | `#b45309` | estrela da nota | 5.02 sobre `background` |
+| `star` | `#b45309` | estrela da nota | 5.02 sobre `background`, 4.56 sobre `surface` |
 | `border` | `#6b7280` | borda de campo | 4.83 sobre `background` (mínimo 3:1 para controle) |
 
 Cor nunca é o único sinal: o estado "salvo" muda ícone e label, a nota usa ★ e ☆, o erro traz texto.
@@ -43,7 +43,7 @@ Regras de texto (RF10): nunca `allowFontScaling={false}`, nunca `height` ou `lin
 |---|---|---|---|
 | `Button` | `label`, `onPress`, `variant` (`primary` \| `secondary`), `loading?`, `disabled?` | `accessibilityRole="button"`, `accessibilityState={{ disabled, busy: loading }}`, `minHeight` 44; `loading` troca o texto por `ActivityIndicator` e bloqueia o toque | Fase 2 (#31) |
 | `TextField` | `label`, `value`, `onChangeText`, `error?`, `secureTextEntry?` | label visível acima do campo e `accessibilityLabel` igual; erro com `accessibilityRole="alert"` abaixo do campo; `minHeight` 44 | Fase 2 (#31) |
-| `Avatar` | `uri?`, `name`, `size` | `accessibilityLabel="Avatar de {name}"` com imagem; sem `uri` mostra a inicial sobre `surface`; `accessible={false}` quando o nome já está no texto ao lado | Fase 2 (#34) |
+| `Avatar` | `uri?`, `name`, `size` | `accessibilityLabel="Avatar de {name}"` com imagem; sem `uri` mostra a inicial em branco sobre uma cor de fundo derivada do nome (contraste >= 4.5:1); `accessible={false}` quando o nome já está no texto ao lado | Fase 2 (#34) |
 | `PullRequestCard` | `pr: PullRequestSummary`, `saved`, `onPress`, `onToggleSave` | o card inteiro é um botão com label "PR #n: título, de autor"; o ícone de salvar é outro botão com `accessibilityState={{ selected: saved }}` e label que muda ("Salvar para estudar" e "Remover dos salvos"); `hitSlop` no ícone | Fase 2 (#34) |
 | `ErrorState` | `message`, `onRetry` | `accessibilityRole="alert"` no texto da mensagem (no `View` o role não é exposto); botão "Tentar novamente" 44x44 | feito (#99, role corrigido no #117) |
 | `EmptyState` | `title`, `text?` | só texto; a tela decide se há ação | feito (#99) |
@@ -72,7 +72,7 @@ Toda tela tem estes estados, e cada um aparece no protótipo: **carregando** (`A
 
 | Tela | Stack | Dados | Vazio | Erro | Cenários |
 |---|---|---|---|---|---|
-| Login | Auth | formulário | n/a | mensagem única "E-mail ou senha incorretos" | C01-C05, C08 |
+| Login | Auth | formulário | n/a | mensagem única "E-mail ou senha incorretos" | C03-C05, C08 |
 | Cadastro | Auth | formulário | n/a | e-mail repetido, senha curta | C02, C03 |
 | Catálogo | App | grade de 2 colunas: avatar, título, número, autor, ícone de salvar | "Nenhum PR encontrado" | `ErrorState`; erro na página 2 mantém a lista e mostra o erro no rodapé | C09-C14, C52, C54 |
 | Detalhe | App | título no header, estatísticas, blocos de texto, salvar, estudado com nota | "Sem descrição" | `ErrorState` | C15-C17, C20, C53 |
@@ -84,4 +84,4 @@ Navegação: o Catálogo é a tela principal e leva a Busca, Salvos, Estudados e
 
 ## Protótipo
 
-Protótipo HTML clicável das 7 telas, com os 4 estados alternáveis, publicado como Artifact privado ([abrir](https://claude.ai/artifact/6uCQVjVTGqNDPBBU4VMqTs); só abre para quem a conta do Lucas Stopinski liberar). A cópia versionada, [prototype.html](prototype.html), abre direto em qualquer navegador. Ele usa os mesmos valores dos tokens e serve de referência visual, não de código. Quando o protótipo e o app divergirem, o app com os tokens é a verdade.
+Protótipo HTML clicável das 7 telas, com os 4 estados alternáveis, publicado como Artifact privado ([abrir](https://claude.ai/artifact/6uCQVjVTGqNDPBBU4VMqTs); só abre para quem a conta do Lucas Stopinski liberar). A cópia versionada, [prototype.html](prototype.html), abre direto em qualquer navegador e é a referência para quem não tem acesso ao Artifact. Ele usa os valores dos tokens para texto e controles; bordas de card, trilho do spinner e cores de avatar são só ilustração e não são tokens. Serve de referência visual, não de código. Quando o protótipo e o app divergirem, o app com os tokens é a verdade.

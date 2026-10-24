@@ -56,7 +56,7 @@ Estratégia, cenários C01-C55 e roteiro manual em [docs/TESTES.md](docs/TESTES.
 
 ## Documentação
 
-[Protótipo clicável das 7 telas](https://claude.ai/artifact/6uCQVjVTGqNDPBBU4VMqTs) (Artifact privado) e [design system](docs/design/DESIGN-SYSTEM.md).
+[Protótipo clicável das 7 telas](docs/design/prototype.html) (também em [Artifact privado](https://claude.ai/artifact/6uCQVjVTGqNDPBBU4VMqTs)) e [design system](docs/design/DESIGN-SYSTEM.md).
 
 [docs/ENUNCIADO.md](docs/ENUNCIADO.md) (rubrica), [docs/PRD.md](docs/PRD.md), [docs/SDD.md](docs/SDD.md), [docs/adr/](docs/adr/) (decisões), [docs/ENTREGA.md](docs/ENTREGA.md) (vídeo e PDF), [docs/MAPA.md](docs/MAPA.md) (estado), [docs/TESTES.md](docs/TESTES.md) (testes).
 

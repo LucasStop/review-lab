@@ -225,7 +225,7 @@
     var on = !!st.saved[pr.n];
     return '<div class="card"><button class="open" data-pr="' + pr.n + '" aria-label="PR #' + pr.n + ': ' + esc(pr.t) + ', de ' + esc(pr.a) + '">' + avatar(pr) +
       '<span class="title">' + esc(pr.t) + '</span><span class="meta">#' + pr.n + ' · ' + esc(pr.a) + '</span></button>' +
-      '<button class="save" data-save="' + pr.n + '" aria-pressed="' + on + '" aria-label="' + (on ? 'Remover dos salvos' : 'Salvar para estudar') + '">' + (on ? '★' : '☆') + '</button></div>';
+      '<button class="save" data-save="' + pr.n + '" aria-label="' + (on ? 'Remover dos salvos' : 'Salvar para estudar') + '">' + (on ? '★' : '☆') + '</button></div>';
   }
   function row(pr, extra) {
     return '<button class="list-row" data-pr="' + pr.n + '">' + avatar(pr) + '<span class="grow"><div class="title">' + esc(pr.t) + '</div><div class="meta">#' + pr.n + ' · ' + esc(pr.a) + '</div></span>' + (extra || '') + '</button>';
@@ -264,8 +264,8 @@
       }).join('');
       return n + '<div class="body"><div class="pad"><div style="display:flex;gap:12px;align-items:center">' + avatar(pr) + '<div><div style="font-size:18px;font-weight:600;overflow-wrap:anywhere">' + esc(pr.t) + '</div><div class="meta" style="font-size:14px;color:var(--a-muted)">#' + pr.n + ' · ' + esc(pr.a) + '</div></div></div>' +
         '<div class="stats"><span class="stat">4 comentários</span><span class="stat">3 arquivos</span><span class="stat">+42 −7</span></div>' +
-        '<div class="actions"><button class="btn secondary" data-save="' + pr.n + '" aria-pressed="' + !!st.saved[pr.n] + '">' + (st.saved[pr.n] ? '★ Salvo' : '☆ Salvar para estudar') + '</button>' +
-        '<button class="btn secondary" data-study aria-pressed="' + !!done + '">' + (done ? '✓ Estudado' : 'Marcar como estudado') + '</button></div>' +
+        '<div class="actions"><button class="btn secondary" data-save="' + pr.n + '">' + (st.saved[pr.n] ? '★ Salvo' : '☆ Salvar para estudar') + '</button>' +
+        '<button class="btn secondary" data-study>' + (done ? '✓ Estudado' : 'Marcar como estudado') + '</button></div>' +
         (done ? '<div><div style="font-size:14px;font-weight:600">Nota de utilidade</div>' + stars(done, true) + '</div>' : '') +
         '<div class="block">' + blocks + '</div></div></div>';
     }
