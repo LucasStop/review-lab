@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { toDetail, toSummary } from './pullRequest.ts';
+import { buildSearchQuery, toDetail, toSummary } from './pullRequest.ts';
 
 const base = {
   number: 7,
@@ -68,4 +68,21 @@ test('toDetail with no description gives an empty list, not an error', () => {
   });
   assert.deepEqual(detail.blocks, []);
   assert.equal(detail.author, 'ghost');
+});
+
+test('buildSearchQuery scopes the search to PRs of the configured repo', () => {
+  assert.equal(buildSearchQuery('o/r', '  crash  '), 'type:pr repo:o/r crash');
+});
+
+test('buildSearchQuery returns nothing for an empty term', () => {
+  assert.equal(buildSearchQuery('o/r', ''), undefined);
+  assert.equal(buildSearchQuery('o/r', '   '), undefined);
+});
+
+test('buildSearchQuery neutralizes qualifiers typed by the user', () => {
+  assert.equal(
+    buildSearchQuery('o/r', 'repo:evil/x is:issue'),
+    'type:pr repo:o/r repo evil/x is issue',
+  );
+  assert.equal(buildSearchQuery('o/r', ':::'), undefined);
 });

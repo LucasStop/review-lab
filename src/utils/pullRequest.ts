@@ -28,3 +28,10 @@ export function toDetail(pr: PullRequestDetail): PullRequestDetailView {
     blocks: sanitizeHtml(pr.body_html),
   };
 }
+
+// A busca do GitHub aceita qualificadores (repo:, is:, user:). Sem ':' o termo do usuário não
+// consegue sair do repositório configurado.
+export function buildSearchQuery(repo: string, term: string): string | undefined {
+  const clean = term.replace(/:/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 100);
+  return clean ? `type:pr repo:${repo} ${clean}` : undefined;
+}

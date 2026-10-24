@@ -6,10 +6,11 @@ import type {
   PullRequestDetail,
   PullRequestDetailView,
   PullRequestPage,
+  PullRequestSummary,
 } from '../types/github';
 import { toAppError } from '../utils/appError';
 import { parseLinkHeader } from '../utils/linkHeader';
-import { toDetail, toSummary } from '../utils/pullRequest';
+import { buildSearchQuery, toDetail, toSummary } from '../utils/pullRequest';
 
 export const PAGE_SIZE = 20;
 
@@ -39,4 +40,13 @@ export async function getPullRequest(number: number): Promise<PullRequestDetailV
     headers: { Accept: 'application/vnd.github.html+json' },
   });
   return toDetail(response.data);
+}
+
+export async function searchPullRequests(term: string): Promise<PullRequestSummary[]> {
+  const q = buildSearchQuery(config.repo, term);
+  if (!q) return [];
+  const response = await api.get<{ items: PullRequest[] }>('/search/issues', {
+    params: { q, per_page: PAGE_SIZE },
+  });
+  return response.data.items.map(toSummary);
 }
