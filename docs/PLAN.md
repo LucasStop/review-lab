@@ -2,7 +2,7 @@
 
 ## Contexto
 
-Mobile Development Framework exige um projeto React Native/Expo ("Catálogo Interativo 2.0", Canvas assignment 365836, 10 pontos, upload de um PDF, grupo de até 4 e só um posta). Hoje o grupo é só ele (entra no grupo 10 do Canvas, ainda vai montar o time), então as issues saem por categoria, e cada pessoa que entrar pega uma ou mais categorias.
+Mobile Development Framework exige um projeto React Native/Expo ("Catálogo Interativo 2.0", Canvas assignment 365836, 10 pontos, upload de um PDF, grupo de até 4 e só um posta). O grupo 10 tem 2 integrantes (Lucas Stopinski e Lucas Bruno e Silva); as issues saem por categoria e cada categoria tem um dono (ver AGENTS.md).
 
 ## Fatos verificados
 
