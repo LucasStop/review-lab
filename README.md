@@ -4,7 +4,7 @@ App React Native (Expo) que cataloga pull requests reais de repositórios open s
 
 Projeto do Somativo 2 de Desenvolvimento Mobile Híbrido (PUCPR, 2026/2). Fonte de dados: API REST do GitHub, somente leitura.
 
-> Estado atual: fundação do repositório (Expo, TypeScript, lint, formatação, CI). As telas ainda não existem; o plano está em [docs/PLAN.md](docs/PLAN.md) e o design em [docs/SDD.md](docs/SDD.md).
+> Estado atual: dados, auth e navegação prontos e testados; as telas começam na Fase 2. Estado por RF em [docs/MAPA.md](docs/MAPA.md), plano em [docs/PLAN.md](docs/PLAN.md), design em [docs/SDD.md](docs/SDD.md).
 
 ## Como rodar
 
@@ -37,12 +37,21 @@ Atenção: tudo que começa com `EXPO_PUBLIC_` é embutido no bundle do app e fi
 | `yarn typecheck` | `tsc --noEmit` |
 | `yarn lint` | ESLint |
 | `yarn format` / `yarn format:check` | Prettier (escreve / só confere) |
+| `yarn test` | testes unitários (`node:test`) |
 
 Antes de commitar: `brew install lefthook gitleaks` e `lefthook install`. O hook barra segredo (gitleaks) e código fora do formato. O CI repete typecheck, lint, formato e gitleaks em cada PR.
 
+## Como testar
+
+```bash
+yarn test          # unitários: sanitizador, hash, sessão, cache, erros
+```
+
+Estratégia, cenários C01-C55 e roteiro manual em [docs/TESTES.md](docs/TESTES.md).
+
 ## Documentação
 
-[docs/ENUNCIADO.md](docs/ENUNCIADO.md) (rubrica), [docs/PRD.md](docs/PRD.md), [docs/SDD.md](docs/SDD.md), [docs/adr/](docs/adr/) (decisões), [docs/ENTREGA.md](docs/ENTREGA.md) (vídeo e PDF).
+[docs/ENUNCIADO.md](docs/ENUNCIADO.md) (rubrica), [docs/PRD.md](docs/PRD.md), [docs/SDD.md](docs/SDD.md), [docs/adr/](docs/adr/) (decisões), [docs/ENTREGA.md](docs/ENTREGA.md) (vídeo e PDF), [docs/MAPA.md](docs/MAPA.md) (estado), [docs/TESTES.md](docs/TESTES.md) (testes).
 
 ## Uso de IA
 
