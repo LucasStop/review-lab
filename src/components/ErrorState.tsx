@@ -7,8 +7,12 @@ type Props = {
 
 export function ErrorState({ message, onRetry }: Props) {
   return (
-    <View style={styles.container} accessibilityRole="alert">
-      <Text style={styles.message}>{message}</Text>
+    <View style={styles.container}>
+      {/* No Text, não no View: View sem `accessible` não expõe o role, e com `accessible`
+          engoliria o botão num foco só. */}
+      <Text style={styles.message} accessibilityRole="alert">
+        {message}
+      </Text>
       <Pressable
         accessibilityRole="button"
         accessibilityLabel="Tentar novamente"

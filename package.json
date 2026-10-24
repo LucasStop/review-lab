@@ -19,11 +19,16 @@
     "react-native-screens": "~4.30.0"
   },
   "devDependencies": {
+    "@react-native/jest-preset": "^0.88.0",
+    "@testing-library/react-native": "^14.1.0",
     "@types/node": "^22",
     "@types/react": "~19.3.0",
     "eslint": "^9.39.5",
     "eslint-config-expo": "^58.0.4",
+    "jest": "~30.5.2",
+    "jest-expo": "~58.0.12",
     "prettier": "^3.9.10",
+    "test-renderer": "^1.3.1",
     "typescript": "~6.0.3"
   },
   "scripts": {
@@ -35,8 +40,16 @@
     "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
-    "test": "node --test \"src/**/*.test.ts\""
+    "test": "node --test \"src/**/*.test.ts\"",
+    "test:ui": "jest",
+    "test:contract": "node --test scripts/contract.test.ts"
   },
   "private": true,
-  "packageManager": "yarn@1.22.22"
+  "packageManager": "yarn@1.22.22",
+  "jest": {
+    "preset": "jest-expo",
+    "testMatch": [
+      "**/*.test.tsx"
+    ]
+  }
 }
