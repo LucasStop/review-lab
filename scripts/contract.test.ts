@@ -22,7 +22,7 @@ async function get(path: string, accept = 'application/vnd.github+json') {
   return response;
 }
 
-let firstNumber: number;
+let firstNumber: number | undefined;
 
 test('list: closed PRs keep the fields toSummary reads and paginate by Link', async () => {
   const response = await get(`/repos/${repo}/pulls?state=closed&per_page=5&page=1`);
@@ -40,6 +40,7 @@ test('list: closed PRs keep the fields toSummary reads and paginate by Link', as
 });
 
 test('detail: html+json returns body_html and the counts toDetail reads', async () => {
+  assert.ok(firstNumber, 'o teste da lista falhou, sem número para o detalhe');
   const response = await get(
     `/repos/${repo}/pulls/${firstNumber}`,
     'application/vnd.github.html+json',

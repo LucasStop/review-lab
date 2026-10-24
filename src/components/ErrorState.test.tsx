@@ -10,6 +10,7 @@ test('shows the message as an alert and retry calls onRetry', async () => {
   expect(screen.getByRole('alert')).toBeTruthy();
   expect(screen.getByText('Sem conexão.')).toBeTruthy();
 
-  await fireEvent.press(screen.getByRole('button', { name: 'Tentar novamente' }));
+  // Pelo label, não pelo texto: o RNTL cai no texto do filho e esconderia a perda do label.
+  await fireEvent.press(screen.getByLabelText('Tentar novamente'));
   expect(onRetry).toHaveBeenCalledTimes(1);
 });
