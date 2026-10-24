@@ -50,13 +50,16 @@ Mapeamento fixado em 19/10/2026 contra o Canvas, detalhe em [docs/ENUNCIADO.md](
 | [docs/SDD.md](docs/SDD.md) | arquitetura, telas, fluxo de dados, cache, sanitização, persistência |
 | [docs/adr/](docs/adr/) | uma decisão por arquivo (HTML do PR, cache, hash e sessão, armazenamento) |
 | [docs/ENTREGA.md](docs/ENTREGA.md) | roteiro do vídeo e esqueleto do PDF |
+| [docs/MAPA.md](docs/MAPA.md) | estado por RF, módulos, issues por categoria e pessoa, fases |
+| [docs/TESTES.md](docs/TESTES.md) | tipos de teste, pirâmide, regressão, cenários C01-C50, roteiro manual |
 
 ## Convenções
 
 - Idioma: README e docs em português brasileiro. Identificadores, commits e PRs em inglês.
 - Git: GitHub Flow, branch `feat/<issue>-slug` ou `fix/<issue>-slug`, um PR por issue, review de outra pessoa. Conventional Commits completo: `tipo(escopo): resumo`, linha em branco, corpo com o porquê. Commits por fase real, nunca um commit único no fim. Commit e push só quando a pessoa dona da sessão pedir.
 - Estilo: editar antes de criar arquivo. Comentário só para o porquê não óbvio. Dependência nova só depois de conferir versão, licença e CVE.
-- Nada é dado como pronto sem verificação: rodar typecheck e lint e ler a saída.
+- Nada é dado como pronto sem verificação: rodar typecheck, lint e testes e ler a saída.
+- Todo PR cita os cenários de [docs/TESTES.md](docs/TESTES.md) que cobre; bug achado vira teste antes do conserto.
 
 ## Segurança
 
