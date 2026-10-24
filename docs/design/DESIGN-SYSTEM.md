@@ -1,0 +1,87 @@
+# Design system
+
+Fonte dos valores: [src/theme/index.ts](../../src/theme/index.ts). O teste [theme.test.ts](../../src/theme/theme.test.ts) calcula o contraste de cada par e falha abaixo de 4.5:1. Protótipo clicável das 7 telas: ver a seção [Protótipo](#protótipo).
+
+Princípio: nenhuma tela escreve cor, tamanho ou espaçamento solto. Tudo vem de `src/theme`. Só tema claro; o enunciado não pede escuro e um segundo tema dobraria o trabalho de contraste.
+
+## Tokens
+
+### Cores
+
+| Token | Valor | Uso | Contraste |
+|---|---|---|---|
+| `background` | `#ffffff` | fundo das telas | |
+| `surface` | `#f3f4f6` | cards, campos, faixas | |
+| `text` | `#111827` | texto principal | 17.74 sobre `background`, 16.12 sobre `surface` |
+| `textMuted` | `#4b5563` | autor, número do PR, legenda | 7.56 sobre `background`, 6.87 sobre `surface` |
+| `primary` | `#1f2937` | botão principal | |
+| `onPrimary` | `#ffffff` | texto do botão principal | 14.68 sobre `primary` |
+| `link` | `#1d4ed8` | link do corpo do PR | 6.70 sobre `background` |
+| `danger` | `#b91c1c` | texto de erro | 5.91 sobre `dangerSurface` |
+| `dangerSurface` | `#fef2f2` | fundo de erro | |
+| `star` | `#b45309` | estrela da nota | 5.02 sobre `background`, 4.56 sobre `surface` |
+| `border` | `#6b7280` | borda de campo | 4.83 sobre `background` (mínimo 3:1 para controle) |
+
+Cor nunca é o único sinal: o estado "salvo" muda ícone e label, a nota usa ★ e ☆, o erro traz texto.
+
+### Espaçamento, raio, tipografia, toque
+
+| Token | Valores |
+|---|---|
+| `spacing` | `xs` 4, `sm` 8, `md` 12, `lg` 16, `xl` 24, `xxl` 32 (escala de 4) |
+| `radius` | `sm` 4, `md` 8, `lg` 12, `pill` 999 |
+| `typography` | `title` 22/700, `heading` 18/600, `body` 16/400, `caption` 14/400, `button` 16/600 |
+| `touch.min` | 44 |
+
+Regras de texto (RF10): nunca `allowFontScaling={false}`, nunca `height` ou `lineHeight` fixos em texto de conteúdo, nunca `numberOfLines` que esconda a informação principal. Contêiner de texto usa `minHeight`, não `height`.
+
+## Componentes
+
+`StarRating`, `ErrorState` e `EmptyState` já existem em [src/components/](../../src/components/). O resto entra na Fase 2, no PR da primeira tela que o usa. O contrato abaixo é o que o PR tem que entregar, e todo componente usa os tokens.
+
+| Componente | Props | Acessibilidade | Estado |
+|---|---|---|---|
+| `Button` | `label`, `onPress`, `variant` (`primary` \| `secondary`), `loading?`, `disabled?` | `accessibilityRole="button"`, `accessibilityState={{ disabled, busy: loading }}`, `minHeight` 44; `loading` troca o texto por `ActivityIndicator` e bloqueia o toque | Fase 2 (#31) |
+| `TextField` | `label`, `value`, `onChangeText`, `error?`, `secureTextEntry?` | label visível acima do campo e `accessibilityLabel` igual; erro com `accessibilityRole="alert"` abaixo do campo; `minHeight` 44 | Fase 2 (#31) |
+| `Avatar` | `uri?`, `name`, `size` | `accessibilityLabel="Avatar de {name}"` com imagem; sem `uri` mostra a inicial em branco sobre uma cor de fundo derivada do nome (contraste >= 4.5:1); `accessible={false}` quando o nome já está no texto ao lado | Fase 2 (#34) |
+| `PullRequestCard` | `pr: PullRequestSummary`, `saved`, `onPress`, `onToggleSave` | o card inteiro é um botão com label "PR #n: título, de autor"; o ícone de salvar é outro botão com `accessibilityState={{ selected: saved }}` e label que muda ("Salvar para estudar" e "Remover dos salvos"); `hitSlop` no ícone | Fase 2 (#34) |
+| `ErrorState` | `message`, `onRetry` | `accessibilityRole="alert"` no texto da mensagem (no `View` o role não é exposto); botão "Tentar novamente" 44x44 | feito (#99, role corrigido no #117) |
+| `EmptyState` | `title`, `text?` | só texto; a tela decide se há ação | feito (#99) |
+| `StarRating` | `value`, `onChange?` | editável: 5 botões "Dar nota N de 5" com `selected`; somente leitura: um único elemento "Nota N de 5"; alvo 44x44 | feito (#98) |
+
+Os componentes feitos ainda têm cores soltas. Migram para os tokens no PR da primeira tela que os usa, sem mudar comportamento.
+
+## Convenção de testID
+
+Formato `tela.elemento`, em minúsculas, para o Maestro e para os testes de componente. Item de lista leva o número do PR.
+
+| Tela | testIDs |
+|---|---|
+| Login | `login.email`, `login.password`, `login.submit`, `login.signup`, `login.error` |
+| Cadastro | `signup.email`, `signup.password`, `signup.submit`, `signup.error` |
+| Catálogo | `catalog.list`, `catalog.card.<n>`, `catalog.save.<n>`, `catalog.search`, `catalog.favorites`, `catalog.studied`, `catalog.logout`, `catalog.footer-loader`, `catalog.empty` |
+| Detalhe | `detail.title`, `detail.body`, `detail.save`, `detail.studied`, `detail.rating`, `detail.error` |
+| Busca | `search.input`, `search.submit`, `search.result.<n>`, `search.empty` |
+| Salvos | `favorites.list`, `favorites.item.<n>`, `favorites.empty` |
+| Estudados | `studied.list`, `studied.item.<n>`, `studied.empty` |
+| Comum | `error.retry`, `loading` |
+
+## Telas e estados
+
+Toda tela tem estes estados, e cada um aparece no protótipo: **carregando** (`ActivityIndicator`), **erro** (`ErrorState`), **vazio** (`EmptyState`), **dados**.
+
+| Tela | Stack | Dados | Vazio | Erro | Cenários |
+|---|---|---|---|---|---|
+| Login | Auth | formulário | n/a | mensagem única "E-mail ou senha incorretos" | C03-C05, C08 |
+| Cadastro | Auth | formulário | n/a | e-mail repetido, senha curta | C02, C03 |
+| Catálogo | App | grade de 2 colunas: avatar, título, número, autor, ícone de salvar | "Nenhum PR encontrado" | `ErrorState`; erro na página 2 mantém a lista e mostra o erro no rodapé | C09-C14, C52, C54 |
+| Detalhe | App | título no header, estatísticas, blocos de texto, salvar, estudado com nota | "Sem descrição" | `ErrorState` | C15-C17, C20, C53 |
+| Busca | App | campo, botão "Buscar", lista de resultados | "Nenhum resultado para {termo}" | `ErrorState`; limite de requisições com o horário | C31-C35 |
+| Salvos | App | lista | "Você ainda não salvou nenhum PR" | n/a (vem do Context) | C22, C23 |
+| Estudados | App | lista com nota | "Você ainda não marcou nenhum PR como estudado" | n/a | C30, C55 |
+
+Navegação: o Catálogo é a tela principal e leva a Busca, Salvos, Estudados e Sair pelo header. Sem sessão, só a AuthStack existe.
+
+## Protótipo
+
+Protótipo HTML clicável das 7 telas, com os 4 estados alternáveis, publicado como Artifact privado ([abrir](https://claude.ai/artifact/6uCQVjVTGqNDPBBU4VMqTs); só abre para quem a conta do Lucas Stopinski liberar). A cópia versionada, [prototype.html](prototype.html), abre direto em qualquer navegador e é a referência para quem não tem acesso ao Artifact. Ele usa os valores dos tokens para texto e controles; bordas de card, trilho do spinner e cores de avatar são só ilustração e não são tokens. Serve de referência visual, não de código. Quando o protótipo e o app divergirem, o app com os tokens é a verdade.
