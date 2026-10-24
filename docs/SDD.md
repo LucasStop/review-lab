@@ -46,7 +46,7 @@ Estados de cada requisição: `loading | error | data` explícitos em `useFetch`
 Resumo; decisão em [ADR 0002](adr/0002-cache-e-rate-limit.md).
 
 - Cache em AsyncStorage por URL, TTL de 10 min na lista e 1 h no detalhe. Cache expirado serve de fallback se a rede falhar.
-- ETag/`If-None-Match`: resposta 304 não consome limite.
+- ETag/`If-None-Match`: resposta 304 renova a cópia; sem token ainda desconta do limite (medido), o TTL é que poupa as 60/h.
 - Interceptor lê `x-ratelimit-remaining` e `x-ratelimit-reset`; 403/429 com remaining 0 vira erro "limite atingido, volta às HH:MM" com cache como alternativa.
 - Token opcional por `EXPO_PUBLIC_GITHUB_TOKEN`; sem ele o app funciona com 60/h.
 

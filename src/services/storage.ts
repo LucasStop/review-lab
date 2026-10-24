@@ -4,6 +4,7 @@
 export type KV = {
   get: (key: string) => Promise<string | null>;
   set: (key: string, value: string) => Promise<void>;
+  remove: (key: string) => Promise<void>;
 };
 
 export const userKey = (userId: string, name: string) => `rl.${userId}.${name}`;
@@ -24,5 +25,5 @@ export function createStorage(kv: KV) {
 
   const write = (key: string, value: unknown) => kv.set(key, JSON.stringify(value));
 
-  return { read, write };
+  return { read, write, remove: kv.remove };
 }

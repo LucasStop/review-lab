@@ -8,6 +8,7 @@ import type {
   PullRequestPage,
   PullRequestSummary,
 } from '../types/github';
+import { cache } from './appCache';
 import { toAppError } from '../utils/appError';
 import { parseLinkHeader } from '../utils/linkHeader';
 import { buildSearchQuery, toDetail, toSummary } from '../utils/pullRequest';
@@ -25,29 +26,60 @@ export const api = create({
 
 api.interceptors.response.use(undefined, (error) => Promise.reject(toAppError(error)));
 
-export async function listPullRequests(
+const MIN = 60_000;
+const LIST_TTL = 10 * MIN;
+const DETAIL_TTL = 60 * MIN;
+
+// 304 chega como resposta normal para o cache renovar a cópia sem gastar o limite.
+const conditional = (etag?: string, headers: Record<string, string> = {}) => ({
+  headers: etag ? { ...headers, 'If-None-Match': etag } : headers,
+  validateStatus: (status: number) => (status >= 200 && status < 300) || status === 304,
+});
+
+// `refresh` ignora o TTL (pull-to-refresh).
+export function listPullRequests(
   page: number,
   signal?: AbortSignal,
+  refresh = false,
 ): Promise<PullRequestPage> {
-  const response = await api.get<PullRequest[]>(`/repos/${config.repo}/pulls`, {
-    params: { state: 'closed', per_page: PAGE_SIZE, page },
-    signal,
-  });
-  return {
-    items: response.data.map(toSummary),
-    hasNext: parseLinkHeader(response.headers.link).next !== undefined,
-  };
+  return cache.get(
+    `list:${config.repo}:${page}`,
+    { ttlMs: LIST_TTL, force: refresh },
+    async (etag) => {
+      const response = await api.get<PullRequest[]>(`/repos/${config.repo}/pulls`, {
+        params: { state: 'closed', per_page: PAGE_SIZE, page },
+        signal,
+        ...conditional(etag),
+      });
+      if (response.status === 304) return 'not-modified';
+      return {
+        value: {
+          items: response.data.map(toSummary),
+          hasNext: parseLinkHeader(response.headers.link).next !== undefined,
+        },
+        etag: response.headers.etag as string | undefined,
+      };
+    },
+  );
 }
 
-export async function getPullRequest(
+export function getPullRequest(
   number: number,
   signal?: AbortSignal,
+  refresh = false,
 ): Promise<PullRequestDetailView> {
-  const response = await api.get<PullRequestDetail>(`/repos/${config.repo}/pulls/${number}`, {
-    headers: { Accept: 'application/vnd.github.html+json' },
-    signal,
-  });
-  return toDetail(response.data);
+  return cache.get(
+    `detail:${config.repo}:${number}`,
+    { ttlMs: DETAIL_TTL, force: refresh },
+    async (etag) => {
+      const response = await api.get<PullRequestDetail>(`/repos/${config.repo}/pulls/${number}`, {
+        signal,
+        ...conditional(etag, { Accept: 'application/vnd.github.html+json' }),
+      });
+      if (response.status === 304) return 'not-modified';
+      return { value: toDetail(response.data), etag: response.headers.etag as string | undefined };
+    },
+  );
 }
 
 export async function searchPullRequests(
