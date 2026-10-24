@@ -1,10 +1,15 @@
 import { create } from 'axios';
 
 import { config } from '../config';
-import type { PullRequest, PullRequestPage } from '../types/github';
+import type {
+  PullRequest,
+  PullRequestDetail,
+  PullRequestDetailView,
+  PullRequestPage,
+} from '../types/github';
 import { toAppError } from '../utils/appError';
 import { parseLinkHeader } from '../utils/linkHeader';
-import { toSummary } from '../utils/pullRequest';
+import { toDetail, toSummary } from '../utils/pullRequest';
 
 export const PAGE_SIZE = 20;
 
@@ -27,4 +32,11 @@ export async function listPullRequests(page: number): Promise<PullRequestPage> {
     items: response.data.map(toSummary),
     hasNext: parseLinkHeader(response.headers.link).next !== undefined,
   };
+}
+
+export async function getPullRequest(number: number): Promise<PullRequestDetailView> {
+  const response = await api.get<PullRequestDetail>(`/repos/${config.repo}/pulls/${number}`, {
+    headers: { Accept: 'application/vnd.github.html+json' },
+  });
+  return toDetail(response.data);
 }
