@@ -296,3 +296,20 @@ test('C65: Enter searches too, and Buscar with an empty field goes back to the s
   expect(mockSearch).toHaveBeenCalledTimes(1);
   expect(mockList).toHaveBeenCalledTimes(1);
 });
+
+test('Buscar with the same term after the limit searches again, like Tentar novamente', async () => {
+  mockList.mockResolvedValue(page([1], false));
+  const limit = 'Limite de requisições do GitHub atingido. Volta às 20:09.';
+  mockSearch
+    .mockRejectedValueOnce(new AppError('rate-limit', limit))
+    .mockResolvedValueOnce([pr(9)]);
+  await renderCatalog();
+  await screen.findByTestId('catalog.card.0');
+
+  await searchFor('fix');
+  expect(await screen.findByText(limit)).toBeTruthy();
+  await fireEvent.press(screen.getByTestId('catalog.search-submit'));
+
+  expect(await screen.findByText('PR 9')).toBeTruthy();
+  expect(mockSearch).toHaveBeenCalledTimes(2);
+});

@@ -46,7 +46,11 @@ export function CatalogScreen({ navigation }: Props) {
 
   const submit = () => {
     Keyboard.dismiss();
-    setTerm(query.trim());
+    const next = query.trim();
+    // O mesmo termo não muda o estado e não buscaria de novo: depois de um erro (o limite, por
+    // exemplo), Buscar tenta outra vez, como o "Tentar novamente".
+    if (next === term && search.error) search.retry();
+    else setTerm(next);
   };
 
   const loading = searching ? search.status === 'loading' : list.status === 'loading';
