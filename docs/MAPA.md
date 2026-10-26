@@ -12,10 +12,10 @@ Legenda: **base** quer dizer que a lógica existe e está testada, mas falta a t
 | RF02 Navegação | 10% com RF03 | `AuthStack` e `AppStack`, `Detail: { number }` ([navigation/](../src/navigation/), PR #112); o header mostra "PR #n" | montar em `App.tsx` (#32), título do PR via `setOptions` no detalhe (#36) | LucasStop, Luc-Bruno |
 | RF03 Detalhe | 10% com RF02 | `getPullRequest` com ETag (PR #105); `sanitizeHtml` em blocos tipados ([utils/sanitizeHtml.ts](../src/utils/sanitizeHtml.ts), PR #101) | #36 tela e render dos blocos | Luc-Bruno |
 | RF04 Favoritos (Context) | 15% com RF05 | storage por usuário ([services/storage.ts](../src/services/storage.ts), PR #108) | #24 `FavoritesContext`, #26 botão e ícone no card | Luc-Bruno |
-| RF05 Tela de favoritos | 15% com RF04 | `EmptyState` (PR #99) | #38 | Luc-Bruno |
+| RF05 Favoritos (filtro Salvos no Catálogo) | 15% com RF04 | `EmptyState` (PR #99) | #38 | Luc-Bruno |
 | RF06 Persistência | 10% | `createStorage` com hidratação segura (PR #108) e chave `rl.<userId>.<nome>` | #24, #25 e #45 (sem dado zerado na carga) | Luc-Bruno |
-| RF07 Login, sessão, estudados | 10% | credenciais com hash e sal em SecureStore (PR #102); `createAuth` e `AuthContext` (PR #110); `StarRating` (PR #98) | #31 telas de login e cadastro, #32 navegação condicional e logout, #25 e #27 estudados com nota, #39 tela; Perfil com Sair e Excluir conta (#124 serviço, #125 tela, além da rubrica) | LucasStop, Luc-Bruno |
-| RF08 Busca | 10% | `searchPullRequests` e `buildSearchQuery` (PR #106) | #37 | Luc-Bruno |
+| RF07 Login, sessão, estudados | 10% | credenciais com hash e sal em SecureStore (PR #102); `createAuth` e `AuthContext` (PR #110); `StarRating` (PR #98) | #31 telas de login e cadastro, #32 navegação condicional e logout, #25 e #27 estudados com nota, #39 filtro Estudados; Perfil com Sair e Excluir conta (#124 serviço, #125 tela, além da rubrica) | LucasStop, Luc-Bruno |
+| RF08 Busca (campo e botão no Catálogo) | 10% | `searchPullRequests` e `buildSearchQuery` (PR #106) | #37 | Luc-Bruno |
 | RF09 Feedback | 10% | `useFetch` (PR #107), `AppError` com mensagens pt-BR e horário de volta do limite (PR #104), `ErrorState` (PR #99) | #41, que confere o `ActivityIndicator` em todo fluxo | Luc-Bruno |
 | RF10 Acessibilidade | 10% | `StarRating` e `ErrorState` com label, role e toque 44x44 | tokens (#114), #42, #43 e #44 | Luc-Bruno |
 
@@ -64,14 +64,9 @@ Total: 59 testes unitários (`yarn test`), rodando no CI.
 
 Lista viva: [issues](https://github.com/LucasStop/review-lab/issues), [PRs mergeados](https://github.com/LucasStop/review-lab/pulls?q=is%3Apr+is%3Amerged), [milestones](https://github.com/LucasStop/review-lab/milestones).
 
-## Pendente com o professor
+## Decisão do professor
 
-Duas ideias de UX aguardam a resposta antes de mudar o desenho. Enquanto isso valem as telas separadas.
-
-- Salvos e Estudados como filtro do Catálogo, na mesma tela. O RF05 (15%) pede a "Tela de Favoritos", acessível pela tela principal.
-- Busca como campo de pesquisa no topo do Catálogo. O RF08 (10%) pede `TextInput` controlado com botão "Buscar" e lista de resultados.
-
-Se o professor aceitar, atualizam-se o [DESIGN-SYSTEM.md](design/DESIGN-SYSTEM.md), o protótipo e as issues #34, #35, #37, #38 e #39.
+Resposta no Canvas em 26/10/2026: Salvos e Estudados podem ser filtros do Catálogo, "se fizer sentido no contexto do app" e com boa usabilidade, e a busca pode ficar na mesma tela. Por isso o app tem 5 telas (Login, Cadastro, Catálogo, Detalhe, Perfil) e o RF05 e o RF08 são entregues dentro do Catálogo. A usabilidade é conferida por C63-C65 e pelo roteiro manual.
 
 ## Fases
 

@@ -94,9 +94,9 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 | ID | Cenário | Nível | Status |
 |---|---|---|---|
 | C21 | Salvar no detalhe muda o ícone do mesmo PR no card do catálogo | I, E2E | F2 #24, #26 |
-| C22 | A tela de salvos lista os salvos e atualiza ao remover | C, E2E | F2 #38 |
-| C23 | Salvos vazio mostra `EmptyState` amigável (`ListEmptyComponent`) | C | F2 #38 |
-| C54 | Salvos, Estudados, Busca e Perfil são acessíveis a partir do Catálogo | E2E | F2 #35 |
+| C22 | O filtro Salvos do Catálogo lista os salvos e atualiza ao remover | C, E2E | F2 #38 |
+| C23 | Filtro Salvos vazio mostra `EmptyState` amigável (`ListEmptyComponent`) | C | F2 #38 |
+| C54 | Busca, filtros Salvos e Estudados e Perfil são acessíveis na tela do Catálogo | E2E | F2 #35 |
 
 ### Persistência (RF06)
 
@@ -113,8 +113,8 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 |---|---|---|---|
 | C28 | Marcar como estudado com nota de 1 a 5 no detalhe | C, E2E | F2 #27 (`StarRating` em #28) |
 | C29 | Mudar a nota ou desmarcar atualiza a lista | I | F2 #25, #27 |
-| C30 | A tela de estudados lista cada PR com a sua nota | C, E2E | F2 #39 |
-| C55 | Estudados vazio mostra `EmptyState` | C | F2 #39 |
+| C30 | O filtro Estudados do Catálogo lista cada PR com a sua nota | C, E2E | F2 #39 |
+| C55 | Filtro Estudados vazio mostra `EmptyState` | C | F2 #39 |
 
 ### Perfil, sair e excluir conta (RF07, além da rubrica)
 
@@ -137,6 +137,9 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 | C33 | Termo vazio não chama a API | U | ok |
 | C34 | Qualificadores digitados (`repo:`, `is:`) são neutralizados | U | ok |
 | C35 | Loader durante a busca | C | F2 #37 |
+| C63 | Busca e filtro se combinam: buscar dentro de Salvos ou Estudados filtra a lista local; trocar de filtro mantém o termo | C | F2 #37, #38, #39 |
+| C64 | Cada chip de filtro informa o estado (`selected`), tem alvo de 44x44 e o foco continua nele depois de tocar | C | F2 #35, #42 |
+| C65 | Limpar o termo volta à lista paginada do filtro; o termo digitado não some ao trocar de filtro | C | F2 #37 |
 
 ### Feedback de UI (RF09)
 
@@ -168,7 +171,7 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 | C49 | A API real ainda devolve os campos que `toSummary` e `toDetail` leem | contrato | #115 |
 | C50 | O app abre no Expo Go sem erro vermelho | E2E smoke | #115 |
 
-Os IDs C51 a C55 vieram da revisão do catálogo e C56 a C62 do Perfil; ficam no fim da numeração para não renumerar os outros.
+Os IDs C51 a C55 vieram da revisão do catálogo, C56 a C62 do Perfil e C63 a C65 da busca e dos filtros dentro do Catálogo; ficam no fim da numeração para não renumerar os outros.
 
 ## Roteiro manual
 
@@ -182,7 +185,7 @@ Rodar no simulador iOS com o Expo Go, sem token no `.env`, salvo o que o passo p
 6. Buscar `fix` e um termo sem resultado como `zzzqqq` (C31, C32).
 7. Ligar o modo avião (Network Link Conditioner ou o Wi-Fi do Mac desligado), abrir um PR já visto e depois um novo (C37, C40).
 8. Esgotar o limite da rede do Mac (é por IP): `until [ "$(curl -s https://api.github.com/rate_limit | python3 -c 'import sys,json;print(json.load(sys.stdin)["rate"]["remaining"])')" = 0 ]; do curl -s -o /dev/null 'https://api.github.com/repos/expo/expo/pulls?per_page=1'; done`. O `/rate_limit` não gasta. Depois, buscar um termo novo ou abrir um PR nunca aberto e ver a mensagem com o horário (C39). Puxar para atualizar a grade já em cache mostra a lista vencida, não o erro (C40).
-9. Em Ajustes > Acessibilidade > Tela e Tamanho do Texto, colocar o texto no máximo e percorrer as 7 telas (C47).
+9. Em Ajustes > Acessibilidade > Tela e Tamanho do Texto, colocar o texto no máximo e percorrer as 5 telas (C47).
 10. Ligar o VoiceOver e percorrer o login, o card, o detalhe, o botão de salvar e as estrelas (C48).
 
 ## Execuções

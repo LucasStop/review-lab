@@ -12,7 +12,7 @@ src/
   contexts/    AuthContext, FavoritesContext, StudiedContext
   hooks/       useFetch, usePullRequests (paginação), usePullRequest (detalhe), useSearch
   components/  PullRequestCard, StarRating, ErrorState, EmptyState, Avatar
-  screens/     Login, Register, Catalog, Detail, Search, Favorites, Studied, Profile
+  screens/     Login, Register, Catalog, Detail, Profile
   utils/       sanitizeHtml, parseLinkHeader
   navigation/  AuthStack, AppStack, RootNavigator
 ```
@@ -24,11 +24,8 @@ Camadas: tela -> hook -> service. Tela não chama axios.
 | Tela | Stack | Função |
 |---|---|---|
 | Login / Cadastro | AuthStack | entrada local, erro de credencial |
-| Catálogo | AppStack | grade 2 colunas, header com Buscar, Salvos, Estudados, Perfil |
-| Busca | AppStack | `TextInput` + "Buscar", lista de resultados, vazio |
+| Catálogo | AppStack | campo de busca e botão "Buscar" no topo, filtros Todos, Salvos e Estudados, grade 2 colunas; header com Perfil |
 | Detalhe | AppStack | título dinâmico, descrição limpa, salvar, estudado + nota |
-| Salvos | AppStack | lista do Context, vazio amigável |
-| Estudados | AppStack | lista com nota |
 | Perfil | AppStack | e-mail, totais de salvos e estudados, nota média; Sair e Excluir conta com confirmação |
 
 `RootNavigator` escolhe AuthStack ou AppStack pelo estado do `AuthContext`; logout só limpa a sessão, sem `navigate('Login')`.

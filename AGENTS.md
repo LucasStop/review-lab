@@ -31,7 +31,7 @@ Cada categoria é um label `cat:*`, um conjunto de issues e um dono. Review cruz
 |---|---|---|---|
 | `cat:fundacao` | LucasStop | repo, Expo, TypeScript, lint, CI, README base, estrutura de pastas | código e organização 5% |
 | `cat:dados` | LucasStop | cliente axios, paginação, HTML limpo, erro e rate limit, cache | base de RF01, RF03, RF08, RF09 |
-| `cat:navegacao-telas` | Luc-Bruno | native-stack, grade, rolagem infinita, pull-to-refresh, detalhe, busca, tela de favoritos | RF01 15%, RF02/RF03 10%, RF05 (com RF04, 15%), RF08 10% |
+| `cat:navegacao-telas` | Luc-Bruno | native-stack, grade, rolagem infinita, pull-to-refresh, detalhe, busca e filtros Salvos e Estudados no Catálogo | RF01 15%, RF02/RF03 10%, RF05 (com RF04, 15%), RF08 10% |
 | `cat:estado` | Luc-Bruno | Context de favoritos e "estudados" com nota, AsyncStorage | RF04 (com RF05, 15%), RF06 10%, consumidos do RF07 |
 | `cat:auth` | LucasStop | `AuthContext`, login local, hash, expo-secure-store, sessão, logout | RF07 10% |
 | `cat:ux-acessibilidade` | Luc-Bruno | `ActivityIndicator`, erro com "Tentar novamente", toque 44x44, labels, fonte grande | RF09 10%, RF10 10%, UI/UX 5% |
