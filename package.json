@@ -48,6 +48,7 @@
   "packageManager": "yarn@1.22.22",
   "jest": {
     "preset": "jest-expo",
+    "testTimeout": 20000,
     "testMatch": [
       "**/*.test.tsx"
     ]

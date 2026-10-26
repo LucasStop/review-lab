@@ -13,6 +13,7 @@ function setup() {
     kv: {
       get: async (key) => store.get(key) ?? null,
       set: async (key, value) => void store.set(key, value),
+      remove: async (key) => void store.delete(key),
     },
     sha256,
     randomSalt: async () => `salt-${counter++}`,
@@ -94,4 +95,19 @@ test('invalid input is refused before touching the store', async () => {
     reason: 'invalid-input',
   });
   assert.equal(store.size, 0);
+});
+
+test('verify checks the password for a userId and remove drops the credential', async () => {
+  const { store, credentials } = setup();
+  const registered = await credentials.register('a@x.com', 'segredo1');
+  assert.equal(registered.ok, true);
+  const userId = registered.ok ? registered.userId : '';
+  assert.deepEqual(await credentials.verify(userId, 'segredo1'), { ok: true, userId });
+  assert.deepEqual(await credentials.verify(userId, 'outra123'), {
+    ok: false,
+    reason: 'invalid-credentials',
+  });
+  await credentials.remove(userId);
+  assert.equal(store.has(`rl.cred.${userId}`), false);
+  assert.deepEqual(await credentials.register('a@x.com', 'segredo1'), { ok: true, userId });
 });

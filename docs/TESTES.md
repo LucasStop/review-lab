@@ -123,9 +123,9 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 | C56 | O Perfil mostra o e-mail, o total de salvos, o total de estudados e a nota média (traço sem estudados) | C, E2E | F2 #125 |
 | C57 | Sair pede confirmação; Cancelar mantém a sessão e a tela | C, E2E | F2 #125 |
 | C58 | Confirmar Sair limpa só a sessão: salvos e estudados voltam no próximo login | I | F2 #125 |
-| C59 | Excluir conta com senha errada recusa, mostra "Senha incorreta." e não apaga nada | U, C | F2 #124, #125 |
-| C60 | Excluir conta com a senha certa apaga credencial, sessão e as chaves `rl.<userId>.*` e volta ao Login | U, I, E2E | F2 #124, #125 |
-| C61 | Excluir conta não toca nos dados de outro usuário do aparelho; cadastrar o mesmo e-mail depois funciona | U, I | F2 #124 |
+| C59 | Excluir conta com senha errada recusa, mostra "Senha incorreta." e não apaga nada | U, C | U ok #124 (`session.test.ts`; estado em `AuthContext.test.tsx`); C e tela em #125 |
+| C60 | Excluir conta com a senha certa apaga credencial, sessão e as chaves `rl.<userId>.*` e volta ao Login | U, I, E2E | U ok #124; I e E2E em #125 |
+| C61 | Excluir conta não toca nos dados de outro usuário do aparelho; cadastrar o mesmo e-mail depois funciona | U, I | U ok #124 (`session.test.ts`, `storage.test.ts`, `credentials.test.ts`); I em #125 |
 | C62 | O foco entra no diálogo de confirmação e volta ao botão que o abriu ao cancelar ou fechar com Esc | C | F2 #125 |
 
 ### Busca (RF08)
