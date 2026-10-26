@@ -14,16 +14,19 @@ type Props = {
 
 export function Avatar({ uri, name, size, accessible = true }: Props) {
   // Imagem que falha (404, offline) cai no placeholder em vez de deixar um buraco no card.
-  const [failed, setFailed] = useState(false);
+  // `failedUri` guarda qual uri falhou: trocar a uri na mesma instância tenta a nova.
+  const [failedUri, setFailedUri] = useState<string>();
+  const failed = failedUri === uri;
   const box = { width: size, height: size, borderRadius: size / 2 };
 
   if (uri && !failed) {
     return (
       <Image
+        key={uri}
         source={{ uri }}
         accessible={accessible}
         accessibilityLabel={accessible ? `Avatar de ${name}` : undefined}
-        onError={() => setFailed(true)}
+        onError={() => setFailedUri(uri)}
         style={[box, styles.image]}
         testID="avatar.image"
       />

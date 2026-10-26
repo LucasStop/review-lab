@@ -12,15 +12,24 @@ type Props = {
   // Só no filtro Estudados: nota de 1 a 5 do PR.
   rating?: number;
   testID?: string;
+  saveTestID?: string;
 };
 
-export function PullRequestCard({ pr, saved, onPress, onToggleSave, rating, testID }: Props) {
+export function PullRequestCard({
+  pr,
+  saved,
+  onPress,
+  onToggleSave,
+  rating,
+  testID,
+  saveTestID,
+}: Props) {
   const saveLabel = saved ? 'Remover dos salvos' : 'Salvar para estudar';
   return (
     <View style={styles.card}>
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel={`PR #${pr.number}: ${pr.title}, de ${pr.author}`}
+        accessibilityLabel={`PR #${pr.number}: ${pr.title}, de ${pr.author}${rating ? `, nota ${rating} de 5` : ''}`}
         onPress={onPress}
         style={styles.body}
         testID={testID}
@@ -43,7 +52,7 @@ export function PullRequestCard({ pr, saved, onPress, onToggleSave, rating, test
         hitSlop={spacing.sm}
         onPress={onToggleSave}
         style={styles.save}
-        testID={testID && testID.replace('card', 'save')}
+        testID={saveTestID}
       >
         <Text style={[styles.saveGlyph, saved && styles.saved]}>{saved ? '★' : '☆'}</Text>
       </Pressable>

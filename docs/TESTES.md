@@ -69,7 +69,7 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 
 | ID | Cenário | Nível | Status |
 |---|---|---|---|
-| C09 | Grade em 2 colunas com avatar e título | C, E2E | C ok #34 (`PullRequestCard.test.tsx`); E2E F2 #35 |
+| C09 | Grade em 2 colunas com avatar e título | C, E2E | card isolado ok #34 (`PullRequestCard.test.tsx`); grade de 2 colunas e E2E em #35 |
 | C10 | Autor apagado (`ghost`) ou sem avatar mostra placeholder | U, C | U ok; C ok #34 (`PullRequestCard.test.tsx`, `avatar.test.ts`) |
 | C11 | Rolagem infinita anexa a próxima página, com loader no rodapé | I, E2E | F2 #35 |
 | C12 | Na última página não há mais pedidos (`hasNext` falso) | U, I | U parcial (só o parser de `Link`); I F2 #35 |
@@ -159,7 +159,7 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 |---|---|---|---|
 | C43 | Todo tocável e toda imagem tem `accessibilityRole` e `accessibilityLabel` | C | F2 #42 (`StarRating` e `ErrorState` já têm) |
 | C44 | Botão de estado informa o estado (`selected` ou label que muda) | C | F2 #26, #42 |
-| C45 | Alvo de toque de pelo menos 44x44 | C | F2 #43 |
+| C45 | Alvo de toque de pelo menos 44x44 | C | botão salvar do card ok #34; restante F2 #43 |
 | C46 | Pares de cor dos tokens com contraste de pelo menos 4.5:1 | U | #114 |
 | C47 | Fonte do sistema no máximo não corta texto nem sobrepõe; nenhum `allowFontScaling={false}` no código (`git grep`) | M | roteiro |
 | C48 | VoiceOver lê card, botões e estrelas numa ordem que faz sentido | M | roteiro |

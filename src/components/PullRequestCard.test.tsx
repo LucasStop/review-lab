@@ -22,6 +22,7 @@ function card(overrides: Partial<React.ComponentProps<typeof PullRequestCard>> =
       onPress={() => {}}
       onToggleSave={() => {}}
       testID="catalog.card.0"
+      saveTestID="catalog.save.0"
       {...overrides}
     />
   );
@@ -62,18 +63,19 @@ test('C45: the save button is at least 44x44', async () => {
   expect(style.minHeight).toBeGreaterThanOrEqual(touch.min);
 });
 
-test('a long title stays inside the card (shrinks instead of overflowing)', async () => {
-  const long = 'x'.repeat(300);
-  await render(card({ pr: { ...pr, title: long } }));
-  const style = StyleSheet.flatten(screen.getByText(long).props.style);
-  expect(style.flexShrink).toBe(1);
+test('RF10: the title has no fixed height or line height, so a large system font is not cut', async () => {
+  await render(card());
+  const style = StyleSheet.flatten(screen.getByText('Fix race in scheduler').props.style);
   expect(style.height).toBeUndefined();
   expect(style.lineHeight).toBeUndefined();
 });
 
-test('the rating shows only when given', async () => {
+test('the rating shows and is announced only when given', async () => {
   await render(card({ rating: 4 }));
   expect(screen.getByText('Nota 4 de 5')).toBeTruthy();
+  expect(
+    screen.getByLabelText('PR #42: Fix race in scheduler, de octocat, nota 4 de 5'),
+  ).toBeTruthy();
 });
 
 test('C10: no avatar url shows the initial placeholder', async () => {
@@ -81,6 +83,14 @@ test('C10: no avatar url shows the initial placeholder', async () => {
   expect(screen.queryByTestId('avatar.image')).toBeNull();
   expect(screen.getByTestId('avatar.placeholder')).toBeTruthy();
   expect(screen.getByText('G')).toBeTruthy();
+});
+
+test('a new uri after a failed one is tried again', async () => {
+  const view = await render(<Avatar uri="https://broken.example/x.png" name="octocat" size={40} />);
+  await fireEvent(screen.getByTestId('avatar.image'), 'error');
+  expect(screen.queryByTestId('avatar.image')).toBeNull();
+  await view.rerender(<Avatar uri="https://ok.example/y.png" name="octocat" size={40} />);
+  expect(screen.getByTestId('avatar.image')).toBeTruthy();
 });
 
 test('C10: an image that fails to load falls back to the placeholder', async () => {
