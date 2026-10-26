@@ -27,7 +27,7 @@ O Canvas não pede teste, mas o MVP (#52) só vale se cada RF for provado. Este 
 ```
         E2E Maestro      ~8 fluxos, um por RF demonstrável
       Componente/Integ.  um arquivo .test.tsx por tela, Context e componente
-   Unitário node:test    toda lógica pura (59 testes hoje)
+   Unitário node:test    toda lógica pura (totais em Execuções)
 Estático                 em todo commit e PR
 ```
 
@@ -183,11 +183,11 @@ Rodar no simulador iOS com o Expo Go, sem token no `.env`, salvo o que o passo p
 3. Abrir um PR com descrição longa e outro sem descrição (C16, C17).
 4. Salvar 2 PRs, marcar 1 como estudado com nota 4, fechar o app pelo multitarefa e reabrir (C21, C24, C28, C06).
 5. Sair, cadastrar `b@b.com` e conferir que salvos e estudados estão vazios (C27).
-6. Buscar `fix` e um termo sem resultado como `zzzqqq` (C31, C32).
+6. Buscar `fix` e um termo sem resultado como `zzzqqq`, depois tocar em Buscar com o campo vazio e ver a lista paginada voltar; buscar dentro de Salvos e de Estudados, trocar de filtro com o termo aplicado e alternar entre 1 e 2 colunas (C31, C32, C63, C65, C66).
 7. Ligar o modo avião (Network Link Conditioner ou o Wi-Fi do Mac desligado), abrir um PR já visto e depois um novo (C37, C40).
 8. Esgotar o limite da rede do Mac (é por IP): `until [ "$(curl -s https://api.github.com/rate_limit | python3 -c 'import sys,json;print(json.load(sys.stdin)["rate"]["remaining"])')" = 0 ]; do curl -s -o /dev/null 'https://api.github.com/repos/expo/expo/pulls?per_page=1'; done`. O `/rate_limit` não gasta. Depois, buscar um termo novo ou abrir um PR nunca aberto e ver a mensagem com o horário (C39). Puxar para atualizar a grade já em cache mostra a lista vencida, não o erro (C40).
 9. Em Ajustes > Acessibilidade > Tela e Tamanho do Texto, colocar o texto no máximo e percorrer as 5 telas (C47).
-10. Ligar o VoiceOver e percorrer o login, o card, o detalhe, o botão de salvar e as estrelas (C48).
+10. Ligar o VoiceOver e percorrer o login, o card, os chips de filtro (estado lido e foco no chip depois do toque), o detalhe, o botão de salvar e as estrelas (C48, C64).
 
 ## Execuções
 
@@ -195,3 +195,4 @@ Rodar no simulador iOS com o Expo Go, sem token no `.env`, salvo o que o passo p
 |---|---|---|---|---|---|---|
 | 24/10/2026 | Fase 1 | 59 ok | — | — | — | base antes das telas |
 | 24/10/2026 | Fim da Fase 1 (`b86f359`) | 63 ok | 1 ok (ErrorState) | smoke ok | protótipo, 7 telas | contrato real 3 de 3, rodado uma vez no #117 |
+| 26/10/2026 | Fase 2, depois do PR #139 (`5a97c73`) | 83 ok | 72 ok (11 suítes) | — | — | contagem lida no PR #142; o Maestro roda por PR, no cenário do PR |

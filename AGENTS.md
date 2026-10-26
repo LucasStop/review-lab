@@ -17,7 +17,7 @@ Este arquivo é o contexto de qualquer agente que trabalhe aqui. Plano em [docs/
 | 02/11/2026, 23:59 | prazo do Canvas (Somativo 2) |
 | 09/11/2026, 23:59 | Canvas trava; atraso custa -20% por semana |
 
-Entrega: um PDF único (ver [docs/ENUNCIADO.md](docs/ENUNCIADO.md) e [docs/ENTREGA.md](docs/ENTREGA.md)). O enunciado do Canvas não prevê apresentação ao vivo, só o vídeo; o plano de ensino cita 26/10 e 09/11, a confirmar com o professor.
+Entrega: um PDF único (ver [docs/ENUNCIADO.md](docs/ENUNCIADO.md) e [docs/ENTREGA.md](docs/ENTREGA.md)). Não há apresentação ao vivo, só o vídeo: o plano de ensino citava 26/10 e 09/11, e o professor confirmou em 26/10/2026 que a entrega é o PDF com o vídeo.
 
 ## Tema e API
 

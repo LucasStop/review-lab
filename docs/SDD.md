@@ -8,12 +8,12 @@ Expo (TypeScript), React Navigation native-stack, axios, Context API. Sem biblio
 
 ```
 src/
-  services/    github.ts (axios), cache.ts, storage.ts, authStore.ts
+  services/    github.ts (axios), cache.ts, storage.ts, credentials.ts, session.ts e os bindings app*/secure*
   contexts/    AuthContext, FavoritesContext, StudiedContext
-  hooks/       useFetch, usePullRequests (paginação), usePullRequest (detalhe), useSearch
-  components/  PullRequestCard, StarRating, ErrorState, EmptyState, Avatar
-  screens/     Login, Register, Catalog, Detail, Profile
-  utils/       sanitizeHtml, parseLinkHeader
+  hooks/       useFetch (detalhe), usePullRequestList (paginação), usePersistedList (listas por usuário)
+  components/  PullRequestCard, StarRating, ErrorState, EmptyState, Avatar, BodyBlocks, Button, TextField
+  screens/     Login, SignUp, Catalog, Detail, Profile (#125)
+  utils/       sanitizeHtml, linkHeader, appError, pullRequest, collections, mergePage, avatar
   navigation/  AuthStack, AppStack, RootNavigator
 ```
 
@@ -71,7 +71,7 @@ Decisão em [ADR 0004](adr/0004-asyncstorage-vs-sqlite.md) e [ADR 0003](adr/0003
 | Sessão (userId) | expo-secure-store | `rl.session` |
 | Salvos | AsyncStorage | `rl.<userId>.favorites` (snapshot do PR) |
 | Estudados e nota | AsyncStorage | `rl.<userId>.studied` |
-| Cache HTTP | AsyncStorage | `rl.cache.<hash da URL>` |
+| Cache HTTP | AsyncStorage | `rl.cache.list:<repo>:<página>` e `rl.cache.detail:<repo>:<número>` |
 
 Os Contexts carregam no `useEffect` inicial e expõem `hydrated`; o `RootNavigator` mostra `ActivityIndicator` até tudo hidratar, para nunca exibir dado zerado (RF06). Favoritos guardam um snapshot (número, título, autor, avatar) para o filtro Salvos funcionar sem requisição.
 
