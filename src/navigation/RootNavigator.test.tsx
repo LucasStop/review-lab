@@ -68,6 +68,15 @@ test('C07: logging out clears the session and shows the login without navigate()
   expect(screen.queryByTestId('catalog.logout')).toBeNull();
 });
 
+test('logging out still shows the login when clearing the stored session fails', async () => {
+  mockAuth.restore.mockResolvedValue('u1');
+  mockAuth.signOut.mockRejectedValue(new Error('storage down'));
+  await renderApp();
+
+  await fireEvent.press(await screen.findByTestId('catalog.logout'));
+  expect(await screen.findByTestId('login.screen')).toBeTruthy();
+});
+
 test('a successful sign-in swaps the login for the catalog', async () => {
   mockAuth.restore.mockResolvedValue(null);
   mockAuth.signIn.mockResolvedValue({ ok: true, userId: 'u1' });

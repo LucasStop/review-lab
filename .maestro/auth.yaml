@@ -6,6 +6,11 @@ name: auth
 - runFlow: subflows/open-app.yaml
 - evalScript: ${output.email = 'e2e' + Date.now() + '@exemplo.com'}
 # Sessão de uma execução anterior sobrevive no Expo Go: começa deslogado.
+# O app pode ainda estar no loader de hidratação: espera sumir antes de decidir.
+- extendedWaitUntil:
+    notVisible:
+      id: 'loading'
+    timeout: 90000
 - runFlow:
     when:
       visible:

@@ -58,7 +58,7 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 | C01 | Cadastro válido entra logado | U, E2E | ok (U e E2E `.maestro/auth.yaml`) #32 |
 | C02 | E-mail repetido é recusado, mesmo com outra caixa ou com espaços, e a tela mostra a mensagem | U, C | U ok; C ok (#31) |
 | C03 | Senha com menos de 6 caracteres ou e-mail sem `@` é recusado antes de gravar | U, C | U ok; C ok (#31) |
-| C04 | Senha errada e e-mail desconhecido recebem a mesma mensagem | U | ok |
+| C04 | Senha errada e e-mail desconhecido recebem a mesma mensagem | U, E2E | ok (U e E2E `.maestro/auth.yaml`) #32 |
 | C05 | Senha e e-mail em texto puro nunca chegam ao store | U | ok |
 | C51 | Sem sessão, o app abre no Login e não chega à AppStack (login obrigatório) | I, E2E | ok (I `RootNavigator.test.tsx`, E2E `.maestro/auth.yaml`) #32 |
 | C06 | Fechar e reabrir o app mantém a sessão | I, E2E | ok (I e E2E `.maestro/auth.yaml`) #32 |

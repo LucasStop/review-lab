@@ -15,7 +15,7 @@ function LogoutButton() {
     <Pressable
       accessibilityRole="button"
       accessibilityLabel="Sair"
-      onPress={() => void signOut()}
+      onPress={() => void signOut().catch(() => {})}
       style={styles.logout}
       testID="catalog.logout"
     >
