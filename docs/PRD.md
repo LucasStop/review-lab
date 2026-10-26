@@ -52,4 +52,3 @@ Escrever no GitHub (comentar, aprovar), OAuth do GitHub, comentários de review 
 | Busca tem limite próprio de 10/min | botão "Buscar" explícito (sem busca a cada tecla) |
 | Repo renomeado devolve 301 | axios segue redirecionamento; repo fixo em config |
 | PR sem imagem | avatar do autor, placeholder se faltar |
-| Grupo ainda não formado | issues por categoria, sem responsável |
