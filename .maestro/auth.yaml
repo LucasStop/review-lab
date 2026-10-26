@@ -1,0 +1,67 @@
+# C51, C01, C06, C07: login obrigatório, cadastro entra logado, sessão sobrevive ao reabrir, logout.
+# E-mail novo a cada execução: o cadastro recusa e-mail repetido. Precisa do Metro (ver README.md).
+appId: host.exp.Exponent
+name: auth
+---
+- runFlow: subflows/open-app.yaml
+- evalScript: ${output.email = 'e2e' + Date.now() + '@exemplo.com'}
+# Sessão de uma execução anterior sobrevive no Expo Go: começa deslogado.
+# O app pode ainda estar no loader de hidratação: espera sumir antes de decidir.
+- extendedWaitUntil:
+    notVisible:
+      id: 'loading'
+    timeout: 90000
+- runFlow:
+    when:
+      visible:
+        id: 'catalog.logout'
+    commands:
+      - tapOn:
+          id: 'catalog.logout'
+# C51: sem sessão o app abre no Login.
+- extendedWaitUntil:
+    visible:
+      id: 'login.screen'
+    timeout: 90000
+- assertNotVisible:
+    id: 'catalog.logout'
+# C01: cadastro válido entra logado.
+- tapOn:
+    id: 'login.signup'
+- tapOn:
+    id: 'signup.email'
+- inputText: ${output.email}
+- tapOn:
+    id: 'signup.password'
+- inputText: 'segredo123'
+- tapOn:
+    id: 'signup.submit'
+- extendedWaitUntil:
+    visible:
+      id: 'catalog.logout'
+    timeout: 20000
+# C06: fechar e reabrir mantém a sessão.
+- runFlow: subflows/open-app.yaml
+- extendedWaitUntil:
+    visible:
+      id: 'catalog.logout'
+    timeout: 90000
+# C07: logout volta ao Login.
+- tapOn:
+    id: 'catalog.logout'
+- extendedWaitUntil:
+    visible:
+      id: 'login.screen'
+    timeout: 10000
+# C04: senha errada mostra a mensagem única.
+- tapOn:
+    id: 'login.email'
+- inputText: ${output.email}
+- tapOn:
+    id: 'login.password'
+- inputText: 'errada123'
+- tapOn:
+    id: 'login.submit'
+- extendedWaitUntil:
+    visible: 'E-mail ou senha incorretos.'
+    timeout: 10000

@@ -20,8 +20,6 @@ type Reason = Extract<AuthResult, { ok: false }>['reason'];
 type Props = {
   // Prefixo dos testIDs (`login.email`, `signup.submit`...).
   id: 'login' | 'signup';
-  // `new-password` no cadastro: o gerenciador de senhas sugere e guarda uma senha nova.
-  passwordAutoComplete: 'password' | 'new-password';
   submitLabel: string;
   switchLabel: string;
   switchTestID: string;
@@ -33,7 +31,6 @@ type Props = {
 // Login e cadastro são o mesmo formulário; só mudam a chamada, as mensagens e o link.
 export function AuthForm({
   id,
-  passwordAutoComplete,
   submitLabel,
   switchLabel,
   switchTestID,
@@ -69,6 +66,7 @@ export function AuthForm({
 
   return (
     <KeyboardAvoidingView
+      testID={`${id}.screen`}
       style={styles.flex}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
@@ -92,7 +90,10 @@ export function AuthForm({
             setError(null);
           }}
           secureTextEntry
-          autoComplete={passwordAutoComplete}
+          // Não `new-password`: no iOS abre a folha "Use Strong Password?" por cima do formulário,
+          // que engole a digitação do Maestro e aparece no vídeo da demo.
+          autoComplete="password"
+          textContentType="oneTimeCode"
           returnKeyType="done"
           onSubmitEditing={() => void onSubmit()}
           testID={`${id}.password`}

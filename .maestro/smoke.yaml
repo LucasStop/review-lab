@@ -2,21 +2,9 @@
 appId: host.exp.Exponent
 name: smoke
 ---
-- launchApp:
-    stopApp: true
-- openLink: exp://localhost:8081
-- tapOn:
-    text: 'Open'
-    optional: true
-- tapOn:
-    text: 'Continue'
-    optional: true
-# Na primeira abertura o Expo Go mostra o menu de dev por cima do app; tocar no fundo fecha.
-- tapOn:
-    point: '50%,20%'
-    optional: true
-# Até o #32 o App.tsx é o template do Expo; depois a âncora passa a ser o testID `login.screen`.
+- runFlow: subflows/open-app.yaml
 - extendedWaitUntil:
-    visible: 'Open up App.tsx.*'
+    visible:
+      id: 'login.screen'
     timeout: 90000
 - assertNotVisible: 'Render Error'

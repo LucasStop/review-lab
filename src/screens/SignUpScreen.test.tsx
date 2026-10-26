@@ -48,11 +48,10 @@ test('C08: shows the ActivityIndicator while creating the account', async () => 
   expect(screen.getByTestId('loading')).toBeTruthy();
 });
 
-test('the password is secure and asks the password manager for a new one', async () => {
+test('the password field is secure', async () => {
   await render(<SignUpScreen {...props} />);
   const field = screen.getByTestId('signup.password');
   expect(field.props.secureTextEntry).toBe(true);
-  expect(field.props.autoComplete).toBe('new-password');
 });
 
 test('a valid sign-up sends the typed values and shows no error', async () => {
