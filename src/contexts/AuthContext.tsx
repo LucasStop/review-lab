@@ -21,6 +21,8 @@ type AuthValue = {
   signIn: (email: string, password: string) => Promise<AuthResult>;
   signUp: (email: string, password: string) => Promise<AuthResult>;
   signOut: () => Promise<void>;
+  // Senha errada devolve o erro e mantém a sessão; certa apaga a conta e derruba a sessão.
+  deleteAccount: (password: string) => Promise<AuthResult>;
 };
 
 const AuthContext = createContext<AuthValue | null>(null);
@@ -62,9 +64,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  const userId = user?.id;
+  const deleteAccount = useCallback(
+    async (password: string): Promise<AuthResult> => {
+      if (!userId) return { ok: false, reason: 'invalid-credentials' };
+      const result = await auth.deleteAccount(userId, password);
+      if (result.ok) setUser(null);
+      return result;
+    },
+    [userId],
+  );
+
   const value = useMemo(
-    () => ({ user, hydrated, signIn, signUp, signOut }),
-    [user, hydrated, signIn, signUp, signOut],
+    () => ({ user, hydrated, signIn, signUp, signOut, deleteAccount }),
+    [user, hydrated, signIn, signUp, signOut, deleteAccount],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

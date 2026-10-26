@@ -11,6 +11,7 @@ const mockAuth = {
   signIn: jest.fn<(email: string, password: string) => Promise<AuthResult>>(),
   signUp: jest.fn<(email: string, password: string) => Promise<AuthResult>>(),
   signOut: jest.fn<() => Promise<void>>(),
+  deleteAccount: jest.fn<(userId: string, password: string) => Promise<AuthResult>>(),
 };
 // Getter: a fábrica roda no hoist, antes do `const mockAuth` existir.
 jest.mock('../services/appAuth', () => ({

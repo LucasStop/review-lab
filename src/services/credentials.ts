@@ -5,6 +5,7 @@
 export type SecureKV = {
   get: (key: string) => Promise<string | null>;
   set: (key: string, value: string) => Promise<void>;
+  remove: (key: string) => Promise<void>;
 };
 
 export type Deps = {
@@ -59,8 +60,7 @@ export function createCredentials({ kv, sha256, randomSalt }: Deps) {
     return { ok: true, userId };
   }
 
-  async function login(email: string, password: string): Promise<AuthResult> {
-    const userId = await userIdOf(email);
+  async function verify(userId: string, password: string): Promise<AuthResult> {
     const raw = await kv.get(`rl.cred.${userId}`);
     const refused = { ok: false, reason: 'invalid-credentials' } as const;
     if (!raw) return refused;
@@ -78,5 +78,11 @@ export function createCredentials({ kv, sha256, randomSalt }: Deps) {
     }
   }
 
-  return { register, login };
+  async function login(email: string, password: string): Promise<AuthResult> {
+    return verify(await userIdOf(email), password);
+  }
+
+  const remove = (userId: string) => kv.remove(`rl.cred.${userId}`);
+
+  return { register, login, verify, remove };
 }
