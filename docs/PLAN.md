@@ -67,13 +67,17 @@ Mapeamento fixado contra o enunciado do Canvas em 19/10/2026; ver [ENUNCIADO.md]
 
 ## Próximo passo
 
-Fundação (`cat:fundacao`) e issues das demais categorias, ver o Project no GitHub.
+Fase 2: fechar o milestone "MVP interno" até o marco #52 (30/10/2026). Depois, a Fase 3 (entrega, milestone "Entrega Canvas 02/11"). Estado por RF em [MAPA.md](MAPA.md).
 
 
 ## Pendências
 
-1. Aprovar o tema "Review Lab" (GitHub PRs) ou trocar (dev.to, Stack Exchange ou outro do public-apis). O Lucas estava olhando o repositório no Chrome.
-2. Nome do repositório (sugestão: `review-lab`).
-3. Quem entra no grupo 10 e se mudam de dupla (afeta a capa do PDF e o AGENTS.md).
-4. Confirmar com o professor: apresentação ao vivo em 26/10 ou 09/11, e se o peso de 50% do projeto bate com o plano de ensino.
-5. Remoto no GitHub (conta `LucasStop`), convites e Project: só com ok explícito.
+Respostas registradas em 26/10/2026 (#46):
+
+1. Tema: "Review Lab" (PRs do GitHub) aprovado. O professor aprovou também o desenho: busca e filtros Salvos e Estudados dentro do Catálogo, 5 telas.
+2. Nome do repositório: `review-lab`.
+3. Grupo 10: Lucas Stopinski da Silva e Lucas Bruno e Silva (#94). Conferir na conferência final (#55) que a dupla está registrada no grupo do Canvas.
+4. Apresentação: não há apresentação ao vivo. A entrega é o PDF único com o vídeo no YouTube, confirmado com o professor. O peso segue o Canvas: 10 pontos, 50% da nota final.
+5. Colunas do Catálogo: o professor aprovou um botão que alterna entre 1 e 2 colunas (padrão 2), mantendo o `numColumns` do RF01 (#140, C66).
+
+Regra que continua valendo: remoto no GitHub (conta `LucasStop`), convites, Project, visibilidade do repositório e envio ao Canvas só com ok explícito do Lucas.
