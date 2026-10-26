@@ -69,8 +69,8 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 
 | ID | Cenário | Nível | Status |
 |---|---|---|---|
-| C09 | Grade em 2 colunas com avatar e título | C, E2E | F2 #34, #35 |
-| C10 | Autor apagado (`ghost`) ou sem avatar mostra placeholder | U, C | U ok; C F2 #34 |
+| C09 | Grade em 2 colunas com avatar e título | C, E2E | C ok #34 (`PullRequestCard.test.tsx`); E2E F2 #35 |
+| C10 | Autor apagado (`ghost`) ou sem avatar mostra placeholder | U, C | U ok; C ok #34 (`PullRequestCard.test.tsx`, `avatar.test.ts`) |
 | C11 | Rolagem infinita anexa a próxima página, com loader no rodapé | I, E2E | F2 #35 |
 | C12 | Na última página não há mais pedidos (`hasNext` falso) | U, I | U parcial (só o parser de `Link`); I F2 #35 |
 | C13 | Pull-to-refresh recarrega a página 1 ignorando o TTL | U, E2E | U parcial (só o `force` do cache); E2E F2 #35 |
