@@ -1,6 +1,6 @@
 # Mapa do projeto
 
-Retrato de 26/10/2026, no meio da Fase 2 (aplicação), depois do PR #139. Atualizar este arquivo no PR que mudar o estado de um RF.
+Retrato da Fase 2 (aplicação), em andamento desde 26/10/2026. O PR que muda o estado de um RF atualiza este arquivo.
 
 ## Estado por RF
 
@@ -14,7 +14,7 @@ Legenda: **base** quer dizer que a lógica existe, mas falta a tela.
 | RF04 Favoritos (Context) | 15% com RF05 | `FavoritesContext` por usuário (#24); estrela no card e botão no detalhe, com o mesmo estado nas duas telas (#26) | — | Luc-Bruno |
 | RF05 Favoritos (filtro Salvos no Catálogo) | 15% com RF04 | base: `useFavorites().favorites` e `EmptyState` (PR #99) | #38 | Luc-Bruno |
 | RF06 Persistência | 10% | `usePersistedList` no AsyncStorage com chave `rl.<userId>.<nome>`, que recusa gravar antes da hidratação (#24, #25) | #45 (sem dado zerado na carga) | Luc-Bruno |
-| RF07 Login, sessão, estudados | 10% | login e cadastro com hash e sal (#29 e #31), navegação condicional e Sair provisório no Catálogo (#32), exclusão de conta no serviço (#124), `StudiedContext` com nota de 1 a 5 (#25) | #27 estudado com nota no detalhe, #39 filtro Estudados; Perfil com Sair e Excluir conta (#125, além da rubrica) | LucasStop, Luc-Bruno |
+| RF07 Login, sessão, estudados | 10% | login e cadastro com hash e sal (#29 e #31), navegação condicional e Sair provisório no Catálogo (#32), exclusão de conta no serviço (#124), `StudiedContext` com nota de 1 a 5 (#25), marcar como estudado com a nota editável no detalhe (#27) | #39 filtro Estudados; Perfil com Sair e Excluir conta (#125, além da rubrica) | LucasStop, Luc-Bruno |
 | RF08 Busca (campo e botão no Catálogo) | 10% | base: `searchPullRequests` e `buildSearchQuery` (PR #106) | #37 | Luc-Bruno |
 | RF09 Feedback | 10% | `ActivityIndicator` e `ErrorState` com "Tentar novamente" no Catálogo e no detalhe; erro da página seguinte no rodapé; `AppError` com horário de volta do limite (PR #104) | #41, que confere todo fluxo | Luc-Bruno |
 | RF10 Acessibilidade | 10% | tokens com contraste testado (#114); label, role e toque 44x44 nos componentes | #42, #43 e #44 | Luc-Bruno |
@@ -50,7 +50,7 @@ Padrão do projeto: a lógica fica numa fábrica `create*` pura, que recebe as d
 | [src/contexts/AuthContext.tsx](../src/contexts/AuthContext.tsx) | `AuthProvider` e `useAuth` com hidratação | `AuthContext.test.tsx`, `RootNavigator.test.tsx` |
 | [src/contexts/FavoritesContext.tsx](../src/contexts/FavoritesContext.tsx) | `FavoritesProvider` e `useFavorites` | `FavoritesContext.test.tsx` |
 | [src/contexts/StudiedContext.tsx](../src/contexts/StudiedContext.tsx) | `StudiedProvider` e `useStudied`, com nota de 1 a 5 | `StudiedContext.test.tsx` |
-| [src/components/](../src/components/) | `Avatar`, `BodyBlocks`, `Button`, `EmptyState`, `ErrorState`, `PullRequestCard`, `StarRating` e `TextField` | `ErrorState` e `PullRequestCard`; `StarRating` sem teste e sem tela até o #27; os outros pelas telas |
+| [src/components/](../src/components/) | `Avatar`, `BodyBlocks`, `Button`, `EmptyState`, `ErrorState`, `PullRequestCard`, `StarRating` e `TextField` | `ErrorState`, `PullRequestCard` e `StarRating`; os outros pelas telas |
 | [src/screens/](../src/screens/) | Login e Cadastro (com `AuthForm`), Catálogo e Detalhe | um arquivo por tela e `FavoritesFlow.test.tsx` |
 | [src/navigation/](../src/navigation/) | tipos de rota, `RootNavigator`, `AuthStack`, `AppStack` e `Placeholder` (Perfil até o #125) | `RootNavigator.test.tsx`; E2E em `.maestro/` |
 
@@ -65,7 +65,7 @@ Totais da última execução: tabela "Execuções" de [TESTES.md](TESTES.md).
 | `cat:auth` | LucasStop | #29-#32, #124 | — |
 | `cat:entrega` | LucasStop | #46 | #47-#56, #111 (com Luc-Bruno) |
 | `cat:navegacao-telas` | Luc-Bruno | #33-#36 | #37-#39, #125, #140 |
-| `cat:estado` | Luc-Bruno | #23-#26, #28 | #27 |
+| `cat:estado` | Luc-Bruno | #23-#28 | — |
 | `cat:ux-acessibilidade` | Luc-Bruno | #40, #114, #119, #123, #128, #130 | #41-#45 |
 | `cat:nuvem-bonus` | a definir depois do MVP | — | #57-#59 |
 
