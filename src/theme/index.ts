@@ -45,3 +45,6 @@ export const typography = {
 } as const;
 
 export const touch = { min: 44 } as const;
+
+// Ícones de texto (★ ☆): estrela de salvar do card e estrela da nota editável.
+export const glyph = { md: 24, lg: 28 } as const;

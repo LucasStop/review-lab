@@ -1,5 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { colors, glyph, touch } from '../theme';
+
 const STARS = [1, 2, 3, 4, 5];
 
 type Props = {
@@ -47,6 +49,11 @@ export function StarRating({ value, onChange }: Props) {
 
 const styles = StyleSheet.create({
   row: { flexDirection: 'row' },
-  target: { minWidth: 44, minHeight: 44, alignItems: 'center', justifyContent: 'center' },
-  star: { fontSize: 28 },
+  target: {
+    minWidth: touch.min,
+    minHeight: touch.min,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  star: { fontSize: glyph.lg, color: colors.star },
 });
