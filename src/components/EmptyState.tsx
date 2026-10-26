@@ -1,5 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native';
 
+import { colors, spacing, typography } from '../theme';
+
 type Props = {
   title: string;
   text?: string;
@@ -15,7 +17,13 @@ export function EmptyState({ title, text }: Props) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24, gap: 8 },
-  title: { fontSize: 18, fontWeight: '600', textAlign: 'center' },
-  text: { fontSize: 16, textAlign: 'center' },
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: spacing.xl,
+    gap: spacing.sm,
+  },
+  title: { ...typography.heading, color: colors.text, textAlign: 'center' },
+  text: { ...typography.body, color: colors.textMuted, textAlign: 'center' },
 });

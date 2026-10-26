@@ -1,0 +1,50 @@
+# C09, C11, C13: grade carrega, rolagem infinita anexa a página 2, pull-to-refresh recarrega.
+# Gasta requisições da API do GitHub (60 por hora sem token). Precisa do Metro (ver README.md).
+appId: host.exp.Exponent
+name: catalog
+---
+- runFlow: subflows/open-app.yaml
+- extendedWaitUntil:
+    notVisible:
+      id: 'loading'
+    timeout: 90000
+- runFlow:
+    when:
+      visible:
+        id: 'login.screen'
+    commands:
+      - evalScript: ${output.email = 'e2e' + Date.now() + '@exemplo.com'}
+      - tapOn:
+          id: 'login.signup'
+      - tapOn:
+          id: 'signup.email'
+      - inputText: ${output.email}
+      - tapOn:
+          id: 'signup.password'
+      - inputText: 'segredo123'
+      - tapOn:
+          id: 'signup.submit'
+# C09: página 1 em cards.
+- extendedWaitUntil:
+    visible:
+      id: 'catalog.card.0'
+    timeout: 30000
+# C11: rolar até a página 2 (20 por página) anexa cards.
+- scrollUntilVisible:
+    element:
+      id: 'catalog.card.20'
+    direction: DOWN
+    timeout: 60000
+# C13: voltar ao topo e puxar para atualizar.
+- scrollUntilVisible:
+    element:
+      id: 'catalog.card.0'
+    direction: UP
+    timeout: 60000
+- swipe:
+    start: 50%, 30%
+    end: 50%, 80%
+- extendedWaitUntil:
+    visible:
+      id: 'catalog.card.0'
+    timeout: 30000

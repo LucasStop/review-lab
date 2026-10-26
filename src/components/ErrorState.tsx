@@ -1,5 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { colors, radius, spacing, touch, typography } from '../theme';
+
 type Props = {
   message: string;
   onRetry: () => void;
@@ -26,16 +28,22 @@ export function ErrorState({ message, onRetry }: Props) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24, gap: 16 },
-  message: { fontSize: 16, textAlign: 'center' },
-  button: {
-    minWidth: 44,
-    minHeight: 44,
-    paddingHorizontal: 20,
+  container: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 8,
-    backgroundColor: '#1f2937',
+    padding: spacing.xl,
+    gap: spacing.lg,
   },
-  buttonText: { color: '#ffffff', fontSize: 16, fontWeight: '600' },
+  message: { ...typography.body, color: colors.text, textAlign: 'center' },
+  button: {
+    minWidth: touch.min,
+    minHeight: touch.min,
+    paddingHorizontal: spacing.xl,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: radius.md,
+    backgroundColor: colors.primary,
+  },
+  buttonText: { ...typography.button, color: colors.onPrimary },
 });
