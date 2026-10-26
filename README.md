@@ -52,7 +52,7 @@ yarn test:contract  # API real do GitHub, à mão
 maestro test .maestro/smoke.yaml   # E2E no simulador, ver .maestro/README.md
 ```
 
-Estratégia, cenários C01-C62 e roteiro manual em [docs/TESTES.md](docs/TESTES.md).
+Estratégia, cenários C01-C65 e roteiro manual em [docs/TESTES.md](docs/TESTES.md).
 
 ## Documentação
 

@@ -56,7 +56,7 @@ Cada categoria vira um label e um conjunto de issues. Com 1 pessoa, uma segue to
 |---|---|---|
 | `cat:fundacao` | repo, Expo, TypeScript, ESLint, Prettier, lefthook, CI, `.env.example`, README base, AGENTS.md | código e organização 5% |
 | `cat:dados` | cliente axios, mapeadores, paginação, limpeza de HTML, tratamento de erro e rate limit, cache | base de RF01, RF03, RF08, RF09 |
-| `cat:navegacao-telas` | native-stack, grade com FlatList, rolagem infinita, pull-to-refresh, detalhe, busca, tela de favoritos | RF01 15%, RF02/RF03 10%, RF05 (com RF04, 15%), RF08 10% |
+| `cat:navegacao-telas` | native-stack, grade com FlatList, rolagem infinita, pull-to-refresh, detalhe, busca e filtros Salvos e Estudados no Catálogo | RF01 15%, RF02/RF03 10%, RF05 (com RF04, 15%), RF08 10% |
 | `cat:estado` | Context de favoritos e de "estudados" com nota 1 a 5, persistência em AsyncStorage | RF04 (com RF05, 15%), RF06 10%, consumidos do RF07 |
 | `cat:auth` | `AuthContext`, cadastro e login locais, hash, expo-secure-store, sessão persistente, logout | RF07 10% |
 | `cat:ux-acessibilidade` | `ActivityIndicator`, erro com "Tentar novamente", toque 44x44, labels de acessibilidade, fonte grande | RF09 10%, RF10 10%, UI/UX 5% |

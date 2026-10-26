@@ -73,7 +73,7 @@ Decisão em [ADR 0004](adr/0004-asyncstorage-vs-sqlite.md) e [ADR 0003](adr/0003
 | Estudados e nota | AsyncStorage | `rl.<userId>.studied` |
 | Cache HTTP | AsyncStorage | `rl.cache.<hash da URL>` |
 
-Os Contexts carregam no `useEffect` inicial e expõem `hydrated`; o `RootNavigator` mostra `ActivityIndicator` até tudo hidratar, para nunca exibir dado zerado (RF06). Favoritos guardam um snapshot (número, título, autor, avatar) para a tela de salvos funcionar sem requisição.
+Os Contexts carregam no `useEffect` inicial e expõem `hydrated`; o `RootNavigator` mostra `ActivityIndicator` até tudo hidratar, para nunca exibir dado zerado (RF06). Favoritos guardam um snapshot (número, título, autor, avatar) para o filtro Salvos funcionar sem requisição.
 
 ## Erros e acessibilidade
 

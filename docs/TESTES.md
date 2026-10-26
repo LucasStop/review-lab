@@ -137,9 +137,9 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 | C33 | Termo vazio não chama a API | U | ok |
 | C34 | Qualificadores digitados (`repo:`, `is:`) são neutralizados | U | ok |
 | C35 | Loader durante a busca | C | F2 #37 |
-| C63 | Busca e filtro se combinam: buscar dentro de Salvos ou Estudados filtra a lista local; trocar de filtro mantém o termo | C | F2 #37, #38, #39 |
-| C64 | Cada chip de filtro informa o estado (`selected`), tem alvo de 44x44 e o foco continua nele depois de tocar | C | F2 #35, #42 |
-| C65 | Limpar o termo volta à lista paginada do filtro; o termo digitado não some ao trocar de filtro | C | F2 #37 |
+| C63 | Busca e filtro se combinam: buscar dentro de Salvos ou Estudados filtra a lista local; trocar de filtro mantém o termo aplicado | C | F2 #37, #38, #39 |
+| C64 | Cada chip de filtro informa o estado (`accessibilityState.selected`, `aria-pressed` no protótipo), tem alvo de 44x44 e o foco continua nele depois de tocar | C | F2 #35, #42 |
+| C65 | O termo só vale ao tocar em Buscar (ou Enter); Buscar com o campo vazio volta à lista paginada do filtro | C | F2 #37 |
 
 ### Feedback de UI (RF09)
 

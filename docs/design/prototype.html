@@ -149,7 +149,7 @@
   .actions { display: flex; gap: 8px; flex-wrap: wrap; }
   .searchbar { display: flex; align-items: flex-end; gap: 8px; padding: 12px 16px; }
   .searchbar .field { flex: 1; min-width: 0; }
-  .filters { display: flex; gap: 8px; padding: 0 16px 8px; flex: none; }
+  .filters { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 16px 8px; flex: none; }
   .fchip { min-height: 44px; padding: 0 16px; border-radius: 22px; border: 1px solid var(--a-border); background: var(--a-bg); color: var(--a-text); font: inherit; font-size: 15px; font-weight: 600; cursor: pointer; }
   .fchip[aria-pressed='true'] { background: var(--a-primary); color: var(--a-on-primary); border-color: var(--a-primary); }
   #toast:empty { display: none; }
@@ -200,7 +200,7 @@
   var SCREENS = {
     login: { label: 'Login', states: ['dados', 'carregando', 'erro'], scn: 'C01-C05 C08' },
     signup: { label: 'Cadastro', states: ['dados', 'carregando', 'erro'], scn: 'C02 C03' },
-    catalog: { label: 'Catálogo', states: ['dados', 'carregando', 'erro', 'vazio'], scn: 'C09-C14 C22 C23 C30 C31-C35 C52 C54' },
+    catalog: { label: 'Catálogo', states: ['dados', 'carregando', 'erro', 'vazio'], scn: 'C09-C14 C22 C23 C30 C31-C35 C52 C54 C55 C63-C65' },
     detail: { label: 'Detalhe', states: ['dados', 'carregando', 'erro', 'vazio'], scn: 'C15-C17 C20 C53' },
     profile: { label: 'Perfil', states: ['dados', 'sair', 'excluir', 'carregando', 'erro'], scn: 'C07 C56-C62' },
   };
@@ -221,7 +221,7 @@
     ['code', 'if (insets.equals(last)) return;'],
     ['p', 'More context in the linked issue.'],
   ];
-  var st = { screen: 'login', state: 'dados', saved: { 31204: true, 31166: true, 31152: true }, studied: { 31187: 5, 31152: 4 }, filter: 'todos', applied: '', query: '', searched: false, open: PRS[0], toast: '', email: 'ana@exemplo.com', pass: 'segredo123', pw: '', focusSel: null };
+  var st = { screen: 'login', state: 'dados', saved: { 31204: true, 31166: true, 31152: true }, studied: { 31187: 5, 31152: 4 }, filter: 'todos', applied: '', query: '', open: PRS[0], toast: '', email: 'ana@exemplo.com', pass: 'segredo123', pw: '', focusSel: null };
   var app = document.getElementById('app'), viewEl = document.getElementById('view'), toastEl = document.getElementById('toast');
   var focusReset = false;
 
@@ -251,12 +251,9 @@
   function empty(t, s) { return '<div class="center"><div class="t">' + esc(t) + '</div>' + (s ? '<div class="s">' + esc(s) + '</div>' : '') + '</div>'; }
   function card(pr) {
     var on = !!st.saved[pr.n];
-    return '<div class="card"><button class="open" data-pr="' + pr.n + '" aria-label="PR #' + pr.n + ': ' + esc(pr.t) + ', de ' + esc(pr.a) + '">' + avatar(pr) +
+    return '<div class="card"><button class="open" data-pr="' + pr.n + '" aria-label="PR #' + pr.n + ': ' + esc(pr.t) + ', de ' + esc(pr.a) + (st.filter === 'estudados' && st.studied[pr.n] ? ', nota ' + st.studied[pr.n] + ' de 5' : '') + '">' + avatar(pr) +
       '<span class="title">' + esc(pr.t) + '</span><span class="meta">#' + pr.n + ' · ' + esc(pr.a) + '</span>' + (st.filter === 'estudados' && st.studied[pr.n] ? stars(st.studied[pr.n], false) : '') + '</button>' +
       '<button class="save" data-save="' + pr.n + '" aria-label="' + (on ? 'Remover dos salvos' : 'Salvar para estudar') + '">' + (on ? '★' : '☆') + '</button></div>';
-  }
-  function row(pr, extra) {
-    return '<button class="list-row" data-pr="' + pr.n + '">' + avatar(pr) + '<span class="grow"><div class="title">' + esc(pr.t) + '</div><div class="meta">#' + pr.n + ' · ' + esc(pr.a) + '</div></span>' + (extra || '') + '</button>';
   }
 
   function dialog(kind) {
@@ -291,7 +288,7 @@
     }
     if (s === 'catalog') {
       var h = nav('Review Lab', false, '<button class="icon-btn" data-go="profile" aria-label="Perfil">Perfil</button>') +
-        '<div class="searchbar"><div class="field"><label for="p-q">Buscar PRs</label><input id="p-q" placeholder="Ex.: navigation bar" value="' + esc(st.query) + '"></div><button class="btn" data-run>Buscar</button></div>' +
+        '<div class="searchbar"><div class="field"><label for="p-q">Buscar PRs</label><input id="p-q" type="search" enterkeyhint="search" placeholder="Ex.: navigation bar" value="' + esc(st.query) + '"></div><button class="btn" data-run>Buscar</button></div>' +
         '<div class="filters" role="group" aria-label="Filtrar lista">' + [['todos', 'Todos'], ['salvos', 'Salvos'], ['estudados', 'Estudados']].map(function (f) {
           return '<button class="fchip" data-filter="' + f[0] + '" aria-pressed="' + (st.filter === f[0]) + '">' + f[1] + '</button>';
         }).join('') + '</div>';
@@ -409,7 +406,9 @@
     if (t.dataset.pr) { st.open = PRS.filter(function (p) { return String(p.n) === t.dataset.pr; })[0]; return go('detail'); }
     if (t.dataset.save) {
       var n = Number(t.dataset.save); st.saved[n] = !st.saved[n];
-      st.toast = st.saved[n] ? 'Salvo para estudar' : 'Removido dos salvos'; return render();
+      st.toast = st.saved[n] ? 'Salvo para estudar' : 'Removido dos salvos';
+      if (!st.saved[n] && st.screen === 'catalog' && st.filter === 'salvos') st.focusSel = '[data-filter="salvos"]';
+      return render();
     }
     if (t.dataset.study !== undefined) {
       var m = st.open.n; if (st.studied[m]) delete st.studied[m]; else st.studied[m] = 4;
