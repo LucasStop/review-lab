@@ -69,7 +69,7 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 
 | ID | Cenário | Nível | Status |
 |---|---|---|---|
-| C09 | Grade em 2 colunas com avatar e título | C, E2E | ok #35 (`CatalogScreen.test.tsx`, `.maestro/catalog.yaml`) |
+| C09 | Grade em 2 colunas com avatar e título | C, E2E | ok #35 (card em `PullRequestCard.test.tsx`; as 2 colunas só aparecem no simulador: conferidas a olho no screenshot, o fluxo `.maestro/catalog.yaml` cobre a carga e a rolagem) |
 | C10 | Autor apagado (`ghost`) ou sem avatar mostra placeholder | U, C | U ok; C ok #34 (`PullRequestCard.test.tsx`, `avatar.test.ts`) |
 | C11 | Rolagem infinita anexa a próxima página, com loader no rodapé | I, E2E | ok #35 (`CatalogScreen.test.tsx`, `.maestro/catalog.yaml`) |
 | C12 | Na última página não há mais pedidos (`hasNext` falso) | U, I | ok #35 (U do parser de `Link`; I em `CatalogScreen.test.tsx`) |

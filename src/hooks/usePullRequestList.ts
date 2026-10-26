@@ -29,6 +29,8 @@ export function usePullRequestList() {
   const page = useRef(0);
   const busy = useRef(false);
   const alive = useRef(true);
+  // Última operação que falhou: o "Tentar novamente" do rodapé repete essa, seja página 2 ou refresh.
+  const failed = useRef<{ next: number; refresh: boolean }>({ next: 2, refresh: false });
 
   useEffect(() => {
     alive.current = true;
@@ -59,6 +61,7 @@ export function usePullRequestList() {
         },
         (error) => {
           if (!alive.current) return;
+          failed.current = { next, refresh };
           const appError = toAppError(error);
           setState((s) =>
             next === 1 && s.items.length === 0
@@ -88,7 +91,8 @@ export function usePullRequestList() {
 
   // O estado inicial já é `loading`.
   useEffect(() => {
-    void request(1, false);
+    // StrictMode roda o efeito duas vezes em dev: o segundo não gasta outra requisição.
+    if (!busy.current) void request(1, false);
   }, [request]);
 
   const loadMore = useCallback(() => {
@@ -98,7 +102,12 @@ export function usePullRequestList() {
 
   const retryMore = useCallback(
     () =>
-      start(page.current + 1, false, (s) => ({ ...s, loadingMore: true, moreError: undefined })),
+      start(failed.current.next, failed.current.refresh, (s) => ({
+        ...s,
+        loadingMore: !failed.current.refresh,
+        refreshing: failed.current.refresh,
+        moreError: undefined,
+      })),
     [start],
   );
 

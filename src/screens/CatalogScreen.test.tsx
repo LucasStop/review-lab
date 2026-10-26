@@ -160,3 +160,22 @@ test('a failure on page 2 keeps the list and shows the error in the footer', asy
   expect(await screen.findByText('PR 1')).toBeTruthy();
   expect(screen.queryByTestId('catalog.footer-error')).toBeNull();
 });
+
+test('a failed pull-to-refresh keeps the list and its retry reloads page 1, not page 2', async () => {
+  mockList
+    .mockResolvedValueOnce(page([2, 1], true))
+    .mockRejectedValueOnce(new AppError('network', 'Sem conexão. Confira a internet.'))
+    .mockResolvedValueOnce(page([9, 2], true));
+  await renderCatalog();
+  await screen.findByTestId('catalog.card.0');
+
+  await act(async () => {
+    screen.getByTestId('catalog.list').props.onRefresh();
+  });
+  expect(await screen.findByTestId('catalog.footer-error')).toBeTruthy();
+  expect(screen.getByText('PR 1')).toBeTruthy();
+
+  await fireEvent.press(screen.getByLabelText('Tentar novamente'));
+  expect(await screen.findByText('PR 9')).toBeTruthy();
+  expect(mockList).toHaveBeenLastCalledWith(1, undefined, true);
+});
