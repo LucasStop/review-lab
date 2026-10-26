@@ -1,5 +1,5 @@
 import { beforeEach, expect, jest, test } from '@jest/globals';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, createNavigationContainerRef } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { Linking } from 'react-native';
@@ -35,10 +35,11 @@ const detail = (over: Partial<PullRequestDetailView> = {}): PullRequestDetailVie
 });
 
 const Stack = createNativeStackNavigator();
+const navRef = createNavigationContainerRef();
 
 async function renderDetail() {
   await render(
-    <NavigationContainer>
+    <NavigationContainer ref={navRef}>
       <Stack.Navigator>
         <Stack.Screen
           name="Detail"
@@ -102,4 +103,28 @@ test('C26: an error offers "Tentar novamente" and retries the same PR', async ()
   await act(async () => {});
   expect(await screen.findByTestId('detail.title')).toBeTruthy();
   expect(mockGet).toHaveBeenCalledTimes(2);
+});
+
+test('C53: the header shows "PR #n" while loading and the PR title once it arrives', async () => {
+  let release: (d: PullRequestDetailView) => void = () => {};
+  mockGet.mockReturnValue(new Promise((resolve) => (release = resolve)));
+  await renderDetail();
+
+  expect((navRef.getCurrentOptions() as { title?: string }).title).toBe('PR #7');
+  await act(async () => release(detail()));
+  expect((navRef.getCurrentOptions() as { title?: string }).title).toBe('Fix the parser');
+});
+
+test('C20: a link that is not http(s) is not tappable', async () => {
+  const open = jest.spyOn(Linking, 'openURL').mockResolvedValue(undefined);
+  open.mockClear();
+  mockGet.mockResolvedValue(
+    detail({
+      blocks: [{ type: 'paragraph', content: [{ text: 'ruim', href: 'javascript:alert(1)' }] }],
+    }),
+  );
+  await renderDetail();
+
+  await fireEvent.press(await screen.findByText('ruim'));
+  expect(open).not.toHaveBeenCalled();
 });

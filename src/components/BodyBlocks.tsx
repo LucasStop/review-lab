@@ -1,4 +1,4 @@
-import { Linking, StyleSheet, Text, View } from 'react-native';
+import { Linking, Platform, StyleSheet, Text, View } from 'react-native';
 
 import { colors, radius, spacing, typography } from '../theme';
 import type { Block, Inline } from '../utils/sanitizeHtml';
@@ -7,19 +7,20 @@ import type { Block, Inline } from '../utils/sanitizeHtml';
 // executa o conteúdo do PR (ADR 0001).
 function Spans({ content }: { content: Inline[] }) {
   return content.map((span, index) => {
+    // Defesa em profundidade: o sanitizeHtml já descarta o resto, mas o app não abre outro esquema.
+    const href = span.href && /^https?:\/\//i.test(span.href) ? span.href : undefined;
     const style = [
       span.bold && styles.bold,
       span.italic && styles.italic,
       span.code && styles.inlineCode,
-      span.href && styles.link,
+      href && styles.link,
     ];
-    const href = span.href;
     return (
       <Text
         key={index}
         style={style}
         accessibilityRole={href ? 'link' : undefined}
-        onPress={href ? () => void Linking.openURL(href) : undefined}
+        onPress={href ? () => Linking.openURL(href).catch(() => {}) : undefined}
       >
         {span.text}
       </Text>
@@ -75,6 +76,8 @@ export function BodyBlocks({ blocks }: { blocks: Block[] }) {
   );
 }
 
+const mono = Platform.select({ ios: 'Menlo', default: 'monospace' });
+
 const styles = StyleSheet.create({
   container: { gap: spacing.md },
   text: { ...typography.body, color: colors.text },
@@ -82,7 +85,7 @@ const styles = StyleSheet.create({
   bold: { fontWeight: '700' },
   italic: { fontStyle: 'italic' },
   link: { color: colors.link, textDecorationLine: 'underline' },
-  inlineCode: { fontFamily: 'Menlo', backgroundColor: colors.surface },
+  inlineCode: { fontFamily: mono, backgroundColor: colors.surface },
   quote: {
     color: colors.textMuted,
     borderLeftWidth: spacing.xs,
@@ -91,7 +94,7 @@ const styles = StyleSheet.create({
   },
   codeBlock: {
     ...typography.caption,
-    fontFamily: 'Menlo',
+    fontFamily: mono,
     color: colors.text,
     backgroundColor: colors.surface,
     borderRadius: radius.md,

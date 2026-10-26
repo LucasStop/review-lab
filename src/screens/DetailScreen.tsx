@@ -18,10 +18,10 @@ export function DetailScreen({ navigation, route }: Props) {
   const pr = useFetch(fetcher);
   const title = pr.status === 'data' ? pr.data.title : undefined;
 
-  // O header mostra "PR #n" até o título chegar.
+  // O header mostra "PR #n" até o título chegar; trocar de número não deixa o título anterior.
   useEffect(() => {
-    if (title) navigation.setOptions({ title });
-  }, [navigation, title]);
+    navigation.setOptions({ title: title ?? `PR #${number}` });
+  }, [navigation, title, number]);
 
   if (pr.status === 'loading') {
     return (
