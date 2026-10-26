@@ -15,7 +15,7 @@ Legenda: **base** quer dizer que a lógica existe, mas falta a tela.
 | RF05 Favoritos (filtro Salvos no Catálogo) | 15% com RF04 | base: `useFavorites().favorites` e `EmptyState` (PR #99) | #38 | Luc-Bruno |
 | RF06 Persistência | 10% | `usePersistedList` no AsyncStorage com chave `rl.<userId>.<nome>`, que recusa gravar antes da hidratação (#24, #25) | #45 (sem dado zerado na carga) | Luc-Bruno |
 | RF07 Login, sessão, estudados | 10% | login e cadastro com hash e sal (#29 e #31), navegação condicional e Sair provisório no Catálogo (#32), exclusão de conta no serviço (#124), `StudiedContext` com nota de 1 a 5 (#25), marcar como estudado com a nota editável no detalhe (#27) | #39 filtro Estudados; Perfil com Sair e Excluir conta (#125, além da rubrica) | LucasStop, Luc-Bruno |
-| RF08 Busca (campo e botão no Catálogo) | 10% | base: `searchPullRequests` e `buildSearchQuery` (PR #106) | #37 | Luc-Bruno |
+| RF08 Busca (campo e botão no Catálogo) | 10% | campo "Buscar PRs" e botão "Buscar" no Catálogo, com carregando, erro, limite com horário e "Nenhum resultado para" o termo (#37); `searchPullRequests` e `buildSearchQuery` (PR #106) | — | Luc-Bruno |
 | RF09 Feedback | 10% | `ActivityIndicator` e `ErrorState` com "Tentar novamente" no Catálogo e no detalhe; erro da página seguinte no rodapé; `AppError` com horário de volta do limite (PR #104) | #41, que confere todo fluxo | Luc-Bruno |
 | RF10 Acessibilidade | 10% | tokens com contraste testado (#114); label, role e toque 44x44 nos componentes | #42, #43 e #44 | Luc-Bruno |
 
@@ -39,12 +39,12 @@ Padrão do projeto: a lógica fica numa fábrica `create*` pura, que recebe as d
 | [src/utils/sanitizeHtml.ts](../src/utils/sanitizeHtml.ts) | converte `body_html` em blocos tipados e descarta script, style, iframe e img | 12 |
 | [src/utils/appError.ts](../src/utils/appError.ts) | erro normalizado em 7 tipos, com mensagem fixa sem token nem URL | 8 |
 | [src/utils/linkHeader.ts](../src/utils/linkHeader.ts) | parse do header `Link` | 4 |
-| [src/utils/pullRequest.ts](../src/utils/pullRequest.ts) | `toSummary`, `toDetail` e `buildSearchQuery` | 7 |
+| [src/utils/pullRequest.ts](../src/utils/pullRequest.ts) | `toSummary`, `toDetail` e `buildSearchQuery` | 8 |
 | [src/utils/avatar.ts](../src/utils/avatar.ts) | inicial e cor de fundo do avatar sem foto, com o contraste conferido | 3 |
 | [src/utils/collections.ts](../src/utils/collections.ts) | validação e operações das listas de salvos e estudados (`toggleFavorite`, `withStudied`, `withoutStudied`) | 7 |
 | [src/utils/mergePage.ts](../src/utils/mergePage.ts) | junta a página nova à lista sem repetir PR | 3 |
 | [src/theme/index.ts](../src/theme/index.ts) | tokens e pares de texto e fundo | 4 (contraste, espaçamento e alvo de toque) |
-| [src/hooks/useFetch.ts](../src/hooks/useFetch.ts) | `{status, data, error, retry}` com cancelamento por `AbortController` | pelo `DetailScreen.test.tsx` |
+| [src/hooks/useFetch.ts](../src/hooks/useFetch.ts) | `{status, data, error, retry}` com cancelamento por `AbortController` | pelo `DetailScreen.test.tsx` e pelo `CatalogScreen.test.tsx` |
 | [src/hooks/usePersistedList.ts](../src/hooks/usePersistedList.ts) | lista por usuário no AsyncStorage, com hidratação | pelos testes dos Contexts |
 | [src/hooks/usePullRequestList.ts](../src/hooks/usePullRequestList.ts) | páginas, refresh e erro da página seguinte no Catálogo | pelo `CatalogScreen.test.tsx` |
 | [src/contexts/AuthContext.tsx](../src/contexts/AuthContext.tsx) | `AuthProvider` e `useAuth` com hidratação | `AuthContext.test.tsx`, `RootNavigator.test.tsx` |
@@ -64,7 +64,7 @@ Totais da última execução: tabela "Execuções" de [TESTES.md](TESTES.md).
 | `cat:dados` | LucasStop | #15-#22 | — |
 | `cat:auth` | LucasStop | #29-#32, #124 | — |
 | `cat:entrega` | LucasStop | #46 | #47-#56, #111 (com Luc-Bruno) |
-| `cat:navegacao-telas` | Luc-Bruno | #33-#36 | #37-#39, #125, #140 |
+| `cat:navegacao-telas` | Luc-Bruno | #33-#37 | #38, #39, #125, #140 |
 | `cat:estado` | Luc-Bruno | #23-#28 | — |
 | `cat:ux-acessibilidade` | Luc-Bruno | #40, #114, #119, #123, #128, #130 | #41-#45 |
 | `cat:nuvem-bonus` | a definir depois do MVP | — | #57-#59 |
