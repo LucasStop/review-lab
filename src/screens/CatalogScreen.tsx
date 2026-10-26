@@ -4,6 +4,7 @@ import { ActivityIndicator, FlatList, StyleSheet, View, useWindowDimensions } fr
 import { EmptyState } from '../components/EmptyState';
 import { ErrorState } from '../components/ErrorState';
 import { PullRequestCard } from '../components/PullRequestCard';
+import { useFavorites } from '../contexts/FavoritesContext';
 import { usePullRequestList } from '../hooks/usePullRequestList';
 import type { AppStackParamList } from '../navigation/types';
 import { colors, spacing } from '../theme';
@@ -14,6 +15,7 @@ const COLUMNS = 2;
 
 export function CatalogScreen({ navigation }: Props) {
   const list = usePullRequestList();
+  const { isFavorite, toggle } = useFavorites();
   const { width } = useWindowDimensions();
   const cardWidth = (width - spacing.lg * 2 - spacing.md * (COLUMNS - 1)) / COLUMNS;
 
@@ -50,10 +52,9 @@ export function CatalogScreen({ navigation }: Props) {
         <View style={{ width: cardWidth }}>
           <PullRequestCard
             pr={item}
-            // Salvar entra com o FavoritesContext (#24, #26).
-            saved={false}
+            saved={isFavorite(item.number)}
             onPress={() => navigation.navigate('Detail', { number: item.number })}
-            onToggleSave={() => {}}
+            onToggleSave={() => toggle(item)}
             testID={`catalog.card.${index}`}
             saveTestID={`catalog.save.${index}`}
           />

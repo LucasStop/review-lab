@@ -93,7 +93,7 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 
 | ID | Cenário | Nível | Status |
 |---|---|---|---|
-| C21 | Salvar no detalhe muda o ícone do mesmo PR no card do catálogo | I, E2E | F2 #24, #26 |
+| C21 | Salvar no detalhe muda o ícone do mesmo PR no card do catálogo | I, E2E | I ok (`CatalogScreen.test.tsx`, `DetailScreen.test.tsx`); E2E em `.maestro/favorite.yaml` |
 | C22 | O filtro Salvos do Catálogo lista os salvos e atualiza ao remover | C, E2E | F2 #38 |
 | C23 | Filtro Salvos vazio mostra `EmptyState` amigável (`ListEmptyComponent`) | C | F2 #38 |
 | C54 | Busca, filtros Salvos e Estudados e Perfil são acessíveis na tela do Catálogo | E2E | F2 #35 |
@@ -158,7 +158,7 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 | ID | Cenário | Nível | Status |
 |---|---|---|---|
 | C43 | Todo tocável e toda imagem tem `accessibilityRole` e `accessibilityLabel` | C | F2 #42 (`StarRating` e `ErrorState` já têm) |
-| C44 | Botão de estado informa o estado (`selected` ou label que muda) | C | F2 #26, #42 |
+| C44 | Botão de estado informa o estado (`selected` ou label que muda) | C | ok #26; #42 pendente |
 | C45 | Alvo de toque de pelo menos 44x44 | C | botão salvar do card ok #34; restante F2 #43 |
 | C46 | Pares de cor dos tokens com contraste de pelo menos 4.5:1 | U | #114 |
 | C47 | Fonte do sistema no máximo não corta texto nem sobrepõe; nenhum `allowFontScaling={false}` no código (`git grep`) | M | roteiro |

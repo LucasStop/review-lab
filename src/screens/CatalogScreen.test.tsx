@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 
 import type { PullRequestPage, PullRequestSummary } from '../types/github';
+import { FavoritesProvider } from '../contexts/FavoritesContext';
 import { AppError } from '../utils/appError';
 import { CatalogScreen } from './CatalogScreen';
 
@@ -29,12 +30,14 @@ const Empty = () => null;
 
 async function renderCatalog() {
   await render(
-    <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen name="Catalog" component={CatalogScreen as never} />
-        <Stack.Screen name="Detail" component={Empty} />
-      </Stack.Navigator>
-    </NavigationContainer>,
+    <FavoritesProvider userId="u1">
+      <NavigationContainer>
+        <Stack.Navigator>
+          <Stack.Screen name="Catalog" component={CatalogScreen as never} />
+          <Stack.Screen name="Detail" component={Empty} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </FavoritesProvider>,
   );
 }
 
@@ -178,4 +181,23 @@ test('a failed pull-to-refresh keeps the list and its retry reloads page 1, not 
   await fireEvent.press(screen.getByLabelText('Tentar novamente'));
   expect(await screen.findByText('PR 9')).toBeTruthy();
   expect(mockList).toHaveBeenLastCalledWith(1, undefined, true);
+});
+
+test('C21: tapping the star saves the PR and the icon reflects it, tapping again removes it', async () => {
+  mockList.mockResolvedValue(page([3, 2], false));
+  await renderCatalog();
+
+  const star = await screen.findByTestId('catalog.save.0');
+  expect(star.props.accessibilityState).toMatchObject({ selected: false });
+  await fireEvent.press(star);
+  expect(screen.getByTestId('catalog.save.0').props.accessibilityState).toMatchObject({
+    selected: true,
+  });
+  expect(screen.getByTestId('catalog.save.1').props.accessibilityState).toMatchObject({
+    selected: false,
+  });
+  await fireEvent.press(screen.getByTestId('catalog.save.0'));
+  expect(screen.getByTestId('catalog.save.0').props.accessibilityState).toMatchObject({
+    selected: false,
+  });
 });

@@ -5,6 +5,7 @@ import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { Linking } from 'react-native';
 
 import type { PullRequestDetailView } from '../types/github';
+import { FavoritesProvider } from '../contexts/FavoritesContext';
 import { AppError } from '../utils/appError';
 import { DetailScreen } from './DetailScreen';
 
@@ -39,16 +40,18 @@ const navRef = createNavigationContainerRef();
 
 async function renderDetail() {
   await render(
-    <NavigationContainer ref={navRef}>
-      <Stack.Navigator>
-        <Stack.Screen
-          name="Detail"
-          component={DetailScreen as never}
-          initialParams={{ number: 7 }}
-          options={{ title: 'PR #7' }}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>,
+    <FavoritesProvider userId="u1">
+      <NavigationContainer ref={navRef}>
+        <Stack.Navigator>
+          <Stack.Screen
+            name="Detail"
+            component={DetailScreen as never}
+            initialParams={{ number: 7 }}
+            options={{ title: 'PR #7' }}
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </FavoritesProvider>,
   );
 }
 
@@ -127,4 +130,19 @@ test('C20: a link that is not http(s) is not tappable', async () => {
 
   await fireEvent.press(await screen.findByText('ruim'));
   expect(open).not.toHaveBeenCalled();
+});
+
+test('C44: the save button reports its state and flips on press', async () => {
+  mockGet.mockResolvedValue(detail());
+  await renderDetail();
+
+  const save = await screen.findByTestId('detail.save');
+  expect(save.props.accessibilityState).toMatchObject({ selected: false });
+  expect(screen.getByLabelText('Salvar para estudar')).toBeTruthy();
+
+  await fireEvent.press(save);
+  expect(screen.getByTestId('detail.save').props.accessibilityState).toMatchObject({
+    selected: true,
+  });
+  expect(screen.getByLabelText('Salvo para estudar')).toBeTruthy();
 });
