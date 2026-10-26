@@ -1,4 +1,5 @@
 import { beforeEach, expect, jest, test } from '@jest/globals';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NavigationContainer, createNavigationContainerRef } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
@@ -6,6 +7,7 @@ import { Linking } from 'react-native';
 
 import type { PullRequestDetailView } from '../types/github';
 import { FavoritesProvider } from '../contexts/FavoritesContext';
+import { StudiedProvider } from '../contexts/StudiedContext';
 import { AppError } from '../utils/appError';
 import { DetailScreen } from './DetailScreen';
 
@@ -41,23 +43,28 @@ const navRef = createNavigationContainerRef();
 async function renderDetail() {
   await render(
     <FavoritesProvider userId="u1">
-      <NavigationContainer ref={navRef}>
-        <Stack.Navigator>
-          <Stack.Screen
-            name="Detail"
-            component={DetailScreen as never}
-            initialParams={{ number: 7 }}
-            options={{ title: 'PR #7' }}
-          />
-        </Stack.Navigator>
-      </NavigationContainer>
+      <StudiedProvider userId="u1">
+        <NavigationContainer ref={navRef}>
+          <Stack.Navigator>
+            <Stack.Screen
+              name="Detail"
+              component={DetailScreen as never}
+              initialParams={{ number: 7 }}
+              options={{ title: 'PR #7' }}
+            />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </StudiedProvider>
     </FavoritesProvider>,
   );
 }
 
-beforeEach(() => {
+const stateOf = (label: string) => screen.getByLabelText(label).props.accessibilityState;
+
+beforeEach(async () => {
   mockGet.mockReset();
   jest.restoreAllMocks();
+  await AsyncStorage.clear();
 });
 
 test('C36: shows the loader while the detail loads', async () => {
@@ -145,4 +152,60 @@ test('C44: the save button reports its state and flips on press', async () => {
     selected: true,
   });
   expect(screen.getByLabelText('Salvo para estudar')).toBeTruthy();
+});
+
+test('C28: marking as studied stores rating 4, shows the stars and another star changes it', async () => {
+  mockGet.mockResolvedValue(detail());
+  await renderDetail();
+
+  const studied = await screen.findByTestId('detail.studied');
+  expect(studied.props.accessibilityState).toMatchObject({ selected: false });
+  expect(screen.queryByTestId('detail.rating')).toBeNull();
+
+  await fireEvent.press(studied);
+  expect(screen.getByTestId('detail.studied').props.accessibilityState).toMatchObject({
+    selected: true,
+  });
+  expect(screen.getByLabelText('Estudado')).toBeTruthy();
+  expect(screen.getByText('Nota de utilidade')).toBeTruthy();
+  expect(stateOf('Dar nota 4 de 5')).toMatchObject({ selected: true });
+
+  await fireEvent.press(screen.getByLabelText('Dar nota 2 de 5'));
+  expect(stateOf('Dar nota 2 de 5')).toMatchObject({ selected: true });
+  expect(stateOf('Dar nota 4 de 5')).toMatchObject({ selected: false });
+});
+
+test('C28: reopening the detail shows the stored rating', async () => {
+  mockGet.mockResolvedValue(detail());
+  await renderDetail();
+  await fireEvent.press(await screen.findByTestId('detail.studied'));
+  await fireEvent.press(screen.getByLabelText('Dar nota 5 de 5'));
+  await screen.unmount();
+
+  // Os providers montam de novo: a nota só pode vir do AsyncStorage.
+  await renderDetail();
+  expect((await screen.findByTestId('detail.studied')).props.accessibilityState).toMatchObject({
+    selected: true,
+  });
+  expect(stateOf('Dar nota 5 de 5')).toMatchObject({ selected: true });
+});
+
+test('C29: unmarking hides the rating and stays unmarked after reopening', async () => {
+  mockGet.mockResolvedValue(detail());
+  await renderDetail();
+  await fireEvent.press(await screen.findByTestId('detail.studied'));
+  await fireEvent.press(screen.getByTestId('detail.studied'));
+
+  expect(screen.getByTestId('detail.studied').props.accessibilityState).toMatchObject({
+    selected: false,
+  });
+  expect(screen.getByLabelText('Marcar como estudado')).toBeTruthy();
+  expect(screen.queryByTestId('detail.rating')).toBeNull();
+
+  await screen.unmount();
+  await renderDetail();
+  expect((await screen.findByTestId('detail.studied')).props.accessibilityState).toMatchObject({
+    selected: false,
+  });
+  expect(screen.queryByTestId('detail.rating')).toBeNull();
 });

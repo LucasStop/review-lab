@@ -1,0 +1,117 @@
+# C28: marcar como estudado no detalhe e trocar a nota. C24: salvo e estudado sobrevivem a fechar
+# e reabrir o app.
+# Gasta requisições da API do GitHub (60 por hora sem token). Precisa do Metro (ver README.md).
+appId: host.exp.Exponent
+name: studied
+---
+- runFlow: subflows/open-app.yaml
+- extendedWaitUntil:
+    notVisible:
+      id: 'loading'
+    timeout: 90000
+- runFlow:
+    when:
+      visible:
+        id: 'login.screen'
+    commands:
+      - evalScript: ${output.email = 'e2e' + Date.now() + '@exemplo.com'}
+      - tapOn:
+          id: 'login.signup'
+      - tapOn:
+          id: 'signup.email'
+      - inputText: ${output.email}
+      - tapOn:
+          id: 'signup.password'
+      - inputText: 'segredo123'
+      - tapOn:
+          id: 'signup.submit'
+- extendedWaitUntil:
+    visible:
+      id: 'catalog.card.0'
+    timeout: 30000
+- tapOn:
+    id: 'catalog.card.0'
+# O primeiro toque pode cair enquanto a lista ainda reorganiza; repete se o detalhe não abriu.
+- runFlow:
+    when:
+      notVisible:
+        id: 'detail.studied'
+    commands:
+      - tapOn:
+          id: 'catalog.card.0'
+          optional: true
+- extendedWaitUntil:
+    visible:
+      id: 'detail.studied'
+    timeout: 30000
+# O estado persiste entre execuções: começa sempre desmarcado.
+- runFlow:
+    when:
+      visible:
+        id: 'detail.studied'
+        selected: true
+    commands:
+      - tapOn:
+          id: 'detail.studied'
+- runFlow:
+    when:
+      visible:
+        id: 'detail.save'
+        selected: true
+    commands:
+      - tapOn:
+          id: 'detail.save'
+- tapOn:
+    id: 'detail.save'
+- tapOn:
+    id: 'detail.studied'
+- assertVisible:
+    id: 'detail.studied'
+    selected: true
+# Marcar já grava a nota 4; tocar na segunda estrela troca para 2.
+- assertVisible:
+    text: 'Dar nota 4 de 5'
+    selected: true
+- tapOn: 'Dar nota 2 de 5'
+- assertVisible:
+    text: 'Dar nota 2 de 5'
+    selected: true
+# C24: fecha e reabre o app. A sessão continua e o mesmo PR volta salvo e com a nota 2.
+- runFlow: subflows/open-app.yaml
+- extendedWaitUntil:
+    visible:
+      id: 'catalog.card.0'
+    timeout: 90000
+- tapOn:
+    id: 'catalog.card.0'
+- runFlow:
+    when:
+      notVisible:
+        id: 'detail.studied'
+    commands:
+      - tapOn:
+          id: 'catalog.card.0'
+          optional: true
+- extendedWaitUntil:
+    visible:
+      id: 'detail.studied'
+    timeout: 30000
+- assertVisible:
+    id: 'detail.save'
+    selected: true
+- assertVisible:
+    id: 'detail.studied'
+    selected: true
+- assertVisible:
+    text: 'Dar nota 2 de 5'
+    selected: true
+# Desmarcar esconde a nota. Deixa o estado limpo para a próxima execução.
+- tapOn:
+    id: 'detail.studied'
+- assertNotVisible:
+    id: 'detail.rating'
+- tapOn:
+    id: 'detail.save'
+- assertVisible:
+    id: 'detail.save'
+    selected: false
