@@ -7,7 +7,7 @@ name: search
 - runFlow: subflows/open-app.yaml
 - extendedWaitUntil:
     visible:
-      id: 'login\.screen|catalog\.list'
+      id: 'login\.screen|catalog\.logout'
     timeout: 90000
 - runFlow:
     when:
@@ -54,6 +54,16 @@ name: search
 - inputText: 'fix'
 - tapOn:
     id: 'catalog.search-submit'
+# O card 0 da lista paginada fica na tela até a busca começar: espera o loader sair antes.
+- extendedWaitUntil:
+    visible:
+      id: 'loading'
+    timeout: 5000
+    optional: true
+- extendedWaitUntil:
+    notVisible:
+      id: 'loading'
+    timeout: 30000
 - extendedWaitUntil:
     visible:
       id: 'catalog.card.0'
