@@ -39,14 +39,14 @@ export function createAuth({
     signUp: async (email: string, password: string) =>
       open(await credentials.register(email, password)),
     signOut: () => kv.remove(KEY),
-    // Senha errada não apaga nada. A sessão sai por último: se algo falhar no meio, a conta
-    // continua entrável e a exclusão pode ser repetida.
+    // Senha errada não apaga nada. A credencial sai por último: se algo falhar no meio, ela
+    // continua lá e dá para entrar de novo e repetir a exclusão.
     deleteAccount: async (userId: string, password: string): Promise<AuthResult> => {
       const checked = await credentials.verify(userId, password);
       if (!checked.ok) return checked;
       await removeUserData(userId);
-      await credentials.remove(userId);
       await kv.remove(KEY);
+      await credentials.remove(userId);
       return checked;
     },
   };

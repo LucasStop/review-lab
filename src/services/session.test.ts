@@ -104,3 +104,11 @@ test('C61: deleteAccount leaves another user data alone', async () => {
   await auth.deleteAccount('u1', 'certa123');
   assert.equal(userData.get('rl.u2.favorites'), '[3]');
 });
+
+test('deleteAccount removes the session before the credential, so a failure keeps the account enterable', async () => {
+  const { auth, calls } = setup();
+  await auth.signIn('a@x.com', 'certa123');
+  await auth.deleteAccount('u1', 'certa123');
+  const removals = calls.filter((c) => c.startsWith('remove'));
+  assert.deepEqual(removals, ['remove rl.session', 'remove-credential u1']);
+});

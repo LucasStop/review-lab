@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { createStorage, userKey } from './storage.ts';
+import { createStorage, removeUserKeys, userKey } from './storage.ts';
 
 function setup(initial: Record<string, string> = {}) {
   const data = new Map(Object.entries(initial));
@@ -48,4 +48,19 @@ test('a kv that throws on read returns the fallback', async () => {
     remove: async () => {},
   });
   assert.deepEqual(await storage.read('rl.u.favorites', [] as string[]), []);
+});
+
+test('removeUserKeys removes only the keys of that user', async () => {
+  const keys = new Set([
+    'rl.u1.favorites',
+    'rl.u1.studied',
+    'rl.u2.favorites',
+    'rl.u11.favorites',
+    'rl.cache.x',
+  ]);
+  await removeUserKeys('u1', {
+    getAllKeys: async () => [...keys],
+    multiRemove: async (list) => void list.forEach((key) => keys.delete(key)),
+  });
+  assert.deepEqual([...keys].sort(), ['rl.cache.x', 'rl.u11.favorites', 'rl.u2.favorites']);
 });

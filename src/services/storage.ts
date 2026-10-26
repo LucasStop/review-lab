@@ -9,6 +9,18 @@ export type KV = {
 
 export const userKey = (userId: string, name: string) => `rl.${userId}.${name}`;
 
+// Apaga só as chaves `rl.<userId>.*`. O ponto final do prefixo impede casar com outro userId.
+export async function removeUserKeys(
+  userId: string,
+  kv: {
+    getAllKeys: () => Promise<readonly string[]>;
+    multiRemove: (keys: string[]) => Promise<void>;
+  },
+) {
+  const prefix = `rl.${userId}.`;
+  await kv.multiRemove((await kv.getAllKeys()).filter((key) => key.startsWith(prefix)));
+}
+
 export function createStorage(kv: KV) {
   // Dado corrompido, de outra versão ou disco com erro vira o valor padrão: o app abre vazio
   // em vez de travar na hidratação (RF06).
