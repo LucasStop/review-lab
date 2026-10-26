@@ -5,7 +5,9 @@ import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from
 import { Avatar } from '../components/Avatar';
 import { BodyBlocks } from '../components/BodyBlocks';
 import { ErrorState } from '../components/ErrorState';
+import { StarRating } from '../components/StarRating';
 import { useFavorites } from '../contexts/FavoritesContext';
+import { useStudied } from '../contexts/StudiedContext';
 import { useFetch } from '../hooks/useFetch';
 import type { AppStackParamList } from '../navigation/types';
 import { getPullRequest } from '../services/github';
@@ -13,12 +15,19 @@ import { colors, radius, spacing, touch, typography } from '../theme';
 
 type Props = NativeStackScreenProps<AppStackParamList, 'Detail'>;
 
+// Marcar já grava uma nota, porque a lista de estudados só guarda PR com nota de 1 a 5. O 4 vem
+// do protótipo.
+const FIRST_RATING = 4;
+
 export function DetailScreen({ navigation, route }: Props) {
   const { number } = route.params;
   const fetcher = useCallback((signal: AbortSignal) => getPullRequest(number, signal), [number]);
   const pr = useFetch(fetcher);
   const { isFavorite, toggle } = useFavorites();
+  const { getRating, markStudied, unmark } = useStudied();
   const saved = isFavorite(number);
+  const rating = getRating(number);
+  const studied = rating !== undefined;
   const title = pr.status === 'data' ? pr.data.title : undefined;
 
   // O header mostra "PR #n" até o título chegar; trocar de número não deixa o título anterior.
@@ -65,18 +74,36 @@ export function DetailScreen({ navigation, route }: Props) {
         {data.comments + data.reviewComments} comentários · {data.changedFiles} arquivos · +
         {data.additions} −{data.deletions}
       </Text>
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel={saved ? 'Salvo para estudar' : 'Salvar para estudar'}
-        accessibilityState={{ selected: saved }}
-        onPress={() => toggle(summary)}
-        style={styles.save}
-        testID="detail.save"
-      >
-        <Text style={[styles.saveText, saved && styles.savedText]}>
-          {saved ? '★ Salvo para estudar' : '☆ Salvar para estudar'}
-        </Text>
-      </Pressable>
+      <View style={styles.actions}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={saved ? 'Salvo para estudar' : 'Salvar para estudar'}
+          accessibilityState={{ selected: saved }}
+          onPress={() => toggle(summary)}
+          style={styles.action}
+          testID="detail.save"
+        >
+          <Text style={[styles.actionText, saved && styles.savedText]}>
+            {saved ? '★ Salvo para estudar' : '☆ Salvar para estudar'}
+          </Text>
+        </Pressable>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={studied ? 'Estudado' : 'Marcar como estudado'}
+          accessibilityState={{ selected: studied }}
+          onPress={() => (studied ? unmark(number) : markStudied(summary, FIRST_RATING))}
+          style={styles.action}
+          testID="detail.studied"
+        >
+          <Text style={styles.actionText}>{studied ? '✓ Estudado' : 'Marcar como estudado'}</Text>
+        </Pressable>
+      </View>
+      {studied ? (
+        <View style={styles.rating} testID="detail.rating">
+          <Text style={styles.label}>Nota de utilidade</Text>
+          <StarRating value={rating} onChange={(value) => markStudied(summary, value)} />
+        </View>
+      ) : null}
       <View testID="detail.body">
         {data.blocks.length > 0 ? (
           <BodyBlocks blocks={data.blocks} />
@@ -94,16 +121,19 @@ const styles = StyleSheet.create({
   content: { padding: spacing.lg, gap: spacing.lg },
   author: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
   title: { ...typography.title, color: colors.text },
-  save: {
+  // Quebra de linha: com fonte grande os dois botões não cabem lado a lado.
+  actions: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
+  action: {
     minHeight: touch.min,
-    alignSelf: 'flex-start',
     justifyContent: 'center',
     paddingHorizontal: spacing.lg,
     borderWidth: 1,
     borderColor: colors.border,
     borderRadius: radius.md,
   },
-  saveText: { ...typography.body, color: colors.text },
+  actionText: { ...typography.body, color: colors.text },
   savedText: { color: colors.star },
+  rating: { gap: spacing.xs },
+  label: { ...typography.caption, fontWeight: '600', color: colors.text },
   meta: { ...typography.caption, color: colors.textMuted },
 });

@@ -33,6 +33,7 @@ Cor nunca é o único sinal: o estado "salvo" muda ícone e label, a nota usa �
 | `radius` | `sm` 4, `md` 8, `lg` 12, `pill` 999 |
 | `typography` | `title` 22/700, `heading` 18/600, `body` 16/400, `caption` 14/400, `button` 16/600 |
 | `touch.min` | 44 |
+| `glyph` | `md` 24 (estrela de salvar do card), `lg` 28 (estrela da nota editável) |
 
 Regras de texto (RF10): nunca `allowFontScaling={false}`, nunca `height` ou `lineHeight` fixos em texto de conteúdo, nunca `numberOfLines` que esconda a informação principal. Contêiner de texto usa `minHeight`, não `height`.
 
@@ -49,9 +50,9 @@ Regras de texto (RF10): nunca `allowFontScaling={false}`, nunca `height` ou `lin
 | `ErrorState` | `message`, `onRetry` | `accessibilityRole="alert"` no texto da mensagem (no `View` o role não é exposto); botão "Tentar novamente" 44x44 | feito (#99, role corrigido no #117) |
 | `EmptyState` | `title`, `text?` | só texto; a tela decide se há ação | feito (#99) |
 | `ConfirmDialog` | `title`, `message`, `confirmLabel`, `onConfirm`, `onCancel`, `danger?`, `children?` (campo de senha) | `accessibilityRole="alert"` no texto; o foco entra no diálogo e volta ao botão de origem; fundo inerte (o RN `Modal` já prende o foco; o protótipo web não); Esc cancela; ação de perigo usa `danger` com `onPrimary`; o foco inicial vai para Cancelar em Sair e para o campo de senha em Excluir; alvo 44x44 | Fase 2 (#125) |
-| `StarRating` | `value`, `onChange?` | editável: 5 botões "Dar nota N de 5" com `selected`; somente leitura: um único elemento "Nota N de 5"; alvo 44x44 | feito (#98) |
+| `StarRating` | `value`, `onChange?` | editável: 5 botões "Dar nota N de 5" com `selected`; somente leitura: um único elemento "Nota N de 5"; alvo 44x44; as estrelas quebram linha com a fonte do sistema no máximo | feito (#98), tokens e teste no #27 |
 
-Os componentes feitos ainda têm cores soltas. Migram para os tokens no PR da primeira tela que os usa, sem mudar comportamento.
+Todos os componentes feitos já usam os tokens; o último a migrar foi o `StarRating`, no #27.
 
 ## Convenção de testID
 
@@ -75,7 +76,7 @@ Toda tela tem estes estados, e cada um aparece no protótipo: **carregando** (`A
 | Login | Auth | formulário | n/a | mensagem única "E-mail ou senha incorretos" | C03-C05, C08 |
 | Cadastro | Auth | formulário | n/a | e-mail repetido, senha curta | C02, C03 |
 | Catálogo | App | campo de busca (label "Buscar PRs") e botão "Buscar" no topo, filtros Todos, Salvos e Estudados (`aria-pressed`), grade de 2 colunas: avatar, título, número, autor, ícone de salvar; em Estudados o card mostra a nota | "Nenhum PR encontrado"; "Nenhum resultado para {termo}"; "Você ainda não salvou nenhum PR"; "Você ainda não marcou nenhum PR como estudado" | `ErrorState`; erro na página 2 mantém a lista e mostra o erro no rodapé; limite de requisições da busca com o horário; erro e carregando só valem em Todos e na busca, já que Salvos e Estudados vêm do Context; a busca só roda ao tocar em Buscar (ou Enter), e Buscar com o campo vazio volta à lista; o campo não tem placeholder, porque o label visível já diz o que digitar (feito no #37); o protótipo busca localmente e não mostra o limite | C09-C14, C22, C23, C30, C31-C35, C52, C54, C55, C63-C65 |
-| Detalhe | App | título no header, estatísticas, blocos de texto, salvar, estudado com nota | "Sem descrição" | `ErrorState` | C15-C17, C20, C53 |
+| Detalhe | App | título no header, estatísticas, blocos de texto; botões "☆ Salvar para estudar" e "Marcar como estudado", que viram "★ Salvo para estudar" e "✓ Estudado" com `selected`; marcar grava a nota 4 e mostra "Nota de utilidade" com o `StarRating` editável; desmarcar apaga a nota, e marcar de novo volta a 4, como no protótipo; o app não tem o aviso "Marcado como estudado, nota 4" do protótipo, e o leitor de tela lê o `selected` e o label novo do botão (conferido no #42) | "Sem descrição" | `ErrorState` | C15-C17, C20, C28, C29, C53 |
 | Perfil | App | e-mail, totais de salvos e estudados, nota média, Sair, Excluir conta | n/a | "Senha incorreta." no diálogo de exclusão; "Excluindo conta…" enquanto apaga | C07, C56-C62 |
 
 Navegação: o Catálogo é a tela principal, com busca e filtros Todos, Salvos e Estudados na mesma tela (aprovado pelo professor em 26/10/2026, desde que a usabilidade fique boa), e leva ao Perfil pelo header; Sair e Excluir conta ficam dentro do Perfil. Sem sessão, só a AuthStack existe.
