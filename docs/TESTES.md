@@ -81,13 +81,13 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 
 | ID | Cenário | Nível | Status |
 |---|---|---|---|
-| C15 | Tocar no card abre o detalhe com o número em `route.params` | E2E | F2 #36 |
-| C53 | O detalhe faz a segunda requisição pelo número e põe o título do PR no header com `navigation.setOptions` (hoje o `AppStack` mostra só "PR #n") | C | F2 #36 |
-| C16 | O detalhe mostra avatar maior, estatísticas (comentários, arquivos, +/-) e os blocos de texto | C | F2 #36 |
-| C17 | PR sem descrição mostra "Sem descrição", não erro | U, C | U ok; C F2 #36 |
+| C15 | Tocar no card abre o detalhe com o número em `route.params` | E2E | ok (`.maestro/detail.yaml`) |
+| C53 | O detalhe faz a segunda requisição pelo número e põe o título do PR no header com `navigation.setOptions` (hoje o `AppStack` mostra só "PR #n") | C | ok |
+| C16 | O detalhe mostra avatar maior, estatísticas (comentários, arquivos, +/-) e os blocos de texto | C | ok |
+| C17 | PR sem descrição mostra "Sem descrição", não erro | U, C | U ok; C ok |
 | C18 | HTML hostil (`script`, `on*`, `javascript:`, `iframe`, `img`) não chega à tela | U | ok |
 | C19 | HTML malformado não quebra nem vaza tag | U | ok |
-| C20 | Só link `http` ou `https` vira tocável | U, C | U ok; C F2 #36 |
+| C20 | Só link `http` ou `https` vira tocável | U, C | U ok; C ok |
 
 ### Salvos para estudar (RF04, RF05)
 
@@ -145,7 +145,7 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 
 | ID | Cenário | Nível | Status |
 |---|---|---|---|
-| C36 | `ActivityIndicator` na carga inicial do catálogo e do detalhe e na próxima página (`ListFooterComponent`) | C | catálogo ok #35; detalhe F2 #36, #41 |
+| C36 | `ActivityIndicator` na carga inicial do catálogo e do detalhe e na próxima página (`ListFooterComponent`) | C | catálogo ok #35; detalhe ok #36, #41 pendente |
 | C37 | Erro de rede mostra `ErrorState`, e "Tentar novamente" recarrega | C, I, M | C em #115; I F2 #41; M no roteiro |
 | C38 | `useFetch`: carregando, depois dados; erro, depois retry; cancela ao desmontar | I | F2 #41 |
 | C39 | Limite de requisições mostra o horário de volta (só onde não há cache: busca, PR nunca aberto, página nova) | U, M | U ok; M no roteiro |

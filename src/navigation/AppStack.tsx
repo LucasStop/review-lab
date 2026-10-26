@@ -4,6 +4,7 @@ import { Pressable, StyleSheet, Text } from 'react-native';
 import { useAuth } from '../contexts/AuthContext';
 import { colors, touch, typography } from '../theme';
 import { CatalogScreen } from '../screens/CatalogScreen';
+import { DetailScreen } from '../screens/DetailScreen';
 import { placeholder } from './Placeholder';
 import type { AppStackParamList } from './types';
 
@@ -35,7 +36,7 @@ export function AppStack() {
       />
       <Stack.Screen
         name="Detail"
-        component={placeholder('Detalhe')}
+        component={DetailScreen}
         options={({ route }) => ({ title: `PR #${route.params.number}` })}
       />
       <Stack.Screen
