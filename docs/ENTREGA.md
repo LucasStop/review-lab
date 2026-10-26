@@ -34,6 +34,7 @@ Todo item abaixo ausente custa -20%.
 
 - [ ] Tema/API diferente do Flutter (BrasilAPI/feriados).
 - [ ] Todos os nomes na capa, iguais aos do vídeo.
+- [ ] Dupla registrada no grupo 10 do Canvas (Lucas Stopinski da Silva e Lucas Bruno e Silva).
 - [ ] Os 6 itens do PDF presentes, links abrindo em janela anônima.
 - [ ] Vídeo entre 6:00 e 9:00 e público.
 - [ ] Enviado antes de 02/11 23:59 pelo campo oficial.
