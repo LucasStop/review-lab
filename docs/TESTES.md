@@ -69,13 +69,13 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 
 | ID | Cenário | Nível | Status |
 |---|---|---|---|
-| C09 | Grade em 2 colunas com avatar e título | C, E2E | card isolado ok #34 (`PullRequestCard.test.tsx`); grade de 2 colunas e E2E em #35 |
+| C09 | Grade em 2 colunas com avatar e título | C, E2E | ok #35 (`CatalogScreen.test.tsx`, `.maestro/catalog.yaml`) |
 | C10 | Autor apagado (`ghost`) ou sem avatar mostra placeholder | U, C | U ok; C ok #34 (`PullRequestCard.test.tsx`, `avatar.test.ts`) |
-| C11 | Rolagem infinita anexa a próxima página, com loader no rodapé | I, E2E | F2 #35 |
-| C12 | Na última página não há mais pedidos (`hasNext` falso) | U, I | U parcial (só o parser de `Link`); I F2 #35 |
-| C13 | Pull-to-refresh recarrega a página 1 ignorando o TTL | U, E2E | U parcial (só o `force` do cache); E2E F2 #35 |
-| C14 | Anexar uma página não duplica chave (`keyExtractor` estável) | I | F2 #35 |
-| C52 | Catálogo vazio mostra `ListEmptyComponent` | C | F2 #35 |
+| C11 | Rolagem infinita anexa a próxima página, com loader no rodapé | I, E2E | ok #35 (`CatalogScreen.test.tsx`, `.maestro/catalog.yaml`) |
+| C12 | Na última página não há mais pedidos (`hasNext` falso) | U, I | ok #35 (U do parser de `Link`; I em `CatalogScreen.test.tsx`) |
+| C13 | Pull-to-refresh recarrega a página 1 ignorando o TTL | U, E2E | ok #35 (U do `force`; I e E2E em `CatalogScreen.test.tsx`, `.maestro/catalog.yaml`) |
+| C14 | Anexar uma página não duplica chave (`keyExtractor` estável) | I | ok #35 (`mergePage.test.ts`, `CatalogScreen.test.tsx`) |
+| C52 | Catálogo vazio mostra `ListEmptyComponent` | C | ok #35 (`CatalogScreen.test.tsx`) |
 
 ### Navegação e detalhe (RF02, RF03)
 
@@ -145,7 +145,7 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 
 | ID | Cenário | Nível | Status |
 |---|---|---|---|
-| C36 | `ActivityIndicator` na carga inicial do catálogo e do detalhe e na próxima página (`ListFooterComponent`) | C | F2 #35, #36, #41 |
+| C36 | `ActivityIndicator` na carga inicial do catálogo e do detalhe e na próxima página (`ListFooterComponent`) | C | catálogo ok #35; detalhe F2 #36, #41 |
 | C37 | Erro de rede mostra `ErrorState`, e "Tentar novamente" recarrega | C, I, M | C em #115; I F2 #41; M no roteiro |
 | C38 | `useFetch`: carregando, depois dados; erro, depois retry; cancela ao desmontar | I | F2 #41 |
 | C39 | Limite de requisições mostra o horário de volta (só onde não há cache: busca, PR nunca aberto, página nova) | U, M | U ok; M no roteiro |

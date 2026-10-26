@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, Text } from 'react-native';
 
 import { useAuth } from '../contexts/AuthContext';
 import { colors, touch, typography } from '../theme';
+import { CatalogScreen } from '../screens/CatalogScreen';
 import { placeholder } from './Placeholder';
 import type { AppStackParamList } from './types';
 
@@ -29,7 +30,7 @@ export function AppStack() {
     <Stack.Navigator initialRouteName="Catalog">
       <Stack.Screen
         name="Catalog"
-        component={placeholder('Catálogo')}
+        component={CatalogScreen}
         options={{ title: 'Review Lab', headerLeft: () => <LogoutButton /> }}
       />
       <Stack.Screen
