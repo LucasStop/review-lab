@@ -50,7 +50,7 @@ Regras de texto (RF10): nunca `allowFontScaling={false}`, nunca `height` ou `lin
 | `ErrorState` | `message`, `onRetry` | `accessibilityRole="alert"` no texto da mensagem (no `View` o role não é exposto); botão "Tentar novamente" 44x44 | feito (#99, role corrigido no #117) |
 | `EmptyState` | `title`, `text?` | só texto; a tela decide se há ação | feito (#99) |
 | `ConfirmDialog` | `title`, `message`, `confirmLabel`, `onConfirm`, `onCancel`, `danger?`, `children?` (campo de senha) | `accessibilityRole="alert"` no texto; o foco entra no diálogo e volta ao botão de origem; fundo inerte (o RN `Modal` já prende o foco; o protótipo web não); Esc cancela; ação de perigo usa `danger` com `onPrimary`; o foco inicial vai para Cancelar em Sair e para o campo de senha em Excluir; alvo 44x44 | Fase 2 (#125) |
-| `StarRating` | `value`, `onChange?` | editável: 5 botões "Dar nota N de 5" com `selected`; somente leitura: um único elemento "Nota N de 5"; alvo 44x44 | feito (#98), tokens e teste no #27 |
+| `StarRating` | `value`, `onChange?` | editável: 5 botões "Dar nota N de 5" com `selected`; somente leitura: um único elemento "Nota N de 5"; alvo 44x44; as estrelas quebram linha com a fonte do sistema no máximo | feito (#98), tokens e teste no #27 |
 
 Todos os componentes feitos já usam os tokens; o último a migrar foi o `StarRating`, no #27.
 

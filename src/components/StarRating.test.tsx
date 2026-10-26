@@ -24,6 +24,12 @@ test('C28: the editable rating is one 44x44 button per star and marks only the c
   expect(onChange).toHaveBeenCalledWith(5);
 });
 
+test('C47: the stars wrap to a new line when the system font is at its largest', async () => {
+  const { root } = await render(<StarRating value={3} onChange={jest.fn()} />);
+
+  expect(StyleSheet.flatten(root?.props.style).flexWrap).toBe('wrap');
+});
+
 test('the read-only rating is a single element with the value in its label', async () => {
   await render(<StarRating value={4} />);
 

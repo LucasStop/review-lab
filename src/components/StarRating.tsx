@@ -20,12 +20,12 @@ export function StarRating({ value, onChange }: Props) {
     >
       {STARS.map((star) => {
         const selected = star <= value;
-        const glyph = <Text style={styles.star}>{selected ? '★' : '☆'}</Text>;
+        const icon = <Text style={styles.star}>{selected ? '★' : '☆'}</Text>;
 
         if (readOnly) {
           return (
             <View key={star} style={styles.target}>
-              {glyph}
+              {icon}
             </View>
           );
         }
@@ -39,7 +39,7 @@ export function StarRating({ value, onChange }: Props) {
             onPress={() => onChange(star)}
             style={styles.target}
           >
-            {glyph}
+            {icon}
           </Pressable>
         );
       })}
@@ -48,7 +48,8 @@ export function StarRating({ value, onChange }: Props) {
 }
 
 const styles = StyleSheet.create({
-  row: { flexDirection: 'row' },
+  // Com a fonte do sistema no máximo a estrela passa de 90pt e as 5 não cabem numa linha.
+  row: { flexDirection: 'row', flexWrap: 'wrap' },
   target: {
     minWidth: touch.min,
     minHeight: touch.min,
