@@ -103,7 +103,7 @@ test('C20: a link in the body opens through Linking', async () => {
   expect(open).toHaveBeenCalledWith('https://example.com/x');
 });
 
-test('C26: an error offers "Tentar novamente" and retries the same PR', async () => {
+test('C37: an error offers "Tentar novamente" and retries the same PR', async () => {
   mockGet.mockRejectedValueOnce(new AppError('network', 'Sem conexão'));
   mockGet.mockResolvedValueOnce(detail());
   await renderDetail();
