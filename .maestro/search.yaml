@@ -1,0 +1,68 @@
+# C31, C32, C65: busca pelo botão Buscar, termo sem resultado, campo vazio volta à lista e o
+# resultado tocado abre o detalhe. Gasta 2 buscas (limite de 10 por minuto sem token) e o
+# detalhe de 1 PR. Precisa do Metro (ver README.md).
+appId: host.exp.Exponent
+name: search
+---
+- runFlow: subflows/open-app.yaml
+- extendedWaitUntil:
+    visible:
+      id: 'login\.screen|catalog\.list'
+    timeout: 90000
+- runFlow:
+    when:
+      visible:
+        id: 'login.screen'
+    commands:
+      - evalScript: ${output.email = 'e2e' + Date.now() + '@exemplo.com'}
+      - tapOn:
+          id: 'login.signup'
+      - tapOn:
+          id: 'signup.email'
+      - inputText: ${output.email}
+      - tapOn:
+          id: 'signup.password'
+      - inputText: 'segredo123'
+      - tapOn:
+          id: 'signup.submit'
+- extendedWaitUntil:
+    visible:
+      id: 'catalog.card.0'
+    timeout: 30000
+# C32: termo sem resultado avisa e diz o termo.
+- tapOn:
+    id: 'catalog.search-input'
+- inputText: 'zzzqqq'
+- tapOn:
+    id: 'catalog.search-submit'
+- extendedWaitUntil:
+    visible: 'Nenhum resultado para “zzzqqq”'
+    timeout: 30000
+# C65: Buscar com o campo vazio volta à lista paginada.
+- tapOn:
+    id: 'catalog.search-input'
+- eraseText: 10
+- tapOn:
+    id: 'catalog.search-submit'
+- extendedWaitUntil:
+    visible:
+      id: 'catalog.card.0'
+    timeout: 30000
+# C31: o resultado é uma lista, não o primeiro PR aberto direto; tocar abre o detalhe.
+- tapOn:
+    id: 'catalog.search-input'
+- inputText: 'fix'
+- tapOn:
+    id: 'catalog.search-submit'
+- extendedWaitUntil:
+    visible:
+      id: 'catalog.card.0'
+    timeout: 30000
+- assertNotVisible:
+    id: 'detail.title'
+- tapOn:
+    id: 'catalog.card.0'
+- extendedWaitUntil:
+    visible:
+      id: 'detail.title'
+    timeout: 30000
