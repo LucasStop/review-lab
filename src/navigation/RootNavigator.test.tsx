@@ -22,6 +22,7 @@ jest.mock('../services/appAuth', () => ({
 
 // O Catálogo real traz rede e parser de HTML; aqui só importa qual pilha aparece.
 jest.mock('../screens/CatalogScreen', () => ({ CatalogScreen: () => null }));
+jest.mock('../screens/DetailScreen', () => ({ DetailScreen: () => null }));
 
 async function renderApp() {
   await render(

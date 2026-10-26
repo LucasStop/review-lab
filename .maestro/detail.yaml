@@ -1,0 +1,40 @@
+# C15: tocar no card abre o detalhe com título, estatísticas e corpo.
+# Gasta requisições da API do GitHub (60 por hora sem token). Precisa do Metro (ver README.md).
+appId: host.exp.Exponent
+name: detail
+---
+- runFlow: subflows/open-app.yaml
+- extendedWaitUntil:
+    notVisible:
+      id: 'loading'
+    timeout: 90000
+- runFlow:
+    when:
+      visible:
+        id: 'login.screen'
+    commands:
+      - evalScript: ${output.email = 'e2e' + Date.now() + '@exemplo.com'}
+      - tapOn:
+          id: 'login.signup'
+      - tapOn:
+          id: 'signup.email'
+      - inputText: ${output.email}
+      - tapOn:
+          id: 'signup.password'
+      - inputText: 'segredo123'
+      - tapOn:
+          id: 'signup.submit'
+- extendedWaitUntil:
+    visible:
+      id: 'catalog.card.0'
+    timeout: 30000
+- tapOn:
+    id: 'catalog.card.0'
+- extendedWaitUntil:
+    visible:
+      id: 'detail.title'
+    timeout: 30000
+- assertVisible:
+    id: 'detail.stats'
+- assertVisible:
+    id: 'detail.body'
