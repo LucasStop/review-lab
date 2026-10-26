@@ -3,8 +3,8 @@ import { ActivityIndicator, FlatList, StyleSheet, View, useWindowDimensions } fr
 
 import { EmptyState } from '../components/EmptyState';
 import { ErrorState } from '../components/ErrorState';
-import { useFavorites } from '../contexts/FavoritesContext';
 import { PullRequestCard } from '../components/PullRequestCard';
+import { useFavorites } from '../contexts/FavoritesContext';
 import { usePullRequestList } from '../hooks/usePullRequestList';
 import type { AppStackParamList } from '../navigation/types';
 import { colors, spacing } from '../theme';

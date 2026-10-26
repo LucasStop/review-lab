@@ -144,5 +144,5 @@ test('C44: the save button reports its state and flips on press', async () => {
   expect(screen.getByTestId('detail.save').props.accessibilityState).toMatchObject({
     selected: true,
   });
-  expect(screen.getByLabelText('Remover dos salvos')).toBeTruthy();
+  expect(screen.getByLabelText('Salvo para estudar')).toBeTruthy();
 });

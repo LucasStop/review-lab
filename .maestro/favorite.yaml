@@ -22,6 +22,7 @@ name: favorite
     commands:
       - tapOn:
           id: 'catalog.card.0'
+          optional: true
 - extendedWaitUntil:
     visible:
       id: 'detail.save'
@@ -40,3 +41,14 @@ name: favorite
 - assertVisible:
     id: 'detail.save'
     selected: true
+# Voltar pelo header: a estrela do mesmo PR no card já está marcada, sem recarregar.
+- tapOn: 'Review Lab'
+- assertVisible:
+    id: 'catalog.save.0'
+    selected: true
+# Deixa o estado limpo para a próxima execução.
+- tapOn:
+    id: 'catalog.save.0'
+- assertVisible:
+    id: 'catalog.save.0'
+    selected: false

@@ -67,7 +67,7 @@ export function DetailScreen({ navigation, route }: Props) {
       </Text>
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel={saved ? 'Remover dos salvos' : 'Salvar para estudar'}
+        accessibilityLabel={saved ? 'Salvo para estudar' : 'Salvar para estudar'}
         accessibilityState={{ selected: saved }}
         onPress={() => toggle(summary)}
         style={styles.save}
