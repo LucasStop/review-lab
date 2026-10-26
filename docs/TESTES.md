@@ -55,15 +55,15 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 
 | ID | Cenário | Nível | Status |
 |---|---|---|---|
-| C01 | Cadastro válido entra logado | U, E2E | U ok; E2E F2 #31 |
-| C02 | E-mail repetido é recusado, mesmo com outra caixa ou com espaços, e a tela mostra a mensagem | U, C | U ok; C F2 #31 |
-| C03 | Senha com menos de 6 caracteres ou e-mail sem `@` é recusado antes de gravar | U, C | U ok; C F2 #31 |
+| C01 | Cadastro válido entra logado | U, E2E | U ok; E2E F2 #32 (precisa do `App.tsx` montado) |
+| C02 | E-mail repetido é recusado, mesmo com outra caixa ou com espaços, e a tela mostra a mensagem | U, C | U ok; C ok (#31) |
+| C03 | Senha com menos de 6 caracteres ou e-mail sem `@` é recusado antes de gravar | U, C | U ok; C ok (#31) |
 | C04 | Senha errada e e-mail desconhecido recebem a mesma mensagem | U | ok |
 | C05 | Senha e e-mail em texto puro nunca chegam ao store | U | ok |
 | C51 | Sem sessão, o app abre no Login e não chega à AppStack (login obrigatório) | I, E2E | F2 #32 |
 | C06 | Fechar e reabrir o app mantém a sessão | I, E2E | F2 #32 |
 | C07 | Logout volta ao login e apaga a sessão (o botão Sair fica no Perfil, #125) | U, E2E | U ok; E2E F2 #32, #125 |
-| C08 | `ActivityIndicator` durante o login e o cadastro | C | F2 #31 |
+| C08 | `ActivityIndicator` durante o login e o cadastro | C | ok (#31) |
 
 ### Catálogo (RF01)
 

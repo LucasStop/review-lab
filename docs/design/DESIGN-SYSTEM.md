@@ -42,8 +42,8 @@ Regras de texto (RF10): nunca `allowFontScaling={false}`, nunca `height` ou `lin
 
 | Componente | Props | Acessibilidade | Estado |
 |---|---|---|---|
-| `Button` | `label`, `onPress`, `variant` (`primary` \| `secondary`), `loading?`, `disabled?` | `accessibilityRole="button"`, `accessibilityState={{ disabled, busy: loading }}`, `minHeight` 44; `loading` troca o texto por `ActivityIndicator` e bloqueia o toque | Fase 2 (#31) |
-| `TextField` | `label`, `value`, `onChangeText`, `error?`, `secureTextEntry?` | label visível acima do campo e `accessibilityLabel` igual; erro com `accessibilityRole="alert"` abaixo do campo; `minHeight` 44 | Fase 2 (#31) |
+| `Button` | `label`, `onPress`, `variant` (`primary` \| `secondary`), `loading?`, `disabled?`, `testID?` | `accessibilityRole="button", `accessibilityState={{ disabled, busy: loading }}`, `minHeight` 44; `loading` troca o texto por `ActivityIndicator` e bloqueia o toque; o spinner leva `testID="loading"` | feito (#31) |
+| `TextField` | `label`, `value`, `onChangeText`, `secureTextEntry?`, `keyboardType?`, `autoComplete?`, `testID?` | label visível acima do campo e `accessibilityLabel` igual; `minHeight` 44; o erro do formulário é da tela, com `accessibilityRole="alert"` e testID `tela.error`, para não apontar qual campo errou | feito (#31) |
 | `Avatar` | `uri?`, `name`, `size` | `accessibilityLabel="Avatar de {name}"` com imagem; sem `uri` mostra a inicial em branco sobre uma cor de fundo derivada do nome (contraste >= 4.5:1); `accessible={false}` quando o nome já está no texto ao lado | Fase 2 (#34) |
 | `PullRequestCard` | `pr: PullRequestSummary`, `saved`, `onPress`, `onToggleSave` | o card inteiro é um botão com label "PR #n: título, de autor"; o ícone de salvar é outro botão com `accessibilityState={{ selected: saved }}` e label que muda ("Salvar para estudar" e "Remover dos salvos"); `hitSlop` no ícone | Fase 2 (#34) |
 | `ErrorState` | `message`, `onRetry` | `accessibilityRole="alert"` no texto da mensagem (no `View` o role não é exposto); botão "Tentar novamente" 44x44 | feito (#99, role corrigido no #117) |
@@ -60,7 +60,7 @@ Formato `tela.elemento`, em minúsculas, para o Maestro e para os testes de comp
 | Tela | testIDs |
 |---|---|
 | Login | `login.email`, `login.password`, `login.submit`, `login.signup`, `login.error` |
-| Cadastro | `signup.email`, `signup.password`, `signup.submit`, `signup.error` |
+| Cadastro | `signup.email`, `signup.password`, `signup.submit`, `signup.login`, `signup.error` |
 | Catálogo | `catalog.list`, `catalog.card.<n>`, `catalog.save.<n>`, `catalog.search-input`, `catalog.search-submit`, `catalog.filter.all`, `catalog.filter.saved`, `catalog.filter.studied`, `catalog.profile`, `catalog.footer-loader`, `catalog.empty` |
 | Detalhe | `detail.title`, `detail.body`, `detail.save`, `detail.studied`, `detail.rating`, `detail.error` |
 | Perfil | `profile.email`, `profile.saved-count`, `profile.studied-count`, `profile.avg`, `profile.logout`, `profile.delete`, `profile.password`, `profile.confirm`, `profile.cancel`, `profile.error` |
