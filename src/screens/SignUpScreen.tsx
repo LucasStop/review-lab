@@ -9,6 +9,7 @@ export function SignUpScreen({ navigation }: NativeStackScreenProps<AuthStackPar
   return (
     <AuthForm
       id="signup"
+      passwordAutoComplete="new-password"
       submitLabel="Criar conta"
       switchLabel="Já tenho conta"
       switchTestID="signup.login"

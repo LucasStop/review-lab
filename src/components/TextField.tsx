@@ -4,7 +4,14 @@ import { colors, radius, spacing, touch, typography } from '../theme';
 
 type Props = Pick<
   TextInputProps,
-  'value' | 'onChangeText' | 'secureTextEntry' | 'keyboardType' | 'autoComplete' | 'testID'
+  | 'value'
+  | 'onChangeText'
+  | 'secureTextEntry'
+  | 'keyboardType'
+  | 'autoComplete'
+  | 'returnKeyType'
+  | 'onSubmitEditing'
+  | 'testID'
 > & { label: string };
 
 export function TextField({ label, ...input }: Props) {

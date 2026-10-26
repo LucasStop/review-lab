@@ -30,7 +30,7 @@ test('C02: a repeated e-mail shows the message on screen', async () => {
   expect(await screen.findByRole('alert')).toHaveTextContent('Esse e-mail já tem conta.');
 });
 
-test('C03: invalid input shows the rule that failed, not a generic error', async () => {
+test('C03: invalid input explains the rules (valid e-mail, at least 6 characters)', async () => {
   mockSignUp.mockResolvedValue({ ok: false, reason: 'invalid-input' });
   await render(<SignUpScreen {...props} />);
 
@@ -46,7 +46,22 @@ test('C08: shows the ActivityIndicator while creating the account', async () => 
 
   await fill('ana@exemplo.com', 'segredo123');
   expect(screen.getByTestId('loading')).toBeTruthy();
-  expect(screen.getByTestId('signup.password').props.secureTextEntry).toBe(true);
+});
+
+test('the password is secure and asks the password manager for a new one', async () => {
+  await render(<SignUpScreen {...props} />);
+  const field = screen.getByTestId('signup.password');
+  expect(field.props.secureTextEntry).toBe(true);
+  expect(field.props.autoComplete).toBe('new-password');
+});
+
+test('a valid sign-up sends the typed values and shows no error', async () => {
+  mockSignUp.mockResolvedValue({ ok: true, userId: 'u1' });
+  await render(<SignUpScreen {...props} />);
+
+  await fill('ana@exemplo.com', 'segredo123');
+  expect(mockSignUp).toHaveBeenCalledWith('ana@exemplo.com', 'segredo123');
+  expect(screen.queryByTestId('signup.error')).toBeNull();
 });
 
 test('"Já tenho conta" goes back to the login screen', async () => {

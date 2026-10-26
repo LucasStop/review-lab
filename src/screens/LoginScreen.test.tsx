@@ -1,6 +1,6 @@
 import { beforeEach, expect, jest, test } from '@jest/globals';
 import type { ComponentProps } from 'react';
-import { fireEvent, render, screen } from '@testing-library/react-native';
+import { act, fireEvent, render, screen } from '@testing-library/react-native';
 
 import type { AuthResult } from '../services/credentials';
 import { LoginScreen } from './LoginScreen';
@@ -22,13 +22,63 @@ beforeEach(() => {
   navigate.mockReset();
 });
 
-test('C04: wrong password and unknown e-mail show the same message, without naming a field', async () => {
+test.each(['invalid-credentials', 'invalid-input', 'email-taken'] as const)(
+  'C04: reason %s shows the same message, without naming a field',
+  async (reason) => {
+    mockSignIn.mockResolvedValue({ ok: false, reason });
+    await render(<LoginScreen {...props} />);
+
+    await fill('ana@exemplo.com', 'errada');
+    expect(await screen.findByRole('alert')).toHaveTextContent('E-mail ou senha incorretos.');
+    expect(screen.getByTestId('login.error')).toBeTruthy();
+  },
+);
+
+test('a rejected sign-in shows a message and frees the button', async () => {
+  mockSignIn.mockRejectedValue(new Error('SecureStore'));
+  await render(<LoginScreen {...props} />);
+
+  await fill('ana@exemplo.com', 'segredo123');
+  expect(await screen.findByTestId('login.error')).toHaveTextContent(
+    'Não foi possível concluir agora. Tente de novo.',
+  );
+  expect(screen.queryByTestId('loading')).toBeNull();
+  expect(screen.getByTestId('login.submit')).toBeEnabled();
+});
+
+test('two presses in the same tick call signIn once', async () => {
+  mockSignIn.mockReturnValue(new Promise(() => {}));
+  await render(<LoginScreen {...props} />);
+
+  await fireEvent.changeText(screen.getByTestId('login.email'), 'ana@exemplo.com');
+  await fireEvent.changeText(screen.getByTestId('login.password'), 'segredo123');
+  // Dois toques antes de qualquer re-render: só a guarda síncrona os segura.
+  const press = screen.getByTestId('login.submit').props.onClick;
+  await act(async () => {
+    press({});
+    press({});
+  });
+  expect(mockSignIn).toHaveBeenCalledTimes(1);
+});
+
+test('typing again clears the previous error', async () => {
   mockSignIn.mockResolvedValue({ ok: false, reason: 'invalid-credentials' });
   await render(<LoginScreen {...props} />);
 
   await fill('ana@exemplo.com', 'errada');
-  expect(await screen.findByRole('alert')).toHaveTextContent('E-mail ou senha incorretos.');
-  expect(screen.getByTestId('login.error')).toBeTruthy();
+  expect(await screen.findByTestId('login.error')).toBeTruthy();
+  await fireEvent.changeText(screen.getByTestId('login.password'), 'errada2');
+  expect(screen.queryByTestId('login.error')).toBeNull();
+});
+
+test('the keyboard "done" key submits from the password field', async () => {
+  mockSignIn.mockResolvedValue({ ok: true, userId: 'u1' });
+  await render(<LoginScreen {...props} />);
+
+  await fireEvent.changeText(screen.getByTestId('login.email'), 'ana@exemplo.com');
+  await fireEvent.changeText(screen.getByTestId('login.password'), 'segredo123');
+  await fireEvent(screen.getByTestId('login.password'), 'submitEditing');
+  expect(mockSignIn).toHaveBeenCalledWith('ana@exemplo.com', 'segredo123');
 });
 
 test('C08: shows the ActivityIndicator and blocks a second press while signing in', async () => {

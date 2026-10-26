@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -13,11 +13,15 @@ import { TextField } from '../components/TextField';
 import type { AuthResult } from '../services/credentials';
 import { colors, spacing, touch, typography } from '../theme';
 
+const UNEXPECTED = 'Não foi possível concluir agora. Tente de novo.';
+
 type Reason = Extract<AuthResult, { ok: false }>['reason'];
 
 type Props = {
   // Prefixo dos testIDs (`login.email`, `signup.submit`...).
   id: 'login' | 'signup';
+  // `new-password` no cadastro: o gerenciador de senhas sugere e guarda uma senha nova.
+  passwordAutoComplete: 'password' | 'new-password';
   submitLabel: string;
   switchLabel: string;
   switchTestID: string;
@@ -29,6 +33,7 @@ type Props = {
 // Login e cadastro são o mesmo formulário; só mudam a chamada, as mensagens e o link.
 export function AuthForm({
   id,
+  passwordAutoComplete,
   submitLabel,
   switchLabel,
   switchTestID,
@@ -40,16 +45,26 @@ export function AuthForm({
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Guarda síncrona: o `disabled` do botão só vale depois do re-render, e dois toques no mesmo
+  // tick chamariam `submit` duas vezes.
+  const sending = useRef(false);
 
   async function onSubmit() {
+    if (sending.current) return;
+    sending.current = true;
     setBusy(true);
     setError(null);
-    const result = await submit(email, password);
-    // Em sucesso a stack troca e esta tela desmonta; só falha volta ao formulário.
-    if (!result.ok) {
+    try {
+      const result = await submit(email, password);
+      // Em sucesso a stack troca e esta tela desmonta; só falha volta ao formulário.
+      if (result.ok) return;
       setError(messages[result.reason]);
-      setBusy(false);
+    } catch {
+      // SecureStore ou expo-crypto podem falhar; sem isto o botão ficaria preso no spinner.
+      setError(UNEXPECTED);
     }
+    sending.current = false;
+    setBusy(false);
   }
 
   return (
@@ -61,7 +76,10 @@ export function AuthForm({
         <TextField
           label="E-mail"
           value={email}
-          onChangeText={setEmail}
+          onChangeText={(text) => {
+            setEmail(text);
+            setError(null);
+          }}
           keyboardType="email-address"
           autoComplete="email"
           testID={`${id}.email`}
@@ -69,13 +87,23 @@ export function AuthForm({
         <TextField
           label="Senha"
           value={password}
-          onChangeText={setPassword}
+          onChangeText={(text) => {
+            setPassword(text);
+            setError(null);
+          }}
           secureTextEntry
-          autoComplete="password"
+          autoComplete={passwordAutoComplete}
+          returnKeyType="done"
+          onSubmitEditing={() => void onSubmit()}
           testID={`${id}.password`}
         />
         {error && (
-          <Text style={styles.error} accessibilityRole="alert" testID={`${id}.error`}>
+          <Text
+            style={styles.error}
+            accessibilityRole="alert"
+            accessibilityLiveRegion="polite"
+            testID={`${id}.error`}
+          >
             {error}
           </Text>
         )}
