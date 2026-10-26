@@ -140,6 +140,7 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 | C63 | Busca e filtro se combinam: buscar dentro de Salvos ou Estudados filtra a lista local; trocar de filtro mantém o termo aplicado | C | F2 #37, #38, #39 |
 | C64 | Cada chip de filtro informa o estado (`accessibilityState.selected`, `aria-pressed` no protótipo), tem alvo de 44x44 e o foco continua nele depois de tocar | C | F2 #35, #42 |
 | C65 | O termo só vale ao tocar em Buscar (ou Enter); Buscar com o campo vazio volta à lista paginada do filtro | C | F2 #37 |
+| C66 | O botão do Catálogo alterna `numColumns` entre 1 e 2 (padrão 2), com label que diz a ação, alvo de 44x44, `key` nova no `FlatList` e a lista e os favoritos intactos | C, E2E | F2 #140 |
 
 ### Feedback de UI (RF09)
 
@@ -171,7 +172,7 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 | C49 | A API real ainda devolve os campos que `toSummary` e `toDetail` leem | contrato | #115 |
 | C50 | O app abre no Expo Go sem erro vermelho | E2E smoke | #115 |
 
-Os IDs C51 a C55 vieram da revisão do catálogo, C56 a C62 do Perfil e C63 a C65 da busca e dos filtros dentro do Catálogo; ficam no fim da numeração para não renumerar os outros.
+Os IDs C51 a C55 vieram da revisão do catálogo, C56 a C62 do Perfil e C63 a C65 da busca e dos filtros dentro do Catálogo e C66 do botão de colunas; ficam no fim da numeração para não renumerar os outros.
 
 ## Roteiro manual
 
