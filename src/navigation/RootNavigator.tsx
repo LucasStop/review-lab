@@ -1,6 +1,8 @@
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
 import { useAuth } from '../contexts/AuthContext';
+import { FavoritesProvider } from '../contexts/FavoritesContext';
+import { StudiedProvider } from '../contexts/StudiedContext';
 import { colors } from '../theme';
 import { AppStack } from './AppStack';
 import { AuthStack } from './AuthStack';
@@ -21,7 +23,15 @@ export function RootNavigator() {
       </View>
     );
   }
-  return user ? <AppStack /> : <AuthStack />;
+  if (!user) return <AuthStack />;
+  // `key` remonta os providers a cada troca de usuário: favoritos e estudados são por conta.
+  return (
+    <FavoritesProvider key={user.id} userId={user.id}>
+      <StudiedProvider userId={user.id}>
+        <AppStack />
+      </StudiedProvider>
+    </FavoritesProvider>
+  );
 }
 
 const styles = StyleSheet.create({

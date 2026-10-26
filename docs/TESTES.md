@@ -102,17 +102,17 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 
 | ID | Cenário | Nível | Status |
 |---|---|---|---|
-| C24 | Salvos e estudados sobrevivem ao fechar e reabrir | I, E2E | F2 #24, #25 |
-| C25 | JSON corrompido no storage abre vazio, sem quebrar | U, I | U ok; I F2 #24 |
+| C24 | Salvos e estudados sobrevivem ao fechar e reabrir | I, E2E | I ok #24, #25 (`FavoritesContext.test.tsx`, `StudiedContext.test.tsx`); E2E em #26, #27 |
+| C25 | JSON corrompido no storage abre vazio, sem quebrar | U, I | U ok; I ok #24, #25 |
 | C26 | Durante a hidratação não aparece lista zerada (loader até carregar) | I | F2 #45 |
-| C27 | Dois usuários no mesmo aparelho não veem os dados um do outro | U, I | U parcial (só o formato de `userKey`); I F2 #24, #25 |
+| C27 | Dois usuários no mesmo aparelho não veem os dados um do outro | U, I | ok #24, #25 (U do `userKey`; I nos dois contextos) |
 
 ### Estudados com nota (RF07)
 
 | ID | Cenário | Nível | Status |
 |---|---|---|---|
 | C28 | Marcar como estudado com nota de 1 a 5 no detalhe | C, E2E | F2 #27 (`StarRating` em #28) |
-| C29 | Mudar a nota ou desmarcar atualiza a lista | I | F2 #25, #27 |
+| C29 | Mudar a nota ou desmarcar atualiza a lista | I | I ok #25 (`StudiedContext.test.tsx`); tela em #27 |
 | C30 | O filtro Estudados do Catálogo lista cada PR com a sua nota | C, E2E | F2 #39 |
 | C55 | Filtro Estudados vazio mostra `EmptyState` | C | F2 #39 |
 
