@@ -20,8 +20,8 @@ App React Native (Expo, TypeScript) que cataloga PRs fechados de um repositório
 | Perfil com contagens, Sair e Excluir conta locais, cada um com confirmação (além da rubrica, só depois do núcleo) | RF07 |
 | Grade de PRs com avatar do autor e título, rolagem infinita, pull-to-refresh | RF01 |
 | Detalhe do PR por número, descrição em texto limpo | RF02, RF03 |
-| Salvar PR para estudar (favorito), tela de salvos | RF04, RF05 |
-| Marcar PR como estudado com nota de utilidade 1 a 5, tela de estudados | RF07 |
+| Salvar PR para estudar (favorito), filtro Salvos no Catálogo | RF04, RF05 |
+| Marcar PR como estudado com nota de utilidade 1 a 5, filtro Estudados no Catálogo | RF07 |
 | Persistência local de salvos e estudados por usuário | RF06 |
 | Busca por termo dentro do repositório, lista de resultados, mensagem de vazio | RF08 |
 | Carregando, erro com "Tentar novamente", limite de requisições explicado | RF09 |

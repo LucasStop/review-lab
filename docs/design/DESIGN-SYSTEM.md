@@ -1,6 +1,6 @@
 # Design system
 
-Fonte dos valores: [src/theme/index.ts](../../src/theme/index.ts). O teste [theme.test.ts](../../src/theme/theme.test.ts) calcula o contraste de cada par e falha abaixo de 4.5:1. Protótipo clicável das 7 telas: ver a seção [Protótipo](#protótipo).
+Fonte dos valores: [src/theme/index.ts](../../src/theme/index.ts). O teste [theme.test.ts](../../src/theme/theme.test.ts) calcula o contraste de cada par e falha abaixo de 4.5:1. Protótipo clicável das 5 telas: ver a seção [Protótipo](#protótipo).
 
 Princípio: nenhuma tela escreve cor, tamanho ou espaçamento solto. Tudo vem de `src/theme`. Só tema claro; o enunciado não pede escuro e um segundo tema dobraria o trabalho de contraste.
 
@@ -61,11 +61,8 @@ Formato `tela.elemento`, em minúsculas, para o Maestro e para os testes de comp
 |---|---|
 | Login | `login.email`, `login.password`, `login.submit`, `login.signup`, `login.error` |
 | Cadastro | `signup.email`, `signup.password`, `signup.submit`, `signup.error` |
-| Catálogo | `catalog.list`, `catalog.card.<n>`, `catalog.save.<n>`, `catalog.search`, `catalog.favorites`, `catalog.studied`, `catalog.profile`, `catalog.footer-loader`, `catalog.empty` |
+| Catálogo | `catalog.list`, `catalog.card.<n>`, `catalog.save.<n>`, `catalog.search-input`, `catalog.search-submit`, `catalog.filter.all`, `catalog.filter.saved`, `catalog.filter.studied`, `catalog.profile`, `catalog.footer-loader`, `catalog.empty` |
 | Detalhe | `detail.title`, `detail.body`, `detail.save`, `detail.studied`, `detail.rating`, `detail.error` |
-| Busca | `search.input`, `search.submit`, `search.result.<n>`, `search.empty` |
-| Salvos | `favorites.list`, `favorites.item.<n>`, `favorites.empty` |
-| Estudados | `studied.list`, `studied.item.<n>`, `studied.empty` |
 | Perfil | `profile.email`, `profile.saved-count`, `profile.studied-count`, `profile.avg`, `profile.logout`, `profile.delete`, `profile.password`, `profile.confirm`, `profile.cancel`, `profile.error` |
 | Comum | `error.retry`, `loading` |
 
@@ -77,15 +74,12 @@ Toda tela tem estes estados, e cada um aparece no protótipo: **carregando** (`A
 |---|---|---|---|---|---|
 | Login | Auth | formulário | n/a | mensagem única "E-mail ou senha incorretos" | C03-C05, C08 |
 | Cadastro | Auth | formulário | n/a | e-mail repetido, senha curta | C02, C03 |
-| Catálogo | App | grade de 2 colunas: avatar, título, número, autor, ícone de salvar | "Nenhum PR encontrado" | `ErrorState`; erro na página 2 mantém a lista e mostra o erro no rodapé | C09-C14, C52, C54 |
+| Catálogo | App | campo de busca (label "Buscar PRs") e botão "Buscar" no topo, filtros Todos, Salvos e Estudados (`aria-pressed`), grade de 2 colunas: avatar, título, número, autor, ícone de salvar; em Estudados o card mostra a nota | "Nenhum PR encontrado"; "Nenhum resultado para {termo}"; "Você ainda não salvou nenhum PR"; "Você ainda não marcou nenhum PR como estudado" | `ErrorState`; erro na página 2 mantém a lista e mostra o erro no rodapé; limite de requisições da busca com o horário; erro e carregando só valem em Todos e na busca, já que Salvos e Estudados vêm do Context; a busca só roda ao tocar em Buscar (ou Enter), e Buscar com o campo vazio volta à lista; o protótipo busca localmente e não mostra o limite | C09-C14, C22, C23, C30, C31-C35, C52, C54, C55, C63-C65 |
 | Detalhe | App | título no header, estatísticas, blocos de texto, salvar, estudado com nota | "Sem descrição" | `ErrorState` | C15-C17, C20, C53 |
-| Busca | App | campo, botão "Buscar", lista de resultados | "Nenhum resultado para {termo}" | `ErrorState`; limite de requisições com o horário | C31-C35 |
-| Salvos | App | lista | "Você ainda não salvou nenhum PR" | n/a (vem do Context) | C22, C23 |
-| Estudados | App | lista com nota | "Você ainda não marcou nenhum PR como estudado" | n/a | C30, C55 |
 | Perfil | App | e-mail, totais de salvos e estudados, nota média, Sair, Excluir conta | n/a | "Senha incorreta." no diálogo de exclusão; "Excluindo conta…" enquanto apaga | C07, C56-C62 |
 
-Navegação: o Catálogo é a tela principal e leva a Busca, Salvos, Estudados e Perfil pelo header; Sair e Excluir conta ficam dentro do Perfil. Sem sessão, só a AuthStack existe.
+Navegação: o Catálogo é a tela principal, com busca e filtros Todos, Salvos e Estudados na mesma tela (aprovado pelo professor em 26/10/2026, desde que a usabilidade fique boa), e leva ao Perfil pelo header; Sair e Excluir conta ficam dentro do Perfil. Sem sessão, só a AuthStack existe.
 
 ## Protótipo
 
-Protótipo HTML clicável das 7 telas, com os 4 estados alternáveis, publicado como Artifact privado ([abrir](https://claude.ai/artifact/6uCQVjVTGqNDPBBU4VMqTs); só abre para quem a conta do Lucas Stopinski liberar). A cópia versionada, [prototype.html](prototype.html), abre direto em qualquer navegador e é a referência para quem não tem acesso ao Artifact. Ele usa os valores dos tokens para texto e controles; bordas de card, trilho do spinner e cores de avatar são só ilustração e não são tokens. Serve de referência visual, não de código. Quando o protótipo e o app divergirem, o app com os tokens é a verdade.
+Protótipo HTML clicável das 5 telas (Login, Cadastro, Catálogo com busca e filtros, Detalhe, Perfil), com os 4 estados alternáveis, publicado como Artifact privado, ainda na versão antiga de 8 telas até ser republicado ([abrir](https://claude.ai/artifact/6uCQVjVTGqNDPBBU4VMqTs); só abre para quem a conta do Lucas Stopinski liberar). A cópia versionada, [prototype.html](prototype.html), abre direto em qualquer navegador e é a referência para quem não tem acesso ao Artifact. Ele usa os valores dos tokens para texto e controles; bordas de card, trilho do spinner e cores de avatar são só ilustração e não são tokens. Serve de referência visual, não de código. Quando o protótipo e o app divergirem, o app com os tokens é a verdade.

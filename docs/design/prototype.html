@@ -149,6 +149,9 @@
   .actions { display: flex; gap: 8px; flex-wrap: wrap; }
   .searchbar { display: flex; align-items: flex-end; gap: 8px; padding: 12px 16px; }
   .searchbar .field { flex: 1; min-width: 0; }
+  .filters { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 16px 8px; flex: none; }
+  .fchip { min-height: 44px; padding: 0 16px; border-radius: 22px; border: 1px solid var(--a-border); background: var(--a-bg); color: var(--a-text); font: inherit; font-size: 15px; font-weight: 600; cursor: pointer; }
+  .fchip[aria-pressed='true'] { background: var(--a-primary); color: var(--a-on-primary); border-color: var(--a-primary); }
   #toast:empty { display: none; }
   .vw, .col { flex: 1; display: flex; flex-direction: column; min-height: 0; }
   .toast { position: absolute; left: 16px; right: 16px; bottom: 16px; background: var(--a-primary); color: var(--a-on-primary); border-radius: 8px; padding: 12px 14px; font-size: 14px; }
@@ -157,8 +160,12 @@
 <div class="wrap">
   <div>
     <h1>Review Lab: protótipo das telas</h1>
-    <p class="lead">Referência visual do app. Os dados são de exemplo, não vêm do GitHub. Cores, espaçamentos e alvos de toque são os de <code>src/theme</code>. Toque nas telas do celular como no app, ou pule direto para uma tela e um estado abaixo.</p>
+    <p class="lead">Busca com botão Buscar no topo do Catálogo e Salvos e Estudados como filtros da mesma tela, como o professor aprovou em 26/10/2026. Os dados são de exemplo, não vêm do GitHub. Toque nas telas do celular ou use os atalhos abaixo.</p>
 
+    <div class="group">
+      <h2>Atalhos do Catálogo</h2>
+      <div class="chips" id="presets"></div>
+    </div>
     <div class="group">
       <h2>Tela</h2>
       <div class="chips" id="screens"></div>
@@ -174,7 +181,8 @@
     <div class="group notes">
       <h2>Como ler</h2>
       <ul>
-        <li>Catálogo: 2 colunas, avatar, título, número e autor. O ícone de salvar é um botão à parte do card.</li>
+        <li>Catálogo: campo de busca com rótulo visível e botão Buscar no topo, filtros Todos, Salvos e Estudados logo abaixo e a grade de 2 colunas. A busca e o filtro se combinam.</li>
+        <li>Salvos e Estudados não são mais telas: o header do Catálogo só leva ao Perfil.</li>
         <li>Detalhe: salvar e estudado mudam de label e de estado. A nota vale de 1 a 5.</li>
         <li>Carregando, Erro e Vazio mostram <code>ActivityIndicator</code>, <code>ErrorState</code> e <code>EmptyState</code>.</li>
         <li>Perfil: Sair e Excluir conta pedem confirmação. Excluir pede a senha (no protótipo, <code>segredo123</code>).</li>
@@ -192,11 +200,8 @@
   var SCREENS = {
     login: { label: 'Login', states: ['dados', 'carregando', 'erro'], scn: 'C01-C05 C08' },
     signup: { label: 'Cadastro', states: ['dados', 'carregando', 'erro'], scn: 'C02 C03' },
-    catalog: { label: 'Catálogo', states: ['dados', 'carregando', 'erro', 'vazio'], scn: 'C09-C14 C52 C54' },
+    catalog: { label: 'Catálogo', states: ['dados', 'carregando', 'erro', 'vazio'], scn: 'C09-C14 C22 C23 C30 C31-C35 C52 C54 C55 C63-C65' },
     detail: { label: 'Detalhe', states: ['dados', 'carregando', 'erro', 'vazio'], scn: 'C15-C17 C20 C53' },
-    search: { label: 'Busca', states: ['dados', 'carregando', 'erro', 'vazio'], scn: 'C31-C35' },
-    favorites: { label: 'Salvos', states: ['dados', 'vazio'], scn: 'C22 C23' },
-    studied: { label: 'Estudados', states: ['dados', 'vazio'], scn: 'C30 C55' },
     profile: { label: 'Perfil', states: ['dados', 'sair', 'excluir', 'carregando', 'erro'], scn: 'C07 C56-C62' },
   };
   var STATE_LABEL = { dados: 'Dados', carregando: 'Carregando', erro: 'Erro', vazio: 'Vazio', sair: 'Confirmar saída', excluir: 'Confirmar exclusão' };
@@ -216,7 +221,7 @@
     ['code', 'if (insets.equals(last)) return;'],
     ['p', 'More context in the linked issue.'],
   ];
-  var st = { screen: 'login', state: 'dados', saved: {}, studied: {}, query: '', searched: false, open: PRS[0], toast: '', email: 'ana@exemplo.com', pass: 'segredo123', pw: '', focusSel: null };
+  var st = { screen: 'login', state: 'dados', saved: { 31204: true, 31166: true, 31152: true }, studied: { 31187: 5, 31152: 4 }, filter: 'todos', applied: '', query: '', open: PRS[0], toast: '', email: 'ana@exemplo.com', pass: 'segredo123', pw: '', focusSel: null };
   var app = document.getElementById('app'), viewEl = document.getElementById('view'), toastEl = document.getElementById('toast');
   var focusReset = false;
 
@@ -227,7 +232,6 @@
     st.toast = toast || '';
     st.pw = '';
     focusReset = true;
-    if (screen === 'search') { st.query = ''; st.searched = false; }
     render();
   }
   function stars(n, interactive) {
@@ -247,12 +251,9 @@
   function empty(t, s) { return '<div class="center"><div class="t">' + esc(t) + '</div>' + (s ? '<div class="s">' + esc(s) + '</div>' : '') + '</div>'; }
   function card(pr) {
     var on = !!st.saved[pr.n];
-    return '<div class="card"><button class="open" data-pr="' + pr.n + '" aria-label="PR #' + pr.n + ': ' + esc(pr.t) + ', de ' + esc(pr.a) + '">' + avatar(pr) +
-      '<span class="title">' + esc(pr.t) + '</span><span class="meta">#' + pr.n + ' · ' + esc(pr.a) + '</span></button>' +
+    return '<div class="card"><button class="open" data-pr="' + pr.n + '" aria-label="PR #' + pr.n + ': ' + esc(pr.t) + ', de ' + esc(pr.a) + (st.filter === 'estudados' && st.studied[pr.n] ? ', nota ' + st.studied[pr.n] + ' de 5' : '') + '">' + avatar(pr) +
+      '<span class="title">' + esc(pr.t) + '</span><span class="meta">#' + pr.n + ' · ' + esc(pr.a) + '</span>' + (st.filter === 'estudados' && st.studied[pr.n] ? stars(st.studied[pr.n], false) : '') + '</button>' +
       '<button class="save" data-save="' + pr.n + '" aria-label="' + (on ? 'Remover dos salvos' : 'Salvar para estudar') + '">' + (on ? '★' : '☆') + '</button></div>';
-  }
-  function row(pr, extra) {
-    return '<button class="list-row" data-pr="' + pr.n + '">' + avatar(pr) + '<span class="grow"><div class="title">' + esc(pr.t) + '</div><div class="meta">#' + pr.n + ' · ' + esc(pr.a) + '</div></span>' + (extra || '') + '</button>';
   }
 
   function dialog(kind) {
@@ -285,13 +286,27 @@
         '<button class="btn block" data-submit>' + (isLogin ? 'Entrar' : 'Criar conta') + '</button>' +
         '<button class="link" data-go="' + (isLogin ? 'signup' : 'login') + '">' + (isLogin ? 'Não tenho conta' : 'Já tenho conta') + '</button></div></div>';
     }
-    var bar = '<button class="icon-btn" data-go="search" aria-label="Buscar">Buscar</button><button class="icon-btn" data-go="favorites" aria-label="Salvos">Salvos</button><button class="icon-btn" data-go="studied" aria-label="Estudados">Estudados</button><button class="icon-btn" data-go="profile" aria-label="Perfil">Perfil</button>';
     if (s === 'catalog') {
-      var h = nav('Review Lab') + '<div class="navbar" style="border-top:0;padding-left:8px">' + bar + '</div>';
+      var h = nav('Review Lab', false, '<button class="icon-btn" data-go="profile" aria-label="Perfil">Perfil</button>') +
+        '<div class="searchbar"><div class="field"><label for="p-q">Buscar PRs</label><input id="p-q" type="search" enterkeyhint="search" placeholder="Ex.: navigation bar" value="' + esc(st.query) + '"></div><button class="btn" data-run>Buscar</button></div>' +
+        '<div class="filters" role="group" aria-label="Filtrar lista">' + [['todos', 'Todos'], ['salvos', 'Salvos'], ['estudados', 'Estudados']].map(function (f) {
+          return '<button class="fchip" data-filter="' + f[0] + '" aria-pressed="' + (st.filter === f[0]) + '">' + f[1] + '</button>';
+        }).join('') + '</div>';
       if (state === 'carregando') return h + loading();
       if (state === 'erro') return h + error('Sem conexão. Verifique a internet e tente de novo.');
-      if (state === 'vazio') return h + empty('Nenhum PR encontrado', 'Tente atualizar a lista.');
-      return h + '<div class="body"><div class="grid">' + PRS.map(card).join('') + '</div><div class="footer-loader" role="status" aria-label="Carregando mais"><div class="spin"></div></div></div>';
+      var q = st.applied.toLowerCase();
+      var list = PRS.filter(function (p) {
+        if (st.filter === 'salvos' && !st.saved[p.n]) return false;
+        if (st.filter === 'estudados' && !st.studied[p.n]) return false;
+        return !q || (p.t + ' ' + p.a + ' ' + p.n).toLowerCase().indexOf(q) >= 0;
+      });
+      if (state === 'vazio' || !list.length) {
+        if (st.applied) return h + empty('Nenhum resultado para “' + st.applied + '”', st.filter === 'todos' ? 'Tente outro termo.' : 'Tente outro termo ou troque o filtro.');
+        if (st.filter === 'salvos') return h + empty('Você ainda não salvou nenhum PR', 'Toque em ☆ em um card ou no detalhe.');
+        if (st.filter === 'estudados') return h + empty('Você ainda não marcou nenhum PR como estudado');
+        return h + empty('Nenhum PR encontrado', 'Tente atualizar a lista.');
+      }
+      return h + '<div class="body"><div class="grid">' + list.map(card).join('') + '</div>' + (st.filter === 'todos' && !st.applied ? '<div class="footer-loader" role="status" aria-label="Carregando mais"><div class="spin"></div></div>' : '') + '</div>';
     }
     if (s === 'detail') {
       var pr = st.open, done = st.studied[pr.n];
@@ -311,19 +326,6 @@
         (done ? '<div><div style="font-size:14px;font-weight:600">Nota de utilidade</div>' + stars(done, true) + '</div>' : '') +
         '<div class="block">' + blocks + '</div></div></div>';
     }
-    if (s === 'search') {
-      var sb = nav('Buscar', true) + '<div class="searchbar"><div class="field"><label for="p-q">Termo de busca</label><input id="p-q" placeholder="Ex.: navigation bar" value="' + esc(st.query) + '"></div><button class="btn" data-run>Buscar</button></div>';
-      if (state === 'carregando') return sb + loading();
-      if (state === 'erro') return sb + error('Sem conexão. Verifique a internet e tente de novo.');
-      if (state === 'vazio') return sb + empty('Nenhum resultado para “' + (st.query || 'zzzqqq') + '”', 'Tente outro termo.');
-      return sb + '<div class="body">' + PRS.slice(0, 4).map(function (p) { return row(p); }).join('') + '</div>';
-    }
-    if (s === 'favorites') {
-      var ids = PRS.filter(function (p) { return st.saved[p.n]; });
-      var fb = nav('Salvos', true);
-      if (state === 'vazio' || !ids.length) return fb + empty('Você ainda não salvou nenhum PR', 'Toque em ☆ no catálogo ou no detalhe.');
-      return fb + '<div class="body">' + ids.map(function (p) { return row(p, '<span style="color:var(--a-star);font-size:20px" aria-hidden="true">★</span>'); }).join('') + '</div>';
-    }
     if (s === 'profile') {
       var pn = nav('Perfil', true);
       if (state === 'carregando') return pn + '<div class="center" role="status" aria-label="Excluindo conta"><div class="spin"></div><div class="s">Excluindo conta…</div></div>';
@@ -338,12 +340,15 @@
         '<div class="actions"><button class="btn secondary" data-dlg="sair">Sair</button><button class="btn danger" data-dlg="excluir">Excluir conta</button></div></div></div>';
       return '<div class="col"' + (dlg ? ' inert' : '') + '>' + page + '</div>' + (dlg ? dialog(state) : '');
     }
-    var sd = PRS.filter(function (p) { return st.studied[p.n]; });
-    var tb = nav('Estudados', true);
-    if (state === 'vazio' || !sd.length) return tb + empty('Você ainda não marcou nenhum PR como estudado');
-    return tb + '<div class="body">' + sd.map(function (p) { return row(p, stars(st.studied[p.n], false)); }).join('') + '</div>';
+    return '';
   }
 
+  var PRESETS = [['Todos', 'todos', ''], ['Salvos', 'salvos', ''], ['Estudados', 'estudados', ''], ['Busca com resultado', 'todos', 'android'], ['Busca sem resultado', 'todos', 'zzzqqq']];
+  var pEl = document.getElementById('presets');
+  PRESETS.forEach(function (p) {
+    var b = document.createElement('button'); b.className = 'chip'; b.textContent = p[0];
+    b.onclick = function () { go('catalog'); st.filter = p[1]; st.query = p[2]; st.applied = p[2]; render(); }; pEl.appendChild(b);
+  });
   var scEl = document.getElementById('screens'), stEl = document.getElementById('states');
   Object.keys(SCREENS).forEach(function (k) {
     var b = document.createElement('button'); b.className = 'chip'; b.textContent = SCREENS[k].label; b.dataset.k = k;
@@ -401,17 +406,17 @@
     if (t.dataset.pr) { st.open = PRS.filter(function (p) { return String(p.n) === t.dataset.pr; })[0]; return go('detail'); }
     if (t.dataset.save) {
       var n = Number(t.dataset.save); st.saved[n] = !st.saved[n];
-      st.toast = st.saved[n] ? 'Salvo para estudar' : 'Removido dos salvos'; return render();
+      st.toast = st.saved[n] ? 'Salvo para estudar' : 'Removido dos salvos';
+      if (!st.saved[n] && st.screen === 'catalog' && st.filter === 'salvos') st.focusSel = '[data-filter="salvos"]';
+      return render();
     }
     if (t.dataset.study !== undefined) {
       var m = st.open.n; if (st.studied[m]) delete st.studied[m]; else st.studied[m] = 4;
       st.toast = st.studied[m] ? 'Marcado como estudado, nota 4' : 'Desmarcado'; return render();
     }
     if (t.dataset.rate) { st.studied[st.open.n] = Number(t.dataset.rate); st.toast = ''; return render(); }
-    if (t.dataset.run !== undefined) {
-      st.query = document.getElementById('p-q').value.trim();
-      st.state = st.query && st.query.toLowerCase() !== 'zzzqqq' ? 'dados' : 'vazio'; return render();
-    }
+    if (t.dataset.filter) { st.filter = t.dataset.filter; st.state = 'dados'; return render(); }
+    if (t.dataset.run !== undefined) { st.applied = document.getElementById('p-q').value.trim(); st.state = 'dados'; return render(); }
   });
   app.addEventListener('input', function (e) {
     var i = e.target;
@@ -421,6 +426,7 @@
     else if (i.id === 'p-pw') { st.pw = i.value; var d = app.querySelector('[data-del]'); if (d) d.disabled = !i.value; }
   });
   document.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && e.target.id === 'p-q') { e.preventDefault(); st.applied = e.target.value.trim(); st.state = 'dados'; render(); return; }
     if (e.key === 'Escape' && st.screen === 'profile' && (st.state === 'sair' || st.state === 'excluir' || st.state === 'erro')) {
       var was = st.state; st.state = 'dados'; st.pw = ''; st.focusSel = '[data-dlg="' + (was === 'sair' ? 'sair' : 'excluir') + '"]'; render();
     }
