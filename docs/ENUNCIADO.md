@@ -66,5 +66,6 @@ Todos aparecem e falam, cada um explicando ao menos uma parte que implementou; t
 ## Pontos de atenção para este projeto
 
 - RF01 exige imagem no card: PR não tem imagem, então o card usa o avatar do autor (`user.avatar_url`) com placeholder.
+- RF01 pede grade com `numColumns`. Em 26/10/2026 o professor aprovou um botão que alterna o Catálogo entre 1 e 2 colunas (padrão 2): a grade continua atendida e o aluno escolhe a leitura. Issue #140, cenário C66.
 - RF03 pede HTML "sem tags": `body_html` é convertido em texto/blocos simples e sanitizado, ver [adr/0001-html-do-pr.md](adr/0001-html-do-pr.md).
 - RF07 mistura login e consumidos; RF06 cobre favoritos e consumidos. A divisão por categoria está no [AGENTS.md](../AGENTS.md).
