@@ -8,12 +8,12 @@ Expo (TypeScript), React Navigation native-stack, axios, Context API. Sem biblio
 
 ```
 src/
-  services/    github.ts (axios), cache.ts, storage.ts, authStore.ts
+  services/    github.ts (axios), cache.ts, storage.ts, credentials.ts, session.ts e os bindings app*/secure*
   contexts/    AuthContext, FavoritesContext, StudiedContext
-  hooks/       useFetch, usePullRequests (paginação), usePullRequest (detalhe), useSearch
-  components/  PullRequestCard, StarRating, ErrorState, EmptyState, Avatar
-  screens/     Login, Register, Catalog, Detail, Profile
-  utils/       sanitizeHtml, parseLinkHeader
+  hooks/       useFetch (detalhe), usePullRequestList (paginação), usePersistedList (listas por usuário)
+  components/  PullRequestCard, StarRating, ErrorState, EmptyState, Avatar, BodyBlocks, Button, TextField
+  screens/     Login, SignUp, Catalog, Detail, Profile (#125)
+  utils/       sanitizeHtml, linkHeader, appError, pullRequest, collections, mergePage, avatar
   navigation/  AuthStack, AppStack, RootNavigator
 ```
 

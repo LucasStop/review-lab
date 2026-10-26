@@ -11,7 +11,7 @@ Mobile Development Framework exige um projeto React Native/Expo ("Catálogo Inte
 - **Entrega:** PDF único com capa (todos os nomes, senão zero para a pessoa), links do GitHub público (README com `npx expo start`) e do vídeo no YouTube (6 a 9 min, todos aparecendo e falando), tema/API/persistência/login, autoavaliação RF01 a RF10, comparação Flutter x RN, tema da explicação técnica com o minuto do vídeo, screenshots.
 - **Penalidades:** mesmo tema ou API do Flutter -20%, item faltante no PDF -20% cada, vídeo fora de 6 a 9 min -5% por minuto, atraso -20% por semana, entrega por comentário -30%.
 - **Temas proibidos por precaução:** Rick and Morty, posts, cachorros, receitas (já usados nas tarefas de Flutter).
-- **Prazo:** Canvas due 02/11 23:59, trava 09/11 23:59. O plano de ensino lista apresentação em 26/10 e 09/11, mas o Canvas não tem tarefa de apresentação: só o Somativo 2 existe. O RA3 é, quase certamente, o vídeo do mesmo projeto. Respondido em 26/10/2026: não há apresentação ao vivo (ver [Pendências](#pendências)).
+- **Prazo:** Canvas due 02/11 23:59, trava 09/11 23:59. O plano de ensino lista apresentação em 26/10 e 09/11, mas o Canvas não tem tarefa de apresentação: só o Somativo 2 existe. Em 26/10/2026 o professor confirmou que não há apresentação ao vivo e que a entrega é o PDF com o vídeo (ver [Pendências](#pendências)); o RA3 fica no vídeo do mesmo projeto.
 - **Curitiba Bus App:** Expo 57, expo-router, zustand, Supabase, mapas. Não casa com a rubrica (React Navigation, Context API, axios) e carrega 198 commits de outro escopo. Decisão do Lucas: app novo. Reaproveitar só o ferramental (ESLint, Prettier, lefthook, CI, convenções).
 
 ## Tema recomendado: "Review Lab", catálogo de PRs reais para estudar code review
@@ -45,7 +45,7 @@ Ferramentas: WebFetch e Firecrawl (busca web e de papers). Perplexity não exist
 
 - **Bacchelli & Bird, ICSE 2013 (Microsoft Research, aberto e lido):** achar defeitos é a motivação principal, mas a revisão rende menos defeitos que o esperado; rende mais transferência de conhecimento, consciência da equipe e soluções alternativas. A compreensão da mudança é o centro da revisão, e as ferramentas atendem mal essa necessidade. Sustenta o app: PR com descrição e contexto legíveis como material de estudo.
 - **Outras fontes achadas na busca, não abertas (citar só como "a confirmar"):** Sadowski et al. (Google, ICSE-SEIP 2018), Catolino et al. (MSR 2022), Kudrjavets et al. "Nudge" (TOSEM 2023), Gousios et al. (ICSE 2014) e a lista `awesome-code-review-research`. Blogs de LinearB, Meta e SmartBear são fontes secundárias.
-- **Docs do GitHub (aberto e lido):** limite primário de 60 req/h sem autenticação (por IP) e 5.000/h autenticado; secundários: 100 requisições concorrentes e 900 pontos/min por endpoint (GET vale 1). Bate com o que medi ao vivo. A página "getting started" não cita `body_html`/`html+json`; esse ponto vale só pelo meu teste ao vivo, então reconferir na Fase 0.
+- **Docs do GitHub (aberto e lido):** limite primário de 60 req/h sem autenticação (por IP) e 5.000/h autenticado; secundários: 100 requisições concorrentes e 900 pontos/min por endpoint (GET vale 1). Bate com o que medi ao vivo. A página "getting started" não cita `body_html`/`html+json`; esse ponto vale pelo meu teste ao vivo e pelo teste de contrato (`yarn test:contract`, rodado no #117).
 - Uso no PDF: citar Bacchelli & Bird como motivação do tema (a explicação técnica e o minuto do vídeo).
 
 ## Divisão por categorias (issues por label `cat:*`)
@@ -74,10 +74,10 @@ Fase 2: fechar o milestone "MVP interno" até o marco #52 (30/10/2026). Depois, 
 
 Respostas registradas em 26/10/2026 (#46):
 
-1. Tema: "Review Lab" (PRs do GitHub) aprovado. O professor aprovou também o desenho, desde que a usabilidade fique boa (C63 a C65): busca e filtros Salvos e Estudados dentro do Catálogo, 5 telas.
+1. Tema: "Review Lab" (PRs do GitHub), mantido, sem aprovação explícita registrada. Em 26/10/2026 o professor respondeu no Canvas sobre o desenho deste app e o aceitou desde que a usabilidade fique boa (C63 a C65): busca e filtros Salvos e Estudados dentro do Catálogo, 5 telas.
 2. Nome do repositório: `review-lab`.
 3. Grupo 10: Lucas Stopinski da Silva e Lucas Bruno e Silva (#94). Conferir na conferência final (#55) que a dupla está registrada no grupo do Canvas.
-4. Apresentação: não há apresentação ao vivo. A entrega é o PDF único com o vídeo no YouTube, confirmado com o professor. O peso segue o Canvas: 10 pontos, 50% da nota final.
-5. Colunas do Catálogo: o professor aprovou um botão que alterna entre 1 e 2 colunas (padrão 2), mantendo o `numColumns` do RF01 (#140, C66).
+4. Apresentação: não há apresentação ao vivo. A entrega é o PDF único com o vídeo no YouTube, confirmado com o professor. Peso: o Canvas dá 10 pontos e 50% da nota final ([ENUNCIADO.md](ENUNCIADO.md)); a conferência com o plano de ensino segue sem resposta e não muda a entrega.
+5. Colunas do Catálogo: o professor sugeriu um botão que alterna entre 1 e 2 colunas (padrão 2), mantendo o `numColumns` do RF01 (#140, C66).
 
 Regra que continua valendo: remoto no GitHub (conta `LucasStop`), convites, Project, visibilidade do repositório e envio ao Canvas só com ok explícito do Lucas.

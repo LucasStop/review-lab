@@ -4,17 +4,17 @@ Retrato de 26/10/2026, no meio da Fase 2 (aplicação), depois do PR #139. Atual
 
 ## Estado por RF
 
-Legenda: **base** quer dizer que a lógica existe e está testada, mas falta a tela.
+Legenda: **base** quer dizer que a lógica existe, mas falta a tela.
 
 | RF | Peso | Já existe | Falta | Dono |
 |---|---|---|---|---|
-| RF01 Catálogo | 15% | grade de 2 colunas com avatar, título, número e autor, rolagem infinita e pull-to-refresh ([screens/CatalogScreen.tsx](../src/screens/CatalogScreen.tsx), #34 e #35); `listPullRequests` com paginação por `Link` e cache (PR #103) | #140 botão que alterna entre 1 e 2 colunas | Luc-Bruno |
+| RF01 Catálogo | 15% | grade de 2 colunas com avatar, título, número e autor, rolagem infinita e pull-to-refresh ([screens/CatalogScreen.tsx](../src/screens/CatalogScreen.tsx), #34 e #35); `listPullRequests` com paginação por `Link` (PR #103) e cache (PR #109) | #140 botão que alterna entre 1 e 2 colunas | Luc-Bruno |
 | RF02 Navegação | 10% com RF03 | `RootNavigator` no `App.tsx`, com a AuthStack sem sessão e a AppStack com sessão (#32); o detalhe recebe `number` e põe o título do PR no header (#36) | Perfil pelo header do Catálogo (#125) | LucasStop, Luc-Bruno |
-| RF03 Detalhe | 10% com RF02 | estatísticas e corpo em blocos sanitizados, com links só http(s) ([screens/DetailScreen.tsx](../src/screens/DetailScreen.tsx), #36) | — | Luc-Bruno |
+| RF03 Detalhe | 10% com RF02 | estatísticas e corpo em blocos sanitizados ([screens/DetailScreen.tsx](../src/screens/DetailScreen.tsx), #36), com links só http(s) filtrados no `sanitizeHtml` e de novo no `BodyBlocks` | — | Luc-Bruno |
 | RF04 Favoritos (Context) | 15% com RF05 | `FavoritesContext` por usuário (#24); estrela no card e botão no detalhe, com o mesmo estado nas duas telas (#26) | — | Luc-Bruno |
 | RF05 Favoritos (filtro Salvos no Catálogo) | 15% com RF04 | base: `useFavorites().favorites` e `EmptyState` (PR #99) | #38 | Luc-Bruno |
 | RF06 Persistência | 10% | `usePersistedList` no AsyncStorage com chave `rl.<userId>.<nome>`, que recusa gravar antes da hidratação (#24, #25) | #45 (sem dado zerado na carga) | Luc-Bruno |
-| RF07 Login, sessão, estudados | 10% | login e cadastro com hash e sal (#31), navegação condicional e Sair provisório no Catálogo (#32), exclusão de conta no serviço (#124), `StudiedContext` com nota de 1 a 5 (#25) | #27 estudado com nota no detalhe, #39 filtro Estudados; Perfil com Sair e Excluir conta (#125, além da rubrica) | LucasStop, Luc-Bruno |
+| RF07 Login, sessão, estudados | 10% | login e cadastro com hash e sal (#29 e #31), navegação condicional e Sair provisório no Catálogo (#32), exclusão de conta no serviço (#124), `StudiedContext` com nota de 1 a 5 (#25) | #27 estudado com nota no detalhe, #39 filtro Estudados; Perfil com Sair e Excluir conta (#125, além da rubrica) | LucasStop, Luc-Bruno |
 | RF08 Busca (campo e botão no Catálogo) | 10% | base: `searchPullRequests` e `buildSearchQuery` (PR #106) | #37 | Luc-Bruno |
 | RF09 Feedback | 10% | `ActivityIndicator` e `ErrorState` com "Tentar novamente" no Catálogo e no detalhe; erro da página seguinte no rodapé; `AppError` com horário de volta do limite (PR #104) | #41, que confere todo fluxo | Luc-Bruno |
 | RF10 Acessibilidade | 10% | tokens com contraste testado (#114); label, role e toque 44x44 nos componentes | #42, #43 e #44 | Luc-Bruno |
@@ -43,14 +43,14 @@ Padrão do projeto: a lógica fica numa fábrica `create*` pura, que recebe as d
 | [src/utils/avatar.ts](../src/utils/avatar.ts) | inicial e cor de fundo do avatar sem foto, com o contraste conferido | 3 |
 | [src/utils/collections.ts](../src/utils/collections.ts) | validação e operações das listas de salvos e estudados (`toggleFavorite`, `withStudied`, `withoutStudied`) | 7 |
 | [src/utils/mergePage.ts](../src/utils/mergePage.ts) | junta a página nova à lista sem repetir PR | 3 |
-| [src/theme/index.ts](../src/theme/index.ts) | tokens e pares de texto e fundo | 4 (contraste) |
+| [src/theme/index.ts](../src/theme/index.ts) | tokens e pares de texto e fundo | 4 (contraste, espaçamento e alvo de toque) |
 | [src/hooks/useFetch.ts](../src/hooks/useFetch.ts) | `{status, data, error, retry}` com cancelamento por `AbortController` | pelo `DetailScreen.test.tsx` |
 | [src/hooks/usePersistedList.ts](../src/hooks/usePersistedList.ts) | lista por usuário no AsyncStorage, com hidratação | pelos testes dos Contexts |
 | [src/hooks/usePullRequestList.ts](../src/hooks/usePullRequestList.ts) | páginas, refresh e erro da página seguinte no Catálogo | pelo `CatalogScreen.test.tsx` |
 | [src/contexts/AuthContext.tsx](../src/contexts/AuthContext.tsx) | `AuthProvider` e `useAuth` com hidratação | `AuthContext.test.tsx`, `RootNavigator.test.tsx` |
 | [src/contexts/FavoritesContext.tsx](../src/contexts/FavoritesContext.tsx) | `FavoritesProvider` e `useFavorites` | `FavoritesContext.test.tsx` |
 | [src/contexts/StudiedContext.tsx](../src/contexts/StudiedContext.tsx) | `StudiedProvider` e `useStudied`, com nota de 1 a 5 | `StudiedContext.test.tsx` |
-| [src/components/](../src/components/) | `Avatar`, `BodyBlocks`, `Button`, `EmptyState`, `ErrorState`, `PullRequestCard`, `StarRating` e `TextField` | `ErrorState` e `PullRequestCard`; os outros pelas telas |
+| [src/components/](../src/components/) | `Avatar`, `BodyBlocks`, `Button`, `EmptyState`, `ErrorState`, `PullRequestCard`, `StarRating` e `TextField` | `ErrorState` e `PullRequestCard`; `StarRating` sem teste e sem tela até o #27; os outros pelas telas |
 | [src/screens/](../src/screens/) | Login e Cadastro (com `AuthForm`), Catálogo e Detalhe | um arquivo por tela e `FavoritesFlow.test.tsx` |
 | [src/navigation/](../src/navigation/) | tipos de rota, `RootNavigator`, `AuthStack`, `AppStack` e `Placeholder` (Perfil até o #125) | `RootNavigator.test.tsx`; E2E em `.maestro/` |
 
