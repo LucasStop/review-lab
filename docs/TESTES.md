@@ -132,14 +132,14 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 
 | ID | Cenário | Nível | Status |
 |---|---|---|---|
-| C31 | Buscar com resultado; tocar num item abre o detalhe dele (não navega direto ao primeiro) | E2E | ok #37 (`.maestro/search.yaml`; o `CatalogScreen.test.tsx` confere o número do PR aberto) |
+| C31 | Buscar com resultado; tocar num item abre o detalhe dele (não navega direto ao primeiro) | C, E2E | ok #37 (`.maestro/search.yaml`; o `CatalogScreen.test.tsx` confere o número do PR aberto) |
 | C32 | Sem resultado mostra mensagem clara | C, E2E | ok #37 (`CatalogScreen.test.tsx`, `.maestro/search.yaml`) |
 | C33 | Termo vazio não chama a API | U, C | U ok; C ok #37 (só espaços não busca) |
 | C34 | Qualificadores (`repo:`, `is:`) e operadores (`AND`, `OR`, `NOT`) digitados são neutralizados | U | ok; operadores no #37 (mais de 5 davam 422) |
 | C35 | Loader durante a busca | C | ok #37 (`CatalogScreen.test.tsx`, com o campo de busca na tela) |
 | C63 | Busca e filtro se combinam: buscar dentro de Salvos ou Estudados filtra a lista local; trocar de filtro mantém o termo aplicado | C | F2 #37, #38, #39 |
 | C64 | Cada chip de filtro informa o estado (`accessibilityState.selected`, `aria-pressed` no protótipo), tem alvo de 44x44 e o foco continua nele depois de tocar | C | F2 #35, #42 |
-| C65 | O termo só vale ao tocar em Buscar (ou Enter); Buscar com o campo vazio volta à lista paginada do filtro | C | em Todos ok #37 (`CatalogScreen.test.tsx`, E2E em `.maestro/search.yaml`); nos filtros, #38 e #39 |
+| C65 | O termo só vale ao tocar em Buscar (ou Enter); Buscar com o campo vazio volta à lista paginada do filtro | C, E2E | em Todos ok #37 (`CatalogScreen.test.tsx`; o `.maestro/search.yaml` cobre a volta com o campo vazio); nos filtros, #38 e #39 |
 | C66 | O botão do Catálogo alterna `numColumns` entre 1 e 2 (padrão 2), com label que diz a ação, alvo de 44x44, `key` nova no `FlatList` e a lista e os favoritos intactos | C, E2E | F2 #140 |
 
 ### Feedback de UI (RF09)
@@ -185,9 +185,9 @@ Rodar no simulador iOS com o Expo Go, sem token no `.env`, salvo o que o passo p
 5. Sair, cadastrar `b@b.com` e conferir que salvos e estudados estão vazios (C27).
 6. Buscar `fix` e um termo sem resultado como `zzzqqq`, depois tocar em Buscar com o campo vazio e ver a lista paginada voltar; buscar dentro de Salvos e de Estudados, trocar de filtro com o termo aplicado e alternar entre 1 e 2 colunas (C31, C32, C63, C65, C66).
 7. Ligar o modo avião (Network Link Conditioner ou o Wi-Fi do Mac desligado), abrir um PR já visto e depois um novo (C37, C40).
-8. Esgotar o limite da rede do Mac (é por IP): `until [ "$(curl -s https://api.github.com/rate_limit | python3 -c 'import sys,json;print(json.load(sys.stdin)["rate"]["remaining"])')" = 0 ]; do curl -s -o /dev/null 'https://api.github.com/repos/expo/expo/pulls?per_page=1'; done`. O `/rate_limit` não gasta. Depois, buscar um termo novo ou abrir um PR nunca aberto e ver a mensagem com o horário (C39). Puxar para atualizar a grade já em cache mostra a lista vencida, não o erro (C40).
+8. Esgotar o limite da rede do Mac (é por IP): `until [ "$(curl -s https://api.github.com/rate_limit | python3 -c 'import sys,json;print(json.load(sys.stdin)["rate"]["remaining"])')" = 0 ]; do curl -s -o /dev/null 'https://api.github.com/repos/expo/expo/pulls?per_page=1'; done`. O `/rate_limit` não gasta. Depois, abrir um PR nunca aberto e ver a mensagem com o horário (C39). Puxar para atualizar a grade já em cache mostra a lista vencida, não o erro (C40). A busca tem um limite próprio, de 10 por minuto, que esse comando não gasta: `for i in $(seq 10); do curl -s -o /dev/null "https://api.github.com/search/issues?q=type:pr+x$i"; done` e, no mesmo minuto, buscar um termo no app e ver a mensagem com o horário (C39).
 9. Em Ajustes > Acessibilidade > Tela e Tamanho do Texto, colocar o texto no máximo e percorrer as 5 telas (C47).
-10. Ligar o VoiceOver e percorrer o login, o card, os chips de filtro (estado lido e foco no chip depois do toque), o detalhe, o botão de salvar e as estrelas (C48, C64).
+10. Ligar o VoiceOver e percorrer o login, a busca (resultado, vazio e erro), o card, os chips de filtro (estado lido e foco no chip depois do toque), o detalhe, o botão de salvar e as estrelas (C48, C64).
 
 ## Execuções
 
