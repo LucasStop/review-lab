@@ -11,17 +11,14 @@ test('C28: the editable rating is one 44x44 button per star and marks only the c
 
   const stars = screen.getAllByRole('button');
   expect(stars).toHaveLength(5);
-  stars.forEach((star) => {
+  stars.forEach((star, index) => {
     const style = StyleSheet.flatten(star.props.style);
     expect(style.minWidth).toBe(touch.min);
     expect(style.minHeight).toBe(touch.min);
+    expect(star.props.accessibilityState).toMatchObject({ selected: index + 1 === 3 });
   });
-  expect(screen.getByLabelText('Dar nota 3 de 5').props.accessibilityState).toMatchObject({
-    selected: true,
-  });
-  expect(screen.getByLabelText('Dar nota 4 de 5').props.accessibilityState).toMatchObject({
-    selected: false,
-  });
+  expect(screen.getAllByText('★')).toHaveLength(3);
+  expect(screen.getAllByText('☆')).toHaveLength(2);
 
   await fireEvent.press(screen.getByLabelText('Dar nota 5 de 5'));
   expect(onChange).toHaveBeenCalledWith(5);
