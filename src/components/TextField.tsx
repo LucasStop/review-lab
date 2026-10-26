@@ -9,6 +9,7 @@ type Props = Pick<
   | 'secureTextEntry'
   | 'keyboardType'
   | 'autoComplete'
+  | 'textContentType'
   | 'returnKeyType'
   | 'onSubmitEditing'
   | 'testID'

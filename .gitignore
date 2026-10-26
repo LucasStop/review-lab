@@ -17,3 +17,6 @@ docs/handoff/
 # lockfiles: nenhum é versionado (yarn gera yarn.lock, npm geraria package-lock.json)
 yarn.lock
 package-lock.json
+
+# Playwright MCP session artifacts
+.playwright-mcp/

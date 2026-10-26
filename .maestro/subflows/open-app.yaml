@@ -1,0 +1,26 @@
+# Abre o app no Expo Go (Metro em localhost:8081) e fecha o menu de dev da primeira abertura.
+appId: host.exp.Exponent
+---
+- launchApp:
+    stopApp: true
+- openLink: exp://localhost:8081
+- tapOn:
+    text: 'Open'
+    optional: true
+- tapOn:
+    text: 'Continue'
+    optional: true
+# O menu de dev aparece quando o bundle termina de carregar; espera por ele e fecha.
+- extendedWaitUntil:
+    visible: 'Go home'
+    timeout: 60000
+    optional: true
+- tapOn:
+    point: '50%,20%'
+    optional: true
+- runFlow:
+    when:
+      visible: 'Go home'
+    commands:
+      - tapOn:
+          point: '50%,10%'
