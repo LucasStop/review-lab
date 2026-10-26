@@ -71,7 +71,7 @@ Decisão em [ADR 0004](adr/0004-asyncstorage-vs-sqlite.md) e [ADR 0003](adr/0003
 | Sessão (userId) | expo-secure-store | `rl.session` |
 | Salvos | AsyncStorage | `rl.<userId>.favorites` (snapshot do PR) |
 | Estudados e nota | AsyncStorage | `rl.<userId>.studied` |
-| Cache HTTP | AsyncStorage | `rl.cache.<hash da URL>` |
+| Cache HTTP | AsyncStorage | `rl.cache.list:<repo>:<página>` e `rl.cache.detail:<repo>:<número>` |
 
 Os Contexts carregam no `useEffect` inicial e expõem `hydrated`; o `RootNavigator` mostra `ActivityIndicator` até tudo hidratar, para nunca exibir dado zerado (RF06). Favoritos guardam um snapshot (número, título, autor, avatar) para o filtro Salvos funcionar sem requisição.
 

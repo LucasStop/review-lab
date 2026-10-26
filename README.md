@@ -4,7 +4,7 @@ App React Native (Expo) que cataloga pull requests reais de repositórios open s
 
 Projeto do Somativo 2 de Desenvolvimento Mobile Híbrido (PUCPR, 2026/2). Fonte de dados: API REST do GitHub, somente leitura.
 
-> Estado atual: Fase 2 (aplicação) em andamento, com Login, Cadastro, Catálogo e Detalhe prontos e testados. Estado por RF em [docs/MAPA.md](docs/MAPA.md), plano em [docs/PLAN.md](docs/PLAN.md), design em [docs/SDD.md](docs/SDD.md).
+> Estado atual: Fase 2 (aplicação) em andamento. Estado por RF em [docs/MAPA.md](docs/MAPA.md), plano em [docs/PLAN.md](docs/PLAN.md), design em [docs/SDD.md](docs/SDD.md).
 
 ## Como rodar
 
