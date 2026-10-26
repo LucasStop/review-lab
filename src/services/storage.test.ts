@@ -64,3 +64,16 @@ test('removeUserKeys removes only the keys of that user', async () => {
   });
   assert.deepEqual([...keys].sort(), ['rl.cache.x', 'rl.u11.favorites', 'rl.u2.favorites']);
 });
+
+test('load returns the fallback for corrupted data but throws when the disk read fails', async () => {
+  const { storage } = setup({ 'rl.u.a': '{not json' });
+  assert.deepEqual(await storage.load('rl.u.a', []), []);
+  const failing = createStorage({
+    get: async () => {
+      throw new Error('disk');
+    },
+    set: async () => {},
+    remove: async () => {},
+  });
+  await assert.rejects(() => failing.load('rl.u.a', []), /disk/);
+});

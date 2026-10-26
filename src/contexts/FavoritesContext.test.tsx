@@ -17,6 +17,11 @@ const as = (userId: string) =>
     return <FavoritesProvider userId={userId}>{children}</FavoritesProvider>;
   };
 
+let currentId = 'u1';
+function SwitchWrapper({ children }: { children: ReactNode }) {
+  return <FavoritesProvider userId={currentId}>{children}</FavoritesProvider>;
+}
+
 async function open(userId = 'u1') {
   const hook = await renderHook(() => useFavorites(), { wrapper: as(userId) });
   await waitFor(() => expect(hook.result.current.hydrated).toBe(true));
@@ -92,4 +97,44 @@ test('C25: valid JSON of the wrong shape opens empty', async () => {
   await AsyncStorage.setItem('rl.u1.favorites', JSON.stringify([{ number: 'x' }]));
   const { result } = await open();
   expect(result.current.favorites).toEqual([]);
+});
+
+test('a toggle before hydration is refused and does not overwrite what is on disk', async () => {
+  await AsyncStorage.setItem('rl.u1.favorites', JSON.stringify([pr(5)]));
+  let release: (value: string | null) => void = () => {};
+  jest
+    .spyOn(AsyncStorage, 'getItem')
+    .mockReturnValueOnce(new Promise((resolve) => (release = resolve)));
+  const { result } = await renderHook(() => useFavorites(), { wrapper: as('u1') });
+
+  await act(async () => result.current.toggle(pr(9)));
+  expect(await AsyncStorage.getItem('rl.u1.favorites')).toBe(JSON.stringify([pr(5)]));
+
+  await act(async () => release(JSON.stringify([pr(5)])));
+  expect(result.current.favorites.map((p) => p.number)).toEqual([5]);
+});
+
+test('a failed disk read does not hydrate a writable empty list that would erase the data', async () => {
+  await AsyncStorage.setItem('rl.u1.favorites', JSON.stringify([pr(5)]));
+  jest.spyOn(AsyncStorage, 'getItem').mockRejectedValueOnce(new Error('disk'));
+  const { result } = await renderHook(() => useFavorites(), { wrapper: as('u1') });
+  await waitFor(() => expect(result.current.hydrated).toBe(true));
+
+  await act(async () => result.current.toggle(pr(9)));
+
+  expect(await AsyncStorage.getItem('rl.u1.favorites')).toBe(JSON.stringify([pr(5)]));
+});
+
+test('C27: switching the user on the same tree shows nothing of the previous one', async () => {
+  await AsyncStorage.setItem('rl.u1.favorites', JSON.stringify([pr(5)]));
+  currentId = 'u1';
+  const { result, rerender } = await renderHook(() => useFavorites(), { wrapper: SwitchWrapper });
+  await waitFor(() => expect(result.current.favorites).toHaveLength(1));
+
+  currentId = 'u2';
+  await rerender({});
+  expect(result.current.favorites).toEqual([]);
+  await act(async () => result.current.toggle(pr(9)));
+  expect(await AsyncStorage.getItem('rl.u2.favorites')).toBe(JSON.stringify([pr(9)]));
+  expect(await AsyncStorage.getItem('rl.u1.favorites')).toBe(JSON.stringify([pr(5)]));
 });

@@ -69,3 +69,17 @@ test('C25: validators reject corrupted data and accept good data', () => {
   assert.equal(isStudiedList([{ ...pr(1), rating: 9 }]), false);
   assert.equal(isStudiedList([pr(1)]), false);
 });
+
+test('validators reject non-positive or fractional numbers and duplicates', () => {
+  assert.equal(isFavoriteList([pr(0)]), false);
+  assert.equal(isFavoriteList([pr(-3)]), false);
+  assert.equal(isFavoriteList([pr(1.5)]), false);
+  assert.equal(isFavoriteList([pr(1), pr(1)]), false);
+  assert.equal(
+    isStudiedList([
+      { ...pr(1), rating: 3 },
+      { ...pr(1), rating: 4 },
+    ]),
+    false,
+  );
+});

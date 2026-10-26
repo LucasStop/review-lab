@@ -35,7 +35,21 @@ export function createStorage(kv: KV) {
     }
   }
 
+  // Como `read`, mas erro de leitura (disco) sobe em vez de virar o padrão: quem grava depois
+  // de uma leitura que falhou apagaria o dado bom que ainda está lá. Dado corrompido segue
+  // virando o padrão (C25).
+  async function load<T>(key: string, fallback: T, isValid?: (value: unknown) => boolean) {
+    const raw = await kv.get(key);
+    if (raw === null) return fallback;
+    try {
+      const value: unknown = JSON.parse(raw);
+      return !isValid || isValid(value) ? (value as T) : fallback;
+    } catch {
+      return fallback;
+    }
+  }
+
   const write = (key: string, value: unknown) => kv.set(key, JSON.stringify(value));
 
-  return { read, write, remove: kv.remove };
+  return { read, load, write, remove: kv.remove };
 }

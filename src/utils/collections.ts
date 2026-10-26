@@ -7,6 +7,8 @@ const isSummary = (value: unknown): value is PullRequestSummary => {
   const v = value as Record<string, unknown>;
   return (
     typeof v.number === 'number' &&
+    Number.isInteger(v.number) &&
+    v.number > 0 &&
     typeof v.title === 'string' &&
     typeof v.author === 'string' &&
     (v.avatarUrl === undefined || typeof v.avatarUrl === 'string')
@@ -17,12 +19,16 @@ export const isRating = (value: unknown): value is number =>
   typeof value === 'number' && Number.isInteger(value) && value >= 1 && value <= 5;
 
 // Dado de outra versão ou corrompido não pode entrar no estado: o storage.read devolve o padrão.
+const hasUniqueNumbers = (list: PullRequestSummary[]) =>
+  new Set(list.map((item) => item.number)).size === list.length;
+
 export const isFavoriteList = (value: unknown): value is PullRequestSummary[] =>
-  Array.isArray(value) && value.every(isSummary);
+  Array.isArray(value) && value.every(isSummary) && hasUniqueNumbers(value);
 
 export const isStudiedList = (value: unknown): value is StudiedEntry[] =>
   Array.isArray(value) &&
-  value.every((entry) => isSummary(entry) && isRating((entry as StudiedEntry).rating));
+  value.every((entry) => isSummary(entry) && isRating((entry as StudiedEntry).rating)) &&
+  hasUniqueNumbers(value);
 
 // Guarda só o snapshot que o card precisa, nunca o objeto inteiro da API.
 const snapshot = ({
