@@ -170,7 +170,7 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 | ID | Cenário | Nível | Status |
 |---|---|---|---|
 | C49 | A API real ainda devolve os campos que `toSummary` e `toDetail` leem | contrato | #115 |
-| C50 | O app abre no Expo Go sem erro vermelho | E2E smoke | #115 |
+| C50 | O app abre no Expo Go sem erro vermelho | E2E smoke | #115; desde o #27 aceita a sessão salva e espera o header do Catálogo, que não depende da API |
 
 Os IDs C51 a C55 vieram da revisão do catálogo, C56 a C62 do Perfil e C63 a C65 da busca e dos filtros dentro do Catálogo e C66 do botão de colunas; ficam no fim da numeração para não renumerar os outros.
 

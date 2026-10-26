@@ -3,9 +3,10 @@ appId: host.exp.Exponent
 name: smoke
 ---
 - runFlow: subflows/open-app.yaml
-# Sem sessão abre no Login; com sessão salva, direto no Catálogo.
+# Sem sessão abre no Login; com sessão salva, direto no Catálogo. Espera o botão do header, que
+# existe em todo estado do Catálogo: a lista some quando a API falha ou a cota acaba.
 - extendedWaitUntil:
     visible:
-      id: 'login\.screen|catalog\.list'
+      id: 'login\.screen|catalog\.logout'
     timeout: 90000
 - assertNotVisible: 'Render Error'
