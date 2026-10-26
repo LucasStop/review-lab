@@ -65,7 +65,8 @@ export function CatalogScreen({ navigation }: Props) {
   const cardWidth = (width - spacing.lg * 2 - spacing.md * (COLUMNS - 1)) / COLUMNS;
   const [query, setQuery] = useState('');
   // O termo só vale ao tocar em Buscar (ou Enter): a busca tem limite de 10 por minuto, então
-  // nada de buscar a cada tecla. Termo vazio volta à lista paginada, que ficou montada.
+  // nada de buscar a cada tecla. Termo vazio volta à lista paginada sem recarregar: as páginas
+  // ficam no hook, mas a rolagem volta ao topo, porque a lista sai da tela enquanto a busca roda.
   const [term, setTerm] = useState('');
   const [filter, setFilter] = useState<Filter>('all');
   // Só Todos vai ao GitHub; Salvos vem do Context e a busca filtra a lista local.
@@ -81,7 +82,11 @@ export function CatalogScreen({ navigation }: Props) {
 
   const submit = () => {
     Keyboard.dismiss();
-    setTerm(query.trim());
+    const next = query.trim();
+    // O mesmo termo não muda o estado e não buscaria de novo: depois de um erro (o limite, por
+    // exemplo), Buscar tenta outra vez, como o "Tentar novamente".
+    if (next === term && search.error) search.retry();
+    else setTerm(next);
   };
 
   let items = NO_RESULTS;

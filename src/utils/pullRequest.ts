@@ -30,8 +30,9 @@ export function toDetail(pr: PullRequestDetail): PullRequestDetailView {
 }
 
 // A busca do GitHub aceita qualificadores (repo:, is:, user:). Sem ':' o termo do usuário não
-// consegue sair do repositório configurado.
+// consegue sair do repositório configurado. AND, OR e NOT só são operadores em maiúscula, e mais
+// de 5 deles dão 422: em minúscula viram palavras, e a busca já não diferencia caixa.
 export function buildSearchQuery(repo: string, term: string): string | undefined {
-  const clean = term.replace(/:/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 100);
+  const clean = term.toLowerCase().replace(/:/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 100);
   return clean ? `type:pr repo:${repo} ${clean}` : undefined;
 }

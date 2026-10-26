@@ -86,3 +86,11 @@ test('buildSearchQuery neutralizes qualifiers typed by the user', () => {
   );
   assert.equal(buildSearchQuery('o/r', ':::'), undefined);
 });
+
+test('buildSearchQuery turns the boolean operators typed by the user into plain words', () => {
+  // Mais de 5 AND, OR ou NOT dá 422 no GitHub; em minúscula viram palavras comuns.
+  assert.equal(
+    buildSearchQuery('o/r', 'a AND b OR c NOT d AND e AND f AND g'),
+    'type:pr repo:o/r a and b or c not d and e and f and g',
+  );
+});

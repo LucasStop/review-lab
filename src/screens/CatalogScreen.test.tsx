@@ -3,7 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react-native';
-import { StyleSheet, Text } from 'react-native';
+import { Keyboard, StyleSheet, Text } from 'react-native';
 
 import type { PullRequestPage, PullRequestSummary } from '../types/github';
 import { FavoritesProvider } from '../contexts/FavoritesContext';
@@ -394,4 +394,43 @@ test('C64: each filter chip states whether it is selected and is at least 44x44'
     expect(style.minWidth).toBe(touch.min);
     expect(style.minHeight).toBe(touch.min);
   }
+});
+
+test('Buscar with the same term after the limit searches again, like Tentar novamente', async () => {
+  mockList.mockResolvedValue(page([1], false));
+  const limit = 'Limite de requisições do GitHub atingido. Volta às 20:09.';
+  mockSearch
+    .mockRejectedValueOnce(new AppError('rate-limit', limit))
+    .mockResolvedValueOnce([pr(9)]);
+  await renderCatalog();
+  await screen.findByTestId('catalog.card.0');
+
+  await searchFor('fix');
+  expect(await screen.findByText(limit)).toBeTruthy();
+  await fireEvent.press(screen.getByTestId('catalog.search-submit'));
+
+  expect(await screen.findByText('PR 9')).toBeTruthy();
+  expect(mockSearch).toHaveBeenCalledTimes(2);
+});
+
+test('while a search is shown the list does not page, refresh or show its footer', async () => {
+  const dismiss = jest.spyOn(Keyboard, 'dismiss');
+  mockList.mockResolvedValueOnce(page([2], true)).mockReturnValueOnce(new Promise(() => {}));
+  mockSearch.mockResolvedValue([pr(9)]);
+  await renderCatalog();
+  await screen.findByTestId('catalog.card.0');
+  await reachEnd();
+  expect(screen.getByTestId('catalog.footer-loader')).toBeTruthy();
+
+  await searchFor('fix');
+
+  expect(await screen.findByText('PR 9')).toBeTruthy();
+  expect(dismiss).toHaveBeenCalled();
+  const list = screen.getByTestId('catalog.list');
+  expect(list.props.onEndReached).toBeUndefined();
+  expect(list.props.onRefresh).toBeUndefined();
+  // Com o teclado aberto, o primeiro toque num resultado já abre o PR em vez de só fechar o teclado.
+  expect(list.props.keyboardShouldPersistTaps).toBe('handled');
+  expect(screen.queryByTestId('catalog.footer-loader')).toBeNull();
+  dismiss.mockRestore();
 });
