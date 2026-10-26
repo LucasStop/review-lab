@@ -15,9 +15,14 @@ appId: host.exp.Exponent
     visible: 'Go home'
     timeout: 60000
     optional: true
-- tapOn:
-    point: '50%,20%'
-    optional: true
+# Só toca no fundo com o menu aberto: sem ele, o toque cai no app (na reabertura acertava a
+# estrela do primeiro card).
+- runFlow:
+    when:
+      visible: 'Go home'
+    commands:
+      - tapOn:
+          point: '50%,20%'
 - runFlow:
     when:
       visible: 'Go home'

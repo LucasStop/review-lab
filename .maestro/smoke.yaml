@@ -3,8 +3,9 @@ appId: host.exp.Exponent
 name: smoke
 ---
 - runFlow: subflows/open-app.yaml
+# Sem sessão abre no Login; com sessão salva, direto no Catálogo.
 - extendedWaitUntil:
     visible:
-      id: 'login.screen'
+      id: 'login\.screen|catalog\.list'
     timeout: 90000
 - assertNotVisible: 'Render Error'
