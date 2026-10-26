@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { colors, radius, spacing, touch, typography } from '../theme';
+import { colors, glyph, radius, spacing, touch, typography } from '../theme';
 import type { PullRequestSummary } from '../types/github';
 import { Avatar } from './Avatar';
 
@@ -80,6 +80,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  saveGlyph: { fontSize: 24, color: colors.textMuted },
+  saveGlyph: { fontSize: glyph.md, color: colors.textMuted },
   saved: { color: colors.star },
 });

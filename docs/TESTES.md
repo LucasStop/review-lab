@@ -102,7 +102,7 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 
 | ID | Cenário | Nível | Status |
 |---|---|---|---|
-| C24 | Salvos e estudados sobrevivem ao fechar e reabrir | I, E2E | I ok #24, #25 (`FavoritesContext.test.tsx`, `StudiedContext.test.tsx`); E2E em #26, #27 |
+| C24 | Salvos e estudados sobrevivem ao fechar e reabrir | I, E2E | I ok #24, #25 (`FavoritesContext.test.tsx`, `StudiedContext.test.tsx`); E2E ok #27 (`.maestro/studied.yaml` salva, marca, fecha e reabre o app) |
 | C25 | JSON corrompido no storage abre vazio, sem quebrar | U, I | U ok; I ok #24, #25 |
 | C26 | Durante a hidratação não aparece lista zerada (loader até carregar) | I | F2 #45 |
 | C27 | Dois usuários no mesmo aparelho não veem os dados um do outro | U, I | ok #24, #25 (U do `userKey`; I nos dois contextos) |
@@ -111,8 +111,8 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 
 | ID | Cenário | Nível | Status |
 |---|---|---|---|
-| C28 | Marcar como estudado com nota de 1 a 5 no detalhe | C, E2E | F2 #27 (`StarRating` em #28) |
-| C29 | Mudar a nota ou desmarcar atualiza a lista | I | I ok #25 (`StudiedContext.test.tsx`); tela em #27 |
+| C28 | Marcar como estudado com nota de 1 a 5 no detalhe | C, E2E | ok #27 (C em `StarRating.test.tsx` e `DetailScreen.test.tsx`, E2E em `.maestro/studied.yaml`) |
+| C29 | Mudar a nota ou desmarcar atualiza a lista | I | I ok #25 (`StudiedContext.test.tsx`); tela ok #27 (`DetailScreen.test.tsx`) |
 | C30 | O filtro Estudados do Catálogo lista cada PR com a sua nota | C, E2E | F2 #39 |
 | C55 | Filtro Estudados vazio mostra `EmptyState` | C | F2 #39 |
 
@@ -162,7 +162,7 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 | C44 | Botão de estado informa o estado (`selected` ou label que muda) | C | ok #26; #42 pendente |
 | C45 | Alvo de toque de pelo menos 44x44 | C | botão salvar do card ok #34; restante F2 #43 |
 | C46 | Pares de cor dos tokens com contraste de pelo menos 4.5:1 | U | #114 |
-| C47 | Fonte do sistema no máximo não corta texto nem sobrepõe; nenhum `allowFontScaling={false}` no código (`git grep`) | M | roteiro |
+| C47 | Fonte do sistema no máximo não corta texto nem sobrepõe; nenhum `allowFontScaling={false}` no código (`git grep`) | C, M | C da quebra de linha das estrelas ok #27 (`StarRating.test.tsx`); roteiro |
 | C48 | VoiceOver lê card, botões e estrelas numa ordem que faz sentido | M | roteiro |
 
 ### Transversais
@@ -170,7 +170,7 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 | ID | Cenário | Nível | Status |
 |---|---|---|---|
 | C49 | A API real ainda devolve os campos que `toSummary` e `toDetail` leem | contrato | #115 |
-| C50 | O app abre no Expo Go sem erro vermelho | E2E smoke | #115 |
+| C50 | O app abre no Expo Go sem erro vermelho | E2E smoke | #115; desde o #27 aceita a sessão salva e espera o header do Catálogo, que não depende da API |
 
 Os IDs C51 a C55 vieram da revisão do catálogo, C56 a C62 do Perfil e C63 a C65 da busca e dos filtros dentro do Catálogo e C66 do botão de colunas; ficam no fim da numeração para não renumerar os outros.
 
