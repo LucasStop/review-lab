@@ -1,14 +1,15 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useCallback, useEffect } from 'react';
-import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { Avatar } from '../components/Avatar';
 import { BodyBlocks } from '../components/BodyBlocks';
 import { ErrorState } from '../components/ErrorState';
+import { useFavorites } from '../contexts/FavoritesContext';
 import { useFetch } from '../hooks/useFetch';
 import type { AppStackParamList } from '../navigation/types';
 import { getPullRequest } from '../services/github';
-import { colors, spacing, typography } from '../theme';
+import { colors, radius, spacing, touch, typography } from '../theme';
 
 type Props = NativeStackScreenProps<AppStackParamList, 'Detail'>;
 
@@ -16,6 +17,8 @@ export function DetailScreen({ navigation, route }: Props) {
   const { number } = route.params;
   const fetcher = useCallback((signal: AbortSignal) => getPullRequest(number, signal), [number]);
   const pr = useFetch(fetcher);
+  const { isFavorite, toggle } = useFavorites();
+  const saved = isFavorite(number);
   const title = pr.status === 'data' ? pr.data.title : undefined;
 
   // O header mostra "PR #n" até o título chegar; trocar de número não deixa o título anterior.
@@ -40,6 +43,13 @@ export function DetailScreen({ navigation, route }: Props) {
   }
 
   const { data } = pr;
+  // Só o resumo vai para o disco: os blocos do corpo não pertencem à lista de salvos.
+  const summary = {
+    number: data.number,
+    title: data.title,
+    author: data.author,
+    avatarUrl: data.avatarUrl,
+  };
   return (
     <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
       <View style={styles.author}>
@@ -55,6 +65,18 @@ export function DetailScreen({ navigation, route }: Props) {
         {data.comments + data.reviewComments} comentários · {data.changedFiles} arquivos · +
         {data.additions} −{data.deletions}
       </Text>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={saved ? 'Remover dos salvos' : 'Salvar para estudar'}
+        accessibilityState={{ selected: saved }}
+        onPress={() => toggle(summary)}
+        style={styles.save}
+        testID="detail.save"
+      >
+        <Text style={[styles.saveText, saved && styles.savedText]}>
+          {saved ? '★ Salvo para estudar' : '☆ Salvar para estudar'}
+        </Text>
+      </Pressable>
       <View testID="detail.body">
         {data.blocks.length > 0 ? (
           <BodyBlocks blocks={data.blocks} />
@@ -72,5 +94,16 @@ const styles = StyleSheet.create({
   content: { padding: spacing.lg, gap: spacing.lg },
   author: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
   title: { ...typography.title, color: colors.text },
+  save: {
+    minHeight: touch.min,
+    alignSelf: 'flex-start',
+    justifyContent: 'center',
+    paddingHorizontal: spacing.lg,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: radius.md,
+  },
+  saveText: { ...typography.body, color: colors.text },
+  savedText: { color: colors.star },
   meta: { ...typography.caption, color: colors.textMuted },
 });

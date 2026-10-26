@@ -1,0 +1,42 @@
+# C21: salvar no detalhe muda a estrela do mesmo PR no card, sem recarregar.
+# Gasta requisições da API do GitHub (60 por hora sem token). Precisa do Metro (ver README.md).
+appId: host.exp.Exponent
+name: favorite
+---
+- runFlow: subflows/open-app.yaml
+- extendedWaitUntil:
+    notVisible:
+      id: 'loading'
+    timeout: 90000
+- extendedWaitUntil:
+    visible:
+      id: 'catalog.card.0'
+    timeout: 30000
+- tapOn:
+    id: 'catalog.card.0'
+# O primeiro toque pode cair enquanto a lista ainda reorganiza; repete se o detalhe não abriu.
+- runFlow:
+    when:
+      notVisible:
+        id: 'detail.save'
+    commands:
+      - tapOn:
+          id: 'catalog.card.0'
+- extendedWaitUntil:
+    visible:
+      id: 'detail.save'
+    timeout: 30000
+# O estado persiste entre execuções: começa sempre desmarcado.
+- runFlow:
+    when:
+      visible:
+        id: 'detail.save'
+        selected: true
+    commands:
+      - tapOn:
+          id: 'detail.save'
+- tapOn:
+    id: 'detail.save'
+- assertVisible:
+    id: 'detail.save'
+    selected: true
