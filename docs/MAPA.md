@@ -39,7 +39,7 @@ Padrão do projeto: a lógica fica numa fábrica `create*` pura, que recebe as d
 | [src/utils/sanitizeHtml.ts](../src/utils/sanitizeHtml.ts) | converte `body_html` em blocos tipados e descarta script, style, iframe e img | 12 |
 | [src/utils/appError.ts](../src/utils/appError.ts) | erro normalizado em 7 tipos, com mensagem fixa sem token nem URL | 8 |
 | [src/utils/linkHeader.ts](../src/utils/linkHeader.ts) | parse do header `Link` | 4 |
-| [src/utils/pullRequest.ts](../src/utils/pullRequest.ts) | `toSummary`, `toDetail` e `buildSearchQuery` | 7 |
+| [src/utils/pullRequest.ts](../src/utils/pullRequest.ts) | `toSummary`, `toDetail` e `buildSearchQuery` | 8 |
 | [src/utils/avatar.ts](../src/utils/avatar.ts) | inicial e cor de fundo do avatar sem foto, com o contraste conferido | 3 |
 | [src/utils/collections.ts](../src/utils/collections.ts) | validação e operações das listas de salvos e estudados (`toggleFavorite`, `withStudied`, `withoutStudied`) | 7 |
 | [src/utils/mergePage.ts](../src/utils/mergePage.ts) | junta a página nova à lista sem repetir PR | 3 |

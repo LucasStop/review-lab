@@ -135,7 +135,7 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 | C31 | Buscar com resultado; tocar num item abre o detalhe dele (não navega direto ao primeiro) | E2E | ok #37 (`.maestro/search.yaml`; o `CatalogScreen.test.tsx` confere o número do PR aberto) |
 | C32 | Sem resultado mostra mensagem clara | C, E2E | ok #37 (`CatalogScreen.test.tsx`, `.maestro/search.yaml`) |
 | C33 | Termo vazio não chama a API | U, C | U ok; C ok #37 (só espaços não busca) |
-| C34 | Qualificadores digitados (`repo:`, `is:`) são neutralizados | U | ok |
+| C34 | Qualificadores (`repo:`, `is:`) e operadores (`AND`, `OR`, `NOT`) digitados são neutralizados | U | ok; operadores no #37 (mais de 5 davam 422) |
 | C35 | Loader durante a busca | C | ok #37 (`CatalogScreen.test.tsx`, com o campo de busca na tela) |
 | C63 | Busca e filtro se combinam: buscar dentro de Salvos ou Estudados filtra a lista local; trocar de filtro mantém o termo aplicado | C | F2 #37, #38, #39 |
 | C64 | Cada chip de filtro informa o estado (`accessibilityState.selected`, `aria-pressed` no protótipo), tem alvo de 44x44 e o foco continua nele depois de tocar | C | F2 #35, #42 |
