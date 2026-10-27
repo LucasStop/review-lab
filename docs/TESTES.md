@@ -8,14 +8,14 @@ O Canvas não pede teste, mas o MVP (#52) só vale se cada RF for provado. Este 
 |---|---|---|---|---|
 | Estático | sim, já existe | TypeScript, ESLint, Prettier, gitleaks: `yarn typecheck`, `yarn lint`, `yarn format:check` | CI e lefthook | pega erro de tipo, de lint, de formato e segredo antes do review |
 | Unitário | sim, já existe | `node:test` com type stripping: `yarn test` | `src/**/*.test.ts` | lógica pura (sanitizador, hash, cache, erros); roda em menos de 1 s e não precisa de nativo |
-| Componente | sim (ferramenta em #115) | jest-expo + React Native Testing Library: `yarn test:ui` | `src/**/*.test.tsx` | prova o que o usuário vê e toca: texto, role, label, `onPress` |
-| Integração | sim (ferramenta em #115) | jest-expo + RNTL, com storage falso e serviço mockado | `src/**/*.test.tsx` | Context + serviço + storage juntos: hidratação, sessão, favoritos por usuário |
+| Componente | sim | jest-expo + React Native Testing Library: `yarn test:ui` | `src/**/*.test.tsx` | prova o que o usuário vê e toca: texto, role, label, `onPress` |
+| Integração | sim | jest-expo + RNTL, com storage falso e serviço mockado | `src/**/*.test.tsx` | Context + serviço + storage juntos: hidratação, sessão, favoritos por usuário |
 | Acessibilidade automatizada | sim | RNTL (`getByRole`, `accessibilityState`, tamanho mínimo) e teste de contraste dos tokens (`node:test`) | junto do componente e em `src/theme/` | o RF10 vale 10% e regressão de contraste ou de label é silenciosa |
 | Segurança do sanitizador | sim, já existe | corpus fixo de HTML hostil no `node:test` | `src/utils/sanitizeHtml.test.ts` | `body_html` é dado não confiável |
-| E2E e cenário em tela | sim, local (ferramenta em #115) | Maestro + Expo Go no simulador iOS: `maestro test .maestro/` | `.maestro/*.yaml` | prova o fluxo real de toque, navegação e persistência; fora do CI porque precisa de simulador |
-| Smoke | sim (#115) | `maestro test .maestro/smoke.yaml` | `.maestro/smoke.yaml` | conferência de 30 s de que o app abre, antes de qualquer demo |
+| E2E e cenário em tela | sim, local | Maestro + Expo Go no simulador iOS: `maestro test .maestro/` | `.maestro/*.yaml` | prova o fluxo real de toque, navegação e persistência; fora do CI porque precisa de simulador |
+| Smoke | sim | `maestro test .maestro/smoke.yaml` | `.maestro/smoke.yaml` | conferência de 30 s de que o app abre, antes de qualquer demo |
 | Regressão | sim, como política | CI obrigatório nos PRs e suíte Maestro antes dos marcos | — | ver a política abaixo |
-| Contrato com a API real | sim, manual (#115) | `yarn test:contract` (3 GETs reais) | `scripts/contract.test.ts` | os mocks podem divergir da API; gasta 3 das 60 req/h, por isso fica fora do CI |
+| Contrato com a API real | sim, manual | `yarn test:contract` (3 GETs reais) | `scripts/contract.test.ts` | os mocks podem divergir da API; gasta 2 das 60 req/h do limite `core` (lista e detalhe) e 1 do limite próprio de `search`, por isso fica fora do CI |
 | Exploratório e manual | sim | roteiro abaixo | este arquivo | fonte ampliada, VoiceOver, modo avião e limite de requisições não se automatizam bem no Expo Go |
 | Snapshot | não | — | — | quebra a cada ajuste visual e ninguém lê o diff |
 | Mutação (Stryker) | não | — | — | custo alto para o prazo; o cético faz a versão manual (mudar uma linha e ver o teste falhar) |
@@ -36,20 +36,20 @@ Regra prática: o que dá para testar sem renderizar desce para o unitário. A t
 ## Política de regressão
 
 - Todo bug achado, seja no roteiro, no review ou pelo cético, vira primeiro um teste vermelho. Só depois vem o conserto, no mesmo PR.
-- O CI roda `yarn typecheck`, `yarn lint`, `yarn format:check`, `yarn test` e o gitleaks em todo PR; `yarn test:ui` entra com o #115. Nenhum merge acontece com CI vermelho.
+- O CI roda `yarn typecheck`, `yarn lint`, `yarn format:check`, `yarn test`, `yarn test:ui` e o gitleaks em todo PR (`.github/workflows/ci.yml`). Nenhum merge acontece com CI vermelho.
 - A suíte Maestro inteira e o roteiro manual rodam antes do #52 (MVP), do #51 (vídeo) e do #56 (envio). O resultado e a data entram na tabela de execuções.
 - Todo PR passa por um subagente cético. Ele tenta quebrar o PR com entrada hostil, offline, limite de requisições e app reaberto, e muda uma linha do código para ver se algum teste falha.
 
 ## Convenções
 
-- Os seletores de E2E usam `testID` no formato `tela.elemento`, por exemplo `login.email`, `catalog.card.123` e `detail.save`. Detalhe em [design/DESIGN-SYSTEM.md](design/DESIGN-SYSTEM.md).
+- Os seletores de E2E usam `testID` no formato `tela.elemento`, por exemplo `login.email`, `catalog.card.0` (o índice do card na lista, não o número do PR) e `detail.save`. Detalhe em [design/DESIGN-SYSTEM.md](design/DESIGN-SYSTEM.md).
 - `node:test` importa o arquivo irmão com a extensão `.ts` e não importa nada nativo. O que é nativo fica atrás de um binding `app*`/`secure*`.
 - Jest pega só `*.test.tsx`. Os globals vêm de `@jest/globals`.
 - Nenhum teste chama a rede, exceto o de contrato.
 
 ## Catálogo de cenários
 
-Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro, **M** manual. Status: **ok** quando já existe teste verde; **F2** quando entra na Fase 2, com a issue indicada.
+Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro, **M** manual. Status: **ok** quando já existe teste verde; **roteiro** quando o cenário é conferido por um passo do roteiro manual, citado na linha; **parcial** quando uma parte tem teste e outra fica de fora, com o motivo na linha. Nenhum cenário fica pendente.
 
 ### Auth e sessão (RF07)
 
@@ -73,8 +73,8 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 | C10 | Autor apagado (`ghost`) ou sem avatar mostra placeholder | U, C | U ok; C ok #34 (`PullRequestCard.test.tsx`, `avatar.test.ts`) |
 | C11 | Rolagem infinita anexa a próxima página, com loader no rodapé | I, E2E | ok #35 (`CatalogScreen.test.tsx`, `.maestro/catalog.yaml`) |
 | C12 | Na última página não há mais pedidos (`hasNext` falso) | U, I | ok #35 (U do parser de `Link`; I em `CatalogScreen.test.tsx`) |
-| C13 | Pull-to-refresh recarrega a página 1 ignorando o TTL | U, E2E | ok #35 (U do `force`; I e E2E em `CatalogScreen.test.tsx`, `.maestro/catalog.yaml`) |
-| C14 | Anexar uma página não duplica chave (`keyExtractor` estável) | I | ok #35 (`mergePage.test.ts`, `CatalogScreen.test.tsx`) |
+| C13 | Pull-to-refresh recarrega a página 1 ignorando o TTL | U, I, E2E | ok #35 (U do `force` em `cache.test.ts`; I em `CatalogScreen.test.tsx`; E2E em `.maestro/catalog.yaml`) |
+| C14 | Anexar uma página não duplica chave (`keyExtractor` estável) | U, I | ok #35 (U `mergePage.test.ts`; I `CatalogScreen.test.tsx`) |
 | C52 | Catálogo vazio mostra `ListEmptyComponent` | C | ok #35 (`CatalogScreen.test.tsx`) |
 
 ### Navegação e detalhe (RF02, RF03)
@@ -82,7 +82,7 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 | ID | Cenário | Nível | Status |
 |---|---|---|---|
 | C15 | Tocar no card abre o detalhe com o número em `route.params` | E2E | ok (`.maestro/detail.yaml`) |
-| C53 | O detalhe faz a segunda requisição pelo número e põe o título do PR no header com `navigation.setOptions` (hoje o `AppStack` mostra só "PR #n") | C | ok |
+| C53 | O detalhe faz a segunda requisição pelo número e põe o título do PR no header com `navigation.setOptions` (o header mostra "PR #n" enquanto carrega) | C | ok (`DetailScreen.test.tsx`) |
 | C16 | O detalhe mostra avatar maior, estatísticas (comentários, arquivos, +/-) e os blocos de texto | C | ok |
 | C17 | PR sem descrição mostra "Sem descrição", não erro | U, C | U ok; C ok |
 | C18 | HTML hostil (`script`, `on*`, `javascript:`, `iframe`, `img`) não chega à tela | U | ok |
@@ -93,10 +93,10 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 
 | ID | Cenário | Nível | Status |
 |---|---|---|---|
-| C21 | Salvar no detalhe muda o ícone do mesmo PR no card do catálogo | I, E2E | I ok (`CatalogScreen.test.tsx`, `DetailScreen.test.tsx`); E2E em `.maestro/favorite.yaml` |
+| C21 | Salvar no detalhe muda o ícone do mesmo PR no card do catálogo | I, E2E | ok (I `FavoritesFlow.test.tsx`, e `CatalogScreen.test.tsx` para o toque na estrela do card; E2E `.maestro/favorite.yaml`) |
 | C22 | O filtro Salvos do Catálogo lista os salvos e atualiza ao remover | C, E2E | ok #38 (`CatalogScreen.test.tsx`, `.maestro/filters.yaml`) |
 | C23 | Filtro Salvos vazio mostra `EmptyState` amigável (`ListEmptyComponent`) | C, E2E | ok #38 (`CatalogScreen.test.tsx`, `.maestro/filters.yaml`) |
-| C54 | Busca, filtros Salvos e Estudados e Perfil são acessíveis na tela do Catálogo | E2E | busca ok #37, Salvos ok #38 e Estudados ok #39 (`.maestro/search.yaml`, `.maestro/filters.yaml`, `.maestro/studied.yaml`); Perfil #125 (`catalog.profile` no header, tocado em `.maestro/auth.yaml` e `.maestro/profile.yaml`) |
+| C54 | Busca, filtros Salvos e Estudados e Perfil são acessíveis na tela do Catálogo | E2E | busca ok #37, Salvos ok #38 e Estudados ok #39 (`.maestro/search.yaml`, `.maestro/filters.yaml`, `.maestro/studied.yaml`); Perfil ok #125 (`catalog.profile` no header, tocado em `.maestro/auth.yaml` e `.maestro/profile.yaml`) |
 
 ### Persistência (RF06)
 
@@ -112,7 +112,7 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 | ID | Cenário | Nível | Status |
 |---|---|---|---|
 | C28 | Marcar como estudado com nota de 1 a 5 no detalhe | C, E2E | ok #27 (C em `StarRating.test.tsx` e `DetailScreen.test.tsx`, E2E em `.maestro/studied.yaml`) |
-| C29 | Mudar a nota ou desmarcar atualiza a lista | I | I ok #25 (`StudiedContext.test.tsx`); tela ok #27 (`DetailScreen.test.tsx`) |
+| C29 | Mudar a nota ou desmarcar atualiza a lista | I, C | I ok #25 (`StudiedContext.test.tsx`); tela ok #27 (`DetailScreen.test.tsx`) |
 | C30 | O filtro Estudados do Catálogo lista cada PR com a sua nota | C, E2E | ok #39 (`CatalogScreen.test.tsx`, `PullRequestCard.test.tsx`, `.maestro/studied.yaml`) |
 | C55 | Filtro Estudados vazio mostra `EmptyState` | C | ok #39 (`CatalogScreen.test.tsx`) |
 
@@ -126,7 +126,7 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 | C59 | Excluir conta com senha errada recusa, mostra "Senha incorreta." e não apaga nada | U, C | U ok #124 (`session.test.ts`; estado em `AuthContext.test.tsx`); C ok #125 (`ProfileScreen.test.tsx`, também campo vazio, toque duplo no mesmo ciclo de render, nova tentativa depois da senha errada, Cancelar/Esc/voltar travados durante a exclusão e falha do `deleteAccount`); E2E em `.maestro/profile.yaml` |
 | C60 | Excluir conta com a senha certa apaga credencial, sessão e as chaves `rl.<userId>.*` e volta ao Login | U, I, E2E | U ok #124; I ok #125 (`RootNavigator.test.tsx`, que confere a limpeza das chaves); E2E em `.maestro/profile.yaml`, que só confere a volta ao Login |
 | C61 | Excluir conta não toca nos dados de outro usuário do aparelho; cadastrar o mesmo e-mail depois funciona | U, I | U ok #124 (`session.test.ts`, `storage.test.ts`, `credentials.test.ts`); I ok #125 (`RootNavigator.test.tsx`); recadastro também em `.maestro/profile.yaml` |
-| C62 | O foco entra no diálogo de confirmação e volta ao botão que o abriu ao cancelar ou fechar com Esc | C | C ok #125 (`ProfileScreen.test.tsx`, espião em `sendAccessibilityEvent`, que também exige o diálogo já fechado quando o foco volta); VoiceOver no passo 11 do roteiro manual |
+| C62 | O foco entra no diálogo de confirmação e volta ao botão que o abriu ao cancelar ou fechar com Esc | C, M | parcial: C ok #125 (`ProfileScreen.test.tsx`, espião em `sendAccessibilityEvent`, que também exige o diálogo já fechado quando o foco volta); o VoiceOver de verdade fica no roteiro, passo 11 |
 
 ### Busca (RF08)
 
@@ -138,7 +138,7 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 | C34 | Qualificadores (`repo:`, `is:`) e operadores (`AND`, `OR`, `NOT`) digitados são neutralizados | U | ok; operadores no #37 (mais de 5 davam 422) |
 | C35 | Loader durante a busca | C | ok #37 (`CatalogScreen.test.tsx`, com o campo de busca na tela) |
 | C63 | Busca e filtro se combinam: buscar dentro de Salvos ou Estudados filtra a lista local; trocar de filtro mantém o termo aplicado | C | Salvos ok #38 e Estudados ok #39 (`CatalogScreen.test.tsx`) |
-| C64 | Cada chip de filtro informa o estado (`accessibilityState.selected`, `aria-pressed` no protótipo), tem alvo de 44x44 e o foco continua nele depois de tocar | C, M | estado e 44x44 de Todos e Salvos ok #38 e de Estudados ok #39 (`CatalogScreen.test.tsx`); o foco no chip depois do toque fica no passo 10 do roteiro; o foco volta ao chip Salvos depois de tirar o salvo de um card, ok #42 (`CatalogScreen.test.tsx`, "in Salvos, unsaving a card moves the focus to the Salvos chip"), e no VoiceOver no passo 10 |
+| C64 | Cada chip de filtro informa o estado (`accessibilityState.selected`, `aria-pressed` no protótipo), tem alvo de 44x44 e o foco continua nele depois de tocar | C, M | parcial: estado e 44x44 de Todos e Salvos ok #38 e de Estudados ok #39 (`CatalogScreen.test.tsx`); o foco no chip depois do toque fica no roteiro, passo 10, porque o foco do VoiceOver não se lê no teste; o foco volta ao chip Salvos depois de tirar o salvo de um card, ok #42 (`CatalogScreen.test.tsx`, "in Salvos, unsaving a card moves the focus to the Salvos chip"), e no VoiceOver no passo 10 |
 | C65 | O termo só vale ao tocar em Buscar (ou Enter); Buscar com o campo vazio volta à lista paginada do filtro | C, E2E | em Todos ok #37 (`CatalogScreen.test.tsx`; o `.maestro/search.yaml` cobre a volta com o campo vazio); em Salvos ok #38 e em Estudados ok #39 (`CatalogScreen.test.tsx`) |
 | C66 | O botão do Catálogo alterna `numColumns` entre 1 e 2 (padrão 2), com label que diz a ação, alvo de 44x44, `key` nova no `FlatList` e a lista e os favoritos intactos | C, E2E | ok #140 (`CatalogScreen.test.tsx`: label da ação, largura do card de 2 para 1 coluna, sem nova busca, favorito marcado, 44x44 e a escolha de volta depois de remontar; `RootNavigator.hydration.test.tsx`: o portão espera `rl.<userId>.layout`; `.maestro/catalog.yaml`: `rightOf`, toque, `below` e volta a 2 colunas) |
 
@@ -147,10 +147,10 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 | ID | Cenário | Nível | Status |
 |---|---|---|---|
 | C36 | `ActivityIndicator` na carga inicial do catálogo e do detalhe e na próxima página (`ListFooterComponent`) | C | catálogo ok #35 (`CatalogScreen.test.tsx`, inclui o rodapé `catalog.footer-loader`); detalhe ok #36 (`DetailScreen.test.tsx`) |
-| C37 | Erro de rede mostra `ErrorState`, e "Tentar novamente" recarrega | C, I, M | C ok #115 (`ErrorState.test.tsx`); I ok #41 (`useFetch.test.tsx` cobre erro e retry), e o ciclo erro, "Tentar novamente", dados com o serviço mockado está nas telas desde #35, #36 e #37 (`CatalogScreen.test.tsx`, `DetailScreen.test.tsx`); M no roteiro |
+| C37 | Erro de rede mostra `ErrorState`, e "Tentar novamente" recarrega | C, I, M | C ok (`ErrorState.test.tsx`); I ok #41 (`useFetch.test.tsx` cobre erro e retry), e o ciclo erro, "Tentar novamente", dados com o serviço mockado está nas telas desde #35, #36 e #37 (`CatalogScreen.test.tsx`, `DetailScreen.test.tsx`); roteiro, passo 7 |
 | C38 | `useFetch`: carregando, depois dados; erro, depois retry; cancela ao desmontar; trocar o fetcher ignora o resultado do antigo | I | ok #41 (`useFetch.test.tsx`) |
-| C39 | Limite de requisições mostra o horário de volta (só onde não há cache: busca, PR nunca aberto, página nova) | U, C, M | U ok; C da busca ok #37 (`CatalogScreen.test.tsx`); M no roteiro |
-| C40 | Com cache, qualquer falha (offline, 403, 5xx) mostra o valor vencido em vez de erro | U, M | U ok; M no roteiro |
+| C39 | Limite de requisições mostra o horário de volta (só onde não há cache: busca, PR nunca aberto, página nova) | U, C, M | parcial: U ok (`appError.test.ts`); C da busca ok #37 (`CatalogScreen.test.tsx`); o PR nunca aberto e a página nova só no roteiro, passo 8, porque o limite real da API não se reproduz num teste |
+| C40 | Com cache, qualquer falha (offline, 403, 5xx) mostra o valor vencido em vez de erro | U, M | U ok (`cache.test.ts`, "an expired entry is the fallback when the network fails"); roteiro, passos 7 e 8 (modo avião e limite esgotado) |
 | C41 | Mensagem de erro nunca carrega token nem URL | U | ok |
 | C42 | Timeout vira mensagem própria | U | ok |
 
@@ -162,15 +162,15 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 | C44 | Botão de estado informa o estado (`selected` ou label que muda) | C | ok #26, conferido no #42: `detail.save`, `detail.studied`, a estrela do card e os chips já têm `selected` e label que muda (`DetailScreen.test.tsx` C44, `PullRequestCard.test.tsx`, `CatalogScreen.test.tsx` C64) |
 | C45 | Alvo de toque de pelo menos 44x44 | C | ok #43: `minWidth` e `minHeight` lidos do `style` em `detail.save`, `detail.studied`, `Button` (3 variantes), `TextField` (só `minHeight`), "Tentar novamente", link do `AuthForm` e `catalog.profile`; estrela do card ok #34. Exceção: links dentro do texto do PR (`BodyBlocks`) são texto corrido e ficam fora (WCAG 2.5.8 isenta alvo inline) |
 | C46 | Pares de cor dos tokens com contraste de pelo menos 4.5:1 | U | ok #44 (`theme.test.ts`); o tema de navegação (`App.tsx`) usa `link` como tint do header e não tem teste automatizado. No simulador com iOS 26.5, o voltar do Detalhe é o botão de vidro do sistema, com a seta quase preta (`#191919` no print), e ignora o tint; o `link` no voltar vale antes do iOS 26 |
-| C47 | Fonte do sistema no máximo não corta texto nem sobrepõe; nenhum `allowFontScaling={false}` no código (`git grep`) | C, M | C da quebra de linha das estrelas ok #27 (`StarRating.test.tsx`); regressão do `git grep` ok #43 (`src/theme/fontScaling.test.ts`, visto cair com `allowFontScaling={false}` e revertido); teto de fonte da inicial do `Avatar`, da estrela do card e do texto Perfil do header (teto 2, `RootNavigator.test.tsx`) ok #43; a passada com a fonte no máximo continua no passo 9 do roteiro |
-| C48 | VoiceOver lê card, botões e estrelas numa ordem que faz sentido | M | roteiro |
+| C47 | Fonte do sistema no máximo não corta texto nem sobrepõe; nenhum `allowFontScaling={false}` no código (`git grep`) | C, M | parcial: C da quebra de linha das estrelas ok #27 (`StarRating.test.tsx`); regressão do `git grep` ok #43 (`src/theme/fontScaling.test.ts`, visto cair com `allowFontScaling={false}` e revertido); teto de fonte da inicial do `Avatar`, da estrela do card e do texto Perfil do header (teto 2, `RootNavigator.test.tsx`) ok #43; a passada com a fonte no máximo das 5 telas fica no roteiro, passo 9, porque o texto real do sistema só existe no aparelho |
+| C48 | VoiceOver lê card, botões e estrelas numa ordem que faz sentido | M | roteiro, passo 10 |
 
 ### Transversais
 
 | ID | Cenário | Nível | Status |
 |---|---|---|---|
-| C49 | A API real ainda devolve os campos que `toSummary` e `toDetail` leem | contrato | #115 |
-| C50 | O app abre no Expo Go sem erro vermelho | E2E smoke | #115; desde o #27 aceita a sessão salva e espera o header do Catálogo, que não depende da API |
+| C49 | A API real ainda devolve os campos que `toSummary` e `toDetail` leem | contrato | ok (`yarn test:contract`, 3 de 3, `scripts/contract.test.ts`; rodado no #117) |
+| C50 | O app abre no Expo Go sem erro vermelho | E2E smoke | ok (`.maestro/smoke.yaml`); desde o #27 aceita a sessão salva e espera o header do Catálogo, que não depende da API |
 
 Os IDs C51 a C55 vieram da revisão do catálogo, C56 a C62 do Perfil e C63 a C65 da busca e dos filtros dentro do Catálogo e C66 do botão de colunas; ficam no fim da numeração para não renumerar os outros.
 

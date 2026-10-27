@@ -39,7 +39,7 @@ Atenção: tudo que começa com `EXPO_PUBLIC_` é embutido no bundle do app e fi
 | `yarn format` / `yarn format:check` | Prettier (escreve / só confere) |
 | `yarn test` | testes unitários (`node:test`) |
 | `yarn test:ui` | testes de componente e integração (jest-expo + RNTL) |
-| `yarn test:contract` | 3 GETs reais na API do GitHub; manual, gasta 3 das 60 req/h |
+| `yarn test:contract` | 3 GETs reais na API do GitHub; manual, gasta 2 das 60 req/h do limite `core` e 1 do `search` |
 
 Antes de commitar: `brew install lefthook gitleaks` e `lefthook install`. O hook barra segredo (gitleaks) e código fora do formato. O CI repete typecheck, lint, formato e gitleaks em cada PR.
 
