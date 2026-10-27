@@ -35,7 +35,7 @@ export const spacing = { xs: 4, sm: 8, md: 12, lg: 16, xl: 24, xxl: 32 } as cons
 
 export const radius = { sm: 4, md: 8, lg: 12, pill: 999 } as const;
 
-// Sem lineHeight fixo em texto de conteúdo e sem allowFontScaling={false}: o RF10 pede que a
+// Sem lineHeight fixo em texto de conteúdo e com allowFontScaling sempre ligado (fontScaling.test.ts): o RF10 pede que a
 // fonte ampliada do sistema não corte nada.
 export const typography = {
   title: { fontSize: 22, fontWeight: '700' },

@@ -25,7 +25,10 @@ export function AppStack() {
               style={styles.headerButton}
               testID="catalog.profile"
             >
-              <Text style={styles.headerButtonText}>Perfil</Text>
+              {/* A barra nativa tem altura fixa e não escala: acima de 2x o texto sai cortado. */}
+              <Text maxFontSizeMultiplier={2} style={styles.headerButtonText}>
+                Perfil
+              </Text>
             </Pressable>
           ),
         })}

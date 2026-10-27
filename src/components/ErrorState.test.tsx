@@ -1,6 +1,8 @@
 import { expect, jest, test } from '@jest/globals';
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import { AccessibilityInfo } from 'react-native';
+import { AccessibilityInfo, StyleSheet } from 'react-native';
+
+import { touch } from '../theme';
 
 import { ErrorState } from './ErrorState';
 
@@ -26,4 +28,12 @@ test('C43: announces the message when it shows and when it changes', async () =>
   expect(announce).toHaveBeenLastCalledWith('Limite atingido.');
   expect(announce).toHaveBeenCalledTimes(2);
   announce.mockRestore();
+});
+
+test('C45: the retry button is at least 44x44', async () => {
+  await render(<ErrorState message="Sem conexão." onRetry={() => {}} />);
+
+  const style = StyleSheet.flatten(screen.getByLabelText('Tentar novamente').props.style);
+  expect(style.minWidth).toBeGreaterThanOrEqual(touch.min);
+  expect(style.minHeight).toBeGreaterThanOrEqual(touch.min);
 });

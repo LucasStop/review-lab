@@ -2,7 +2,7 @@ import { expect, jest, test } from '@jest/globals';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { StyleSheet } from 'react-native';
 
-import { touch } from '../theme';
+import { glyph, touch } from '../theme';
 import type { PullRequestSummary } from '../types/github';
 import { Avatar } from './Avatar';
 import { PullRequestCard } from './PullRequestCard';
@@ -113,4 +113,17 @@ test('an avatar next to the name is hidden from the screen reader', async () => 
 test('a standalone avatar is labelled', async () => {
   await render(<Avatar name="octocat" size={40} />);
   expect(screen.getByLabelText('Avatar de octocat')).toBeTruthy();
+});
+
+test('C47: the initial of the placeholder avatar caps the font scale so it stays inside the circle', async () => {
+  await render(<Avatar name="octocat" size={40} />);
+
+  expect(screen.getByText('O').props.maxFontSizeMultiplier).toBe(1);
+});
+
+test('C47: the star glyph caps the font scale so it fits the 44 target and stays clear of the title', async () => {
+  await render(card());
+
+  const cap = screen.getByText('☆').props.maxFontSizeMultiplier;
+  expect(cap * glyph.md).toBeLessThanOrEqual(touch.min);
 });

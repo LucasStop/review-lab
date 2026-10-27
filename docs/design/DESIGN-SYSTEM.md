@@ -37,7 +37,14 @@ Cor nunca é o único sinal: o estado "salvo" muda ícone e label, a nota usa �
 | `touch.min` | 44 |
 | `glyph` | `md` 24 (estrela de salvar do card), `lg` 28 (estrela da nota editável) |
 
-Regras de texto (RF10): nunca `allowFontScaling={false}`, nunca `height` ou `lineHeight` fixos em texto de conteúdo, nunca `numberOfLines` que esconda a informação principal. Contêiner de texto usa `minHeight`, não `height`.
+Regras de texto (RF10): nunca `allowFontScaling={false}`, nunca `height` ou `lineHeight` fixos em texto de conteúdo, nunca `numberOfLines` que esconda a informação principal. Contêiner de texto usa `minHeight`, não `height`. O teste `src/theme/fontScaling.test.ts` falha se algum arquivo de `src` (fora os `*.test.*`) tiver `allowFontScaling={false}` ou `allowFontScaling: false` literal; prop dinâmica (`allowFontScaling={flag}`) ou spread de objeto não é detectada.
+
+Alvo de toque e fonte grande (RF10, #43):
+
+- Todo elemento tocável tem `minWidth` e `minHeight` de `touch.min`; o `TextField` só `minHeight`, porque ocupa a largura toda. Exceção registrada: links dentro do texto do PR (`BodyBlocks`) são texto corrido, e o WCAG 2.5.8 isenta alvo inline.
+- Texto dentro de forma de tamanho fixo leva `maxFontSizeMultiplier`, sem desligar o `allowFontScaling`: a inicial do `Avatar` usa 1 (é decorativa e o círculo não cresce) e a estrela do card usa 1,5 (24 x 1,5 = 36 cabe nos 44 do alvo, e o `paddingEnd` do corpo do card mantém o título fora dela).
+- A linha do autor no Detalhe tem `flexShrink: 1` no texto, para quebrar em vez de sair da tela.
+- O texto do botão Perfil do header leva `maxFontSizeMultiplier={2}`: a barra nativa tem altura fixa e o UIKit não escala o título nem os botões, então sem teto o texto sai cortado. Conferido no simulador no tamanho máximo (`accessibility-extra-extra-extra-large`).
 
 ## Componentes
 

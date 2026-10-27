@@ -3,11 +3,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NavigationContainer, createNavigationContainerRef } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
-import { Linking } from 'react-native';
+import { Linking, StyleSheet } from 'react-native';
 
 import type { PullRequestDetailView } from '../types/github';
 import { FavoritesProvider } from '../contexts/FavoritesContext';
 import { StudiedProvider } from '../contexts/StudiedContext';
+import { touch } from '../theme';
 import { AppError } from '../utils/appError';
 import { DetailScreen } from './DetailScreen';
 
@@ -209,4 +210,13 @@ test('C29: unmarking hides the rating and stays unmarked after reopening', async
     selected: false,
   });
   expect(screen.queryByTestId('detail.rating')).toBeNull();
+});
+
+test.each(['detail.save', 'detail.studied'])('C45: %s is at least 44x44', async (testID) => {
+  mockGet.mockResolvedValue(detail());
+  await renderDetail();
+
+  const style = StyleSheet.flatten((await screen.findByTestId(testID)).props.style);
+  expect(style.minWidth).toBeGreaterThanOrEqual(touch.min);
+  expect(style.minHeight).toBeGreaterThanOrEqual(touch.min);
 });

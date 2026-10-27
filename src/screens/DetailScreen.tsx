@@ -68,7 +68,7 @@ export function DetailScreen({ navigation, route }: Props) {
     <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
       <View style={styles.author}>
         <Avatar uri={data.avatarUrl} name={data.author} size={56} accessible={false} />
-        <Text style={styles.meta}>
+        <Text style={[styles.meta, styles.authorText]}>
           #{data.number} · {data.author}
         </Text>
       </View>
@@ -125,10 +125,12 @@ const styles = StyleSheet.create({
   screen: { backgroundColor: colors.background },
   content: { padding: spacing.lg, gap: spacing.lg },
   author: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
+  authorText: { flexShrink: 1 },
   title: { ...typography.title, color: colors.text },
   // Quebra de linha: com fonte grande os dois botões não cabem lado a lado.
   actions: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
   action: {
+    minWidth: touch.min,
     minHeight: touch.min,
     justifyContent: 'center',
     paddingHorizontal: spacing.lg,
