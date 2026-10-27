@@ -1,6 +1,6 @@
 import { beforeEach, expect, jest, test } from '@jest/globals';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { fireEvent, render, screen, within } from '@testing-library/react-native';
+import { act, fireEvent, render, screen, within } from '@testing-library/react-native';
 import { AccessibilityInfo } from 'react-native';
 
 import { AuthProvider, useAuth } from '../contexts/AuthContext';
@@ -63,20 +63,22 @@ beforeEach(async () => {
 
 test('C56: shows the email, the saved and studied totals and the average rating', async () => {
   await AsyncStorage.setItem('rl.u1.favorites', JSON.stringify([pr(1), pr(2), pr(3)]));
+  // Média 4,333…: só com 1 casa ela vira "4,3".
   await AsyncStorage.setItem(
     'rl.u1.studied',
     JSON.stringify([
       { ...pr(1), rating: 4 },
       { ...pr(2), rating: 5 },
+      { ...pr(3), rating: 4 },
     ]),
   );
   await renderProfile();
 
   expect(screen.getByTestId('profile.email')).toHaveTextContent('ana@exemplo.com');
-  expect(await within(screen.getByTestId('profile.avg')).findByText('4,5')).toBeTruthy();
+  expect(await within(screen.getByTestId('profile.avg')).findByText('4,3')).toBeTruthy();
   expect(screen.getByTestId('profile.saved-count')).toHaveTextContent('3salvos');
-  expect(screen.getByTestId('profile.studied-count')).toHaveTextContent('2estudados');
-  expect(screen.getByTestId('profile.avg').props.accessibilityLabel).toBe('Nota média: 4,5');
+  expect(screen.getByTestId('profile.studied-count')).toHaveTextContent('3estudados');
+  expect(screen.getByTestId('profile.avg').props.accessibilityLabel).toBe('Nota média: 4,3');
 });
 
 test('C56: without studied PRs the average is a dash with a spoken label', async () => {
@@ -109,7 +111,9 @@ test('C57: logout asks first, and Cancel keeps the session and the screen', asyn
   expect(screen.getByTestId('profile.email')).toBeTruthy();
 });
 
-test('confirming logout closes the dialog and signs out', async () => {
+test('confirming logout closes the dialog before the sign-out finishes', async () => {
+  // Pendente: o AuthProvider não zera o user, então só o próprio Perfil pode fechar o diálogo.
+  mockAuth.signOut.mockReturnValue(new Promise(() => {}));
   await renderProfile();
 
   await fireEvent.press(screen.getByTestId('profile.logout'));
@@ -164,11 +168,59 @@ test('a double tap on Excluir deletes only once', async () => {
   await renderProfile();
   await openDelete('certa123');
 
+  // Os dois toques no mesmo act, sem re-render no meio: o `loading` do botão ainda não vale e
+  // só a guarda síncrona segura o segundo.
   const confirm = screen.getByTestId('profile.confirm');
-  await fireEvent.press(confirm);
-  await fireEvent.press(confirm);
+  await act(async () => {
+    void fireEvent.press(confirm);
+    void fireEvent.press(confirm);
+  });
 
   expect(mockAuth.deleteAccount).toHaveBeenCalledTimes(1);
+});
+
+test('after a wrong password, a new password can be sent again', async () => {
+  mockAuth.deleteAccount.mockResolvedValue({ ok: false, reason: 'invalid-credentials' });
+  await renderProfile();
+  await openDelete('errada123');
+  await fireEvent.press(screen.getByTestId('profile.confirm'));
+  await screen.findByText('Senha incorreta.');
+
+  await fireEvent.changeText(screen.getByTestId('profile.password'), 'outra123');
+  await fireEvent.press(screen.getByTestId('profile.confirm'));
+
+  expect(mockAuth.deleteAccount).toHaveBeenCalledTimes(2);
+  expect(mockAuth.deleteAccount).toHaveBeenLastCalledWith('u1', 'outra123');
+});
+
+test('closing the delete dialog clears the password and the error', async () => {
+  mockAuth.deleteAccount.mockResolvedValue({ ok: false, reason: 'invalid-credentials' });
+  await renderProfile();
+  await openDelete('errada123');
+  await fireEvent.press(screen.getByTestId('profile.confirm'));
+  await screen.findByText('Senha incorreta.');
+
+  await fireEvent.press(screen.getByTestId('profile.cancel'));
+  await openDelete();
+
+  expect(screen.getByTestId('profile.password').props.value).toBe('');
+  expect(screen.queryByText('Senha incorreta.')).toBeNull();
+});
+
+test('while the account is being deleted, Cancelar, Esc and back do not close the dialog', async () => {
+  mockAuth.deleteAccount.mockReturnValue(new Promise(() => {}));
+  await renderProfile();
+  await openDelete('certa123');
+  await fireEvent.press(screen.getByTestId('profile.confirm'));
+
+  await fireEvent.press(screen.getByTestId('profile.cancel'));
+  await fireEvent(screen.getByText('Excluir conta?'), 'accessibilityEscape');
+  await fireEvent(screen.getByText('Excluir conta?'), 'requestClose');
+
+  expect(screen.getByText('Excluir conta?')).toBeTruthy();
+  expect(screen.getByTestId('profile.confirm').props.accessibilityState).toMatchObject({
+    busy: true,
+  });
 });
 
 test('C62: focus enters the dialog and returns to the button that opened it', async () => {
