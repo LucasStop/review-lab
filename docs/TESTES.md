@@ -40,6 +40,58 @@ Regra prática: o que dá para testar sem renderizar desce para o unitário. A t
 - A suíte Maestro inteira e o roteiro manual rodam antes do #52 (MVP), do #51 (vídeo) e do #56 (envio). O resultado e a data entram na tabela de execuções.
 - Todo PR passa por um subagente cético. Ele tenta quebrar o PR com entrada hostil, offline, limite de requisições e app reaberto, e muda uma linha do código para ver se algum teste falha.
 
+## Revisão cética da suíte
+
+Em 27/10/2026, quatro lentes tentaram quebrar a suíte sobre `f4d00f3`: o sanitizador com entrada hostil, o cache offline e no limite de 60 req/h, a sessão com o app reaberto e a mutação de uma linha de cada vez. A lente de mutação aplicou 72 mutações de uma linha e contou 53 mortas e 19 sobreviventes, mas a tabela dela lista 25 sobreviventes: 20 avulsas e 5 no `github.ts`, que não tinha teste. Desses 25, 22 morrem com os testes novos, cada um reaplicado, visto cair e revertido; os 3 do `usePersistedList` (linhas 28, 41 e 47) ficam entre os aceitos, abaixo. Os testes novos também cobrem `sanitizeHtml(null)`. Duas mutações são equivalentes e não se testam: tirar o `if (!html) return []`, porque o parser já devolve lista vazia, e mandar `If-None-Match: undefined`, que o axios descarta.
+
+Corrigidos, com o teste que prende cada um:
+
+| Achado | Cenário | Teste |
+|---|---|---|
+| `sanitizeHtml` estourava a pilha com milhares de tags aninhadas e o Detalhe não abria (`MAX_DEPTH = 64`) | C18, C19 | `sanitizeHtml.test.ts`, "deeply nested hostile html" |
+| Dois `save` do cache concorrentes perdiam uma chave do índice, e o storage crescia sem teto (fila de promessas) | C40 | `cache.test.ts`, "concurrent saves" |
+| 403 ou 429 com `retry-after` (limite secundário) virava "recusou o acesso" ou perdia a hora | C39 | `appError.test.ts`, "with retry-after" |
+| Comentário do contrato dizia 3 req do limite de 60/h | C49 | `scripts/contract.test.ts`, linhas 1-3 |
+
+Lacunas de teste fechadas: `parseLinkHeader` (sem `page`, `page=1.5`, `page=0`), `merged` e o corte de 100 caracteres da busca, a cor do avatar, o limite exato do TTL e de `maxEntries` e o índice sem duplicata, e-mail não-string na sessão, senha de 6 e de 5 caracteres, hash gravado maior que o real, o vetor de 2000 iterações, texto em `svg`, `math` e `template`, `sanitizeHtml(null)`, `x-ratelimit-reset: 0` e 401, o `onEndReached` depois de erro na página 2 e o `github.test.tsx` (path, parâmetros, etag, `Accept` e termo vazio).
+
+Aceitos, sem teste:
+
+- Cópia vencida devolvida em qualquer erro, até 404: o PR não some do GitHub, e mostrar a cópia é melhor que erro.
+- Sem indicador de cópia vencida.
+- `SAFE_URL` aceita `http://` e `https://github.com@evil.com/`: o toque abre o navegador do sistema, que mostra o host.
+- `clean()` quadrático: o corpo de um PR tem poucos nós.
+- Sessão com userId sem credencial abre logada: nenhum fluxo do app produz isso, porque a exclusão apaga a sessão antes da credencial.
+- `signOut` com falha no SecureStore mostra o Login, e a sessão volta ao reabrir.
+- Toque em salvar sem efeito quando a leitura do disco falhou.
+- Troca de chave no `usePersistedList` (linhas 28, 41 e 47): o `RootNavigator` remonta os providers com `key={user.id}`.
+- `userId` é `sha256(email)` sem sal nas chaves do AsyncStorage, coerente com o ADR 0003: o e-mail em texto fica só no SecureStore.
+
+### Bugs achados na Fase 2
+
+| PR | Sintoma | Teste que prende |
+|---|---|---|
+| #153 | texto do botão Perfil do header cortado com a fonte no máximo | `RootNavigator.test.tsx` C47 |
+| #150 | primeiro toque no diálogo só fechava o teclado | `ProfileScreen.test.tsx`, "with the keyboard open" |
+| #150 | foco voltava antes de o diálogo fechar | `ProfileScreen.test.tsx` C62 |
+| #150 | sessão aceitava userId que não era hash de 64 hex | `session.test.ts`, `parseSession` |
+| #145 | trocar de filtro ou termo reaproveitava a lista antiga | `CatalogScreen.test.tsx` C63 |
+| #145 | a busca local não achava o PR pelo número como o card o mostra | `collections.test.ts` C63, `filterByTerm` |
+| #144 | `AND`, `OR` e `NOT` digitados davam 422 na busca | `pullRequest.test.ts`, "boolean operators" |
+| #144 | Buscar de novo com o mesmo termo depois do erro não buscava | `CatalogScreen.test.tsx`, "same term after the limit" |
+| #143 | estrelas cortadas com a fonte do sistema no máximo | `StarRating.test.tsx` C47 |
+| #139 | estrela do card não acompanhava o salvar do detalhe | `FavoritesFlow.test.tsx` C21 |
+| #138 | título do header e esquema de link do corpo sem prova | `DetailScreen.test.tsx` C53, C20 |
+| #137 | escrita antes da leitura do disco apagava os salvos | `FavoritesContext.test.tsx`, "before hydration" e "failed disk read" |
+| #136 | "Tentar novamente" repetia a operação errada e o StrictMode carregava duas vezes | `CatalogScreen.test.tsx`, "failed pull-to-refresh" |
+| #135 | avatar não tentava de novo com a uri nova | `PullRequestCard.test.tsx`, "new uri after a failed one" |
+| #134 | exclusão de conta apagava a credencial antes da sessão | `session.test.ts`, "removes the session before the credential" |
+| #133 | logout com falha no SecureStore deixava a tela logada | `RootNavigator.test.tsx`, "when clearing the stored session fails" |
+| #132 | Login aceitava toque duplo e travava com a promessa rejeitada | `LoginScreen.test.tsx`, "rejected sign-in" e "two presses" |
+| #111 | HTML aninhado estourava a pilha; `save` do cache concorrente; `retry-after` | os três da tabela acima |
+
+Sem teste de unidade ou componente, só fluxo, doc ou configuração: #149 (peso do título e tint do tema), #148 (tamanho do loader), #150 (diálogo acima do teclado), o fix do `e2e` que toca no fundo só com o menu de dev aberto, o timeout do jest no CI (#134) e o alinhamento de docs e protótipo (#126).
+
 ## Convenções
 
 - Os seletores de E2E usam `testID` no formato `tela.elemento`, por exemplo `login.email`, `catalog.card.0` (o índice do card na lista, não o número do PR) e `detail.save`. Detalhe em [design/DESIGN-SYSTEM.md](design/DESIGN-SYSTEM.md).
