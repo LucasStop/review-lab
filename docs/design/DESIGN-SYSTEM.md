@@ -44,7 +44,7 @@ Alvo de toque e fonte grande (RF10, #43):
 - Todo elemento tocável tem `minWidth` e `minHeight` de `touch.min`; o `TextField` só `minHeight`, porque ocupa a largura toda. Exceção registrada: links dentro do texto do PR (`BodyBlocks`) são texto corrido, e o WCAG 2.5.8 isenta alvo inline.
 - Texto dentro de forma de tamanho fixo leva `maxFontSizeMultiplier`, sem desligar o `allowFontScaling`: a inicial do `Avatar` usa 1 (é decorativa e o círculo não cresce) e a estrela do card usa 1,5 (24 x 1,5 = 36 cabe nos 44 do alvo, e o `paddingEnd` do corpo do card mantém o título fora dela).
 - A linha do autor no Detalhe tem `flexShrink: 1` no texto, para quebrar em vez de sair da tela.
-- Risco aberto: o botão Perfil do header nativo tem altura controlada pelo sistema; com a fonte no máximo o texto "Perfil" pode cortar. Conferir no simulador (passo 9 do roteiro).
+- O texto do botão Perfil do header leva `maxFontSizeMultiplier={2}`: a barra nativa tem altura fixa e o UIKit não escala o título nem os botões, então sem teto o texto sai cortado. Conferido no simulador no tamanho máximo (`accessibility-extra-extra-extra-large`).
 
 ## Componentes
 
