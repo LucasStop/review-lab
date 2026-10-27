@@ -117,6 +117,15 @@ name: studied
     text: '.*, nota 2 de 5'
 - tapOn:
     id: 'catalog.card.0'
+# A lista acabou de ser remontada pela troca de filtro; repete se o detalhe não abriu.
+- runFlow:
+    when:
+      notVisible:
+        id: 'detail.studied'
+    commands:
+      - tapOn:
+          id: 'catalog.card.0'
+          optional: true
 - extendedWaitUntil:
     visible:
       id: 'detail.studied'
