@@ -7,6 +7,7 @@ import { Keyboard, StyleSheet, Text } from 'react-native';
 
 import type { PullRequestPage, PullRequestSummary } from '../types/github';
 import { FavoritesProvider } from '../contexts/FavoritesContext';
+import { StudiedProvider } from '../contexts/StudiedContext';
 import { touch } from '../theme';
 import { AppError } from '../utils/appError';
 import { CatalogScreen } from './CatalogScreen';
@@ -29,6 +30,15 @@ const page = (numbers: number[], hasNext: boolean): PullRequestPage => ({
   items: numbers.map(pr),
   hasNext,
 });
+const studied = [
+  { ...pr(5), rating: 4 },
+  { ...pr(6), rating: 2 },
+];
+// Salvos e Estudados vêm dos Contexts e tratam a lista paginada do mesmo jeito.
+const LOCAL_FILTERS = [
+  { name: 'Salvos', storage: 'rl.u1.favorites', items: [pr(5), pr(6)] },
+  { name: 'Estudados', storage: 'rl.u1.studied', items: studied },
+] as const;
 
 const Stack = createNativeStackNavigator();
 const Detail = ({ route }: { route: { params: { number: number } } }) => (
@@ -38,12 +48,14 @@ const Detail = ({ route }: { route: { params: { number: number } } }) => (
 async function renderCatalog() {
   await render(
     <FavoritesProvider userId="u1">
-      <NavigationContainer>
-        <Stack.Navigator>
-          <Stack.Screen name="Catalog" component={CatalogScreen as never} />
-          <Stack.Screen name="Detail" component={Detail as never} />
-        </Stack.Navigator>
-      </NavigationContainer>
+      <StudiedProvider userId="u1">
+        <NavigationContainer>
+          <Stack.Navigator>
+            <Stack.Screen name="Catalog" component={CatalogScreen as never} />
+            <Stack.Screen name="Detail" component={Detail as never} />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </StudiedProvider>
     </FavoritesProvider>,
   );
 }
@@ -60,7 +72,7 @@ async function searchFor(term: string) {
   await fireEvent.press(screen.getByTestId('catalog.search-submit'));
 }
 
-async function showFilter(name: 'Todos' | 'Salvos') {
+async function showFilter(name: 'Todos' | 'Salvos' | 'Estudados') {
   await fireEvent.press(screen.getByRole('button', { name }));
 }
 
@@ -378,63 +390,93 @@ test('Salvos still shows the saved PRs when the list fails, and Todos keeps its 
   expect(screen.getByTestId('catalog.error')).toBeTruthy();
 });
 
-test('Salvos does not page, refresh, show the footer or wait for the list', async () => {
-  await AsyncStorage.setItem('rl.u1.favorites', JSON.stringify([pr(5)]));
-  mockList.mockResolvedValueOnce(page([2], true)).mockReturnValueOnce(new Promise(() => {}));
-  await renderCatalog();
-  await screen.findByTestId('catalog.card.0');
-  await reachEnd();
-  expect(screen.getByTestId('catalog.footer-loader')).toBeTruthy();
+test.each(LOCAL_FILTERS)(
+  '$name does not page, refresh, show the footer or wait for the list',
+  async ({ name, storage, items }) => {
+    await AsyncStorage.setItem(storage, JSON.stringify(items));
+    mockList.mockResolvedValueOnce(page([2], true)).mockReturnValueOnce(new Promise(() => {}));
+    await renderCatalog();
+    await screen.findByTestId('catalog.card.0');
+    await reachEnd();
+    expect(screen.getByTestId('catalog.footer-loader')).toBeTruthy();
 
-  await showFilter('Salvos');
+    await showFilter(name);
 
-  const list = screen.getByTestId('catalog.list');
-  expect(list.props.onEndReached).toBeUndefined();
-  expect(list.props.onRefresh).toBeUndefined();
-  expect(screen.queryByTestId('catalog.footer-loader')).toBeNull();
-  expect(screen.getByText('PR 5')).toBeTruthy();
-});
+    const list = screen.getByTestId('catalog.list');
+    expect(list.props.onEndReached).toBeUndefined();
+    expect(list.props.onRefresh).toBeUndefined();
+    expect(screen.queryByTestId('catalog.footer-loader')).toBeNull();
+    expect(screen.getByText('PR 5')).toBeTruthy();
+  },
+);
 
-test('Salvos shows the saved PRs while the first page of Todos is still loading', async () => {
-  await AsyncStorage.setItem('rl.u1.favorites', JSON.stringify([pr(5)]));
-  mockList.mockReturnValue(new Promise(() => {}));
-  await renderCatalog();
-  expect(screen.getByTestId('loading')).toBeTruthy();
+test.each(LOCAL_FILTERS)(
+  '$name shows its PRs while the first page of Todos is still loading',
+  async ({ name, storage, items }) => {
+    await AsyncStorage.setItem(storage, JSON.stringify(items));
+    mockList.mockReturnValue(new Promise(() => {}));
+    await renderCatalog();
+    expect(screen.getByTestId('loading')).toBeTruthy();
 
-  await showFilter('Salvos');
+    await showFilter(name);
 
-  expect(await screen.findByText('PR 5')).toBeTruthy();
-  expect(screen.queryByTestId('loading')).toBeNull();
-});
+    expect(await screen.findByText('PR 5')).toBeTruthy();
+    expect(screen.queryByTestId('loading')).toBeNull();
+  },
+);
 
-test('C65: in Salvos typing does not filter until Buscar', async () => {
+test.each(LOCAL_FILTERS)(
+  'C65: in $name typing does not filter until Buscar',
+  async ({ name, storage, items }) => {
+    await AsyncStorage.setItem(storage, JSON.stringify(items));
+    mockList.mockResolvedValue(page([1], false));
+    await renderCatalog();
+    await screen.findByTestId('catalog.card.0');
+    await showFilter(name);
+
+    await fireEvent.changeText(screen.getByLabelText('Buscar PRs'), '6');
+    expect(screen.getByText('PR 5')).toBeTruthy();
+
+    await fireEvent.press(screen.getByTestId('catalog.search-submit'));
+    expect(screen.queryByText('PR 5')).toBeNull();
+    expect(screen.getByText('PR 6')).toBeTruthy();
+  },
+);
+
+test.each(LOCAL_FILTERS)(
+  'changing the filter or the term in $name starts a new list',
+  async ({ name, storage, items }) => {
+    await AsyncStorage.setItem(storage, JSON.stringify(items));
+    mockList.mockResolvedValue(page([3, 2, 1], false));
+    await renderCatalog();
+    await screen.findByTestId('catalog.card.0');
+    const todos = screen.getByTestId('catalog.list');
+
+    await showFilter(name);
+    const local = screen.getByTestId('catalog.list');
+    expect(local).not.toBe(todos);
+
+    await searchFor('6');
+    expect(screen.getByTestId('catalog.list')).not.toBe(local);
+  },
+);
+
+test('C63: switching between Salvos and Estudados keeps the term and starts a new list', async () => {
   await AsyncStorage.setItem('rl.u1.favorites', JSON.stringify([pr(5), pr(6)]));
+  await AsyncStorage.setItem('rl.u1.studied', JSON.stringify(studied));
   mockList.mockResolvedValue(page([1], false));
   await renderCatalog();
   await screen.findByTestId('catalog.card.0');
-  await showFilter('Salvos');
-
-  await fireEvent.changeText(screen.getByLabelText('Buscar PRs'), '6');
-  expect(screen.getByText('PR 5')).toBeTruthy();
-
-  await fireEvent.press(screen.getByTestId('catalog.search-submit'));
-  expect(screen.queryByText('PR 5')).toBeNull();
-  expect(screen.getByText('PR 6')).toBeTruthy();
-});
-
-test('changing the filter or the term in Salvos starts a new list', async () => {
-  await AsyncStorage.setItem('rl.u1.favorites', JSON.stringify([pr(5), pr(6)]));
-  mockList.mockResolvedValue(page([3, 2, 1], false));
-  await renderCatalog();
-  await screen.findByTestId('catalog.card.0');
-  const todos = screen.getByTestId('catalog.list');
 
   await showFilter('Salvos');
-  const salvos = screen.getByTestId('catalog.list');
-  expect(salvos).not.toBe(todos);
-
   await searchFor('6');
+  const salvos = screen.getByTestId('catalog.list');
+  await showFilter('Estudados');
+
   expect(screen.getByTestId('catalog.list')).not.toBe(salvos);
+  expect(screen.getByText('PR 6')).toBeTruthy();
+  expect(screen.queryByText('PR 5')).toBeNull();
+  expect(mockSearch).not.toHaveBeenCalled();
 });
 
 test('C64: each filter chip states whether it is selected and is at least 44x44', async () => {
@@ -443,16 +485,87 @@ test('C64: each filter chip states whether it is selected and is at least 44x44'
   await screen.findByTestId('catalog.card.0');
   const chip = (name: string) => screen.getByRole('button', { name });
 
-  expect(chip('Todos').props.accessibilityState).toMatchObject({ selected: true });
-  expect(chip('Salvos').props.accessibilityState).toMatchObject({ selected: false });
-  await showFilter('Salvos');
-  expect(chip('Todos').props.accessibilityState).toMatchObject({ selected: false });
-  expect(chip('Salvos').props.accessibilityState).toMatchObject({ selected: true });
-  for (const name of ['Todos', 'Salvos']) {
+  const names = ['Todos', 'Salvos', 'Estudados'] as const;
+  for (const shown of names) {
+    await showFilter(shown);
+    for (const name of names) {
+      expect(chip(name).props.accessibilityState).toMatchObject({ selected: name === shown });
+    }
+  }
+  for (const name of names) {
     const style = StyleSheet.flatten(chip(name).props.style);
     expect(style.minWidth).toBe(touch.min);
     expect(style.minHeight).toBe(touch.min);
   }
+});
+
+test('C30: Estudados lists each studied PR with its rating, without the network', async () => {
+  await AsyncStorage.setItem('rl.u1.studied', JSON.stringify(studied));
+  mockList.mockResolvedValue(page([5, 1], false));
+  await renderCatalog();
+  await screen.findByTestId('catalog.card.0');
+  // Em Todos o card não mostra a nota, como no protótipo.
+  expect(screen.queryByTestId('catalog.card.0.rating')).toBeNull();
+
+  await showFilter('Estudados');
+
+  expect(screen.getByLabelText('PR #5: PR 5, de ana, nota 4 de 5')).toBeTruthy();
+  expect(screen.getByLabelText('PR #6: PR 6, de ana, nota 2 de 5')).toBeTruthy();
+  expect(screen.getByText('★★★★☆')).toBeTruthy();
+  expect(screen.getByText('★★☆☆☆')).toBeTruthy();
+  expect(screen.queryByText('PR 1')).toBeNull();
+  expect(mockList).toHaveBeenCalledTimes(1);
+  expect(mockSearch).not.toHaveBeenCalled();
+  // A estrela de salvar continua valendo dentro de Estudados.
+  const star = screen.getByTestId('catalog.save.0');
+  expect(star.props.accessibilityState).toMatchObject({ selected: false });
+  await fireEvent.press(star);
+  expect(screen.getByTestId('catalog.save.0').props.accessibilityState).toMatchObject({
+    selected: true,
+  });
+  await fireEvent.press(screen.getByTestId('catalog.card.1'));
+  expect(await screen.findByText('Detalhe 6')).toBeTruthy();
+});
+
+test('C55: an empty Estudados says no PR was marked as studied', async () => {
+  mockList.mockResolvedValue(page([1], false));
+  await renderCatalog();
+  await screen.findByTestId('catalog.card.0');
+
+  await showFilter('Estudados');
+
+  expect(screen.getByTestId('catalog.empty')).toBeTruthy();
+  expect(screen.getByText('Você ainda não marcou nenhum PR como estudado')).toBeTruthy();
+});
+
+test('C63 and C65: the term filters Estudados locally, stays across filters and clears on an empty Buscar', async () => {
+  await AsyncStorage.setItem('rl.u1.studied', JSON.stringify(studied));
+  mockList.mockResolvedValue(page([1], false));
+  mockSearch.mockResolvedValue([pr(7)]);
+  await renderCatalog();
+  await screen.findByTestId('catalog.card.0');
+  await showFilter('Estudados');
+
+  await searchFor('6');
+  expect(screen.getByText('PR 6')).toBeTruthy();
+  expect(screen.queryByText('PR 5')).toBeNull();
+  expect(mockSearch).not.toHaveBeenCalled();
+
+  await showFilter('Todos');
+  expect(await screen.findByText('PR 7')).toBeTruthy();
+  expect(mockSearch).toHaveBeenCalledWith('6', expect.anything());
+
+  await showFilter('Estudados');
+  expect(screen.getByText('PR 6')).toBeTruthy();
+  expect(screen.queryByText('PR 7')).toBeNull();
+
+  await searchFor('zzz');
+  expect(screen.getByText('Nenhum resultado para “zzz”')).toBeTruthy();
+  expect(screen.getByText('Tente outro termo ou troque o filtro.')).toBeTruthy();
+
+  await searchFor('');
+  expect(screen.getByText('PR 5')).toBeTruthy();
+  expect(screen.getByText('PR 6')).toBeTruthy();
 });
 
 test('Buscar with the same term after the limit searches again, like Tentar novamente', async () => {

@@ -40,8 +40,8 @@ export function PullRequestCard({
           #{pr.number} · {pr.author}
         </Text>
         {rating ? (
-          <Text style={styles.meta} testID={testID && `${testID}.rating`}>
-            Nota {rating} de 5
+          <Text style={styles.rating} testID={testID && `${testID}.rating`}>
+            {'★'.repeat(rating) + '☆'.repeat(5 - rating)}
           </Text>
         ) : null}
       </Pressable>
@@ -71,6 +71,7 @@ const styles = StyleSheet.create({
   body: { padding: spacing.md, gap: spacing.xs, paddingEnd: touch.min },
   title: { ...typography.body, color: colors.text, flexShrink: 1 },
   meta: { ...typography.caption, color: colors.textMuted },
+  rating: { ...typography.caption, color: colors.star },
   save: {
     position: 'absolute',
     top: 0,

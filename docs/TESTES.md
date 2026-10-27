@@ -96,7 +96,7 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 | C21 | Salvar no detalhe muda o ícone do mesmo PR no card do catálogo | I, E2E | I ok (`CatalogScreen.test.tsx`, `DetailScreen.test.tsx`); E2E em `.maestro/favorite.yaml` |
 | C22 | O filtro Salvos do Catálogo lista os salvos e atualiza ao remover | C, E2E | ok #38 (`CatalogScreen.test.tsx`, `.maestro/filters.yaml`) |
 | C23 | Filtro Salvos vazio mostra `EmptyState` amigável (`ListEmptyComponent`) | C, E2E | ok #38 (`CatalogScreen.test.tsx`, `.maestro/filters.yaml`) |
-| C54 | Busca, filtros Salvos e Estudados e Perfil são acessíveis na tela do Catálogo | E2E | busca ok #37 e Salvos ok #38 (`.maestro/search.yaml`, `.maestro/filters.yaml`); Estudados no #39 e Perfil no #125 |
+| C54 | Busca, filtros Salvos e Estudados e Perfil são acessíveis na tela do Catálogo | E2E | busca ok #37, Salvos ok #38 e Estudados ok #39 (`.maestro/search.yaml`, `.maestro/filters.yaml`, `.maestro/studied.yaml`); Perfil no #125 |
 
 ### Persistência (RF06)
 
@@ -113,8 +113,8 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 |---|---|---|---|
 | C28 | Marcar como estudado com nota de 1 a 5 no detalhe | C, E2E | ok #27 (C em `StarRating.test.tsx` e `DetailScreen.test.tsx`, E2E em `.maestro/studied.yaml`) |
 | C29 | Mudar a nota ou desmarcar atualiza a lista | I | I ok #25 (`StudiedContext.test.tsx`); tela ok #27 (`DetailScreen.test.tsx`) |
-| C30 | O filtro Estudados do Catálogo lista cada PR com a sua nota | C, E2E | F2 #39 |
-| C55 | Filtro Estudados vazio mostra `EmptyState` | C | F2 #39 |
+| C30 | O filtro Estudados do Catálogo lista cada PR com a sua nota | C, E2E | ok #39 (`CatalogScreen.test.tsx`, `PullRequestCard.test.tsx`, `.maestro/studied.yaml`) |
+| C55 | Filtro Estudados vazio mostra `EmptyState` | C | ok #39 (`CatalogScreen.test.tsx`) |
 
 ### Perfil, sair e excluir conta (RF07, além da rubrica)
 
@@ -137,9 +137,9 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 | C33 | Termo vazio não chama a API | U, C | U ok; C ok #37 (só espaços não busca) |
 | C34 | Qualificadores (`repo:`, `is:`) e operadores (`AND`, `OR`, `NOT`) digitados são neutralizados | U | ok; operadores no #37 (mais de 5 davam 422) |
 | C35 | Loader durante a busca | C | ok #37 (`CatalogScreen.test.tsx`, com o campo de busca na tela) |
-| C63 | Busca e filtro se combinam: buscar dentro de Salvos ou Estudados filtra a lista local; trocar de filtro mantém o termo aplicado | C | Salvos ok #38 (`CatalogScreen.test.tsx`); Estudados no #39 |
-| C64 | Cada chip de filtro informa o estado (`accessibilityState.selected`, `aria-pressed` no protótipo), tem alvo de 44x44 e o foco continua nele depois de tocar | C, M | estado e 44x44 de Todos e Salvos ok #38 (`CatalogScreen.test.tsx`); o foco no chip depois do toque fica no passo 10 do roteiro e no #42 |
-| C65 | O termo só vale ao tocar em Buscar (ou Enter); Buscar com o campo vazio volta à lista paginada do filtro | C, E2E | em Todos ok #37 (`CatalogScreen.test.tsx`; o `.maestro/search.yaml` cobre a volta com o campo vazio); em Salvos ok #38 (`CatalogScreen.test.tsx`); em Estudados, #39 |
+| C63 | Busca e filtro se combinam: buscar dentro de Salvos ou Estudados filtra a lista local; trocar de filtro mantém o termo aplicado | C | Salvos ok #38 e Estudados ok #39 (`CatalogScreen.test.tsx`) |
+| C64 | Cada chip de filtro informa o estado (`accessibilityState.selected`, `aria-pressed` no protótipo), tem alvo de 44x44 e o foco continua nele depois de tocar | C, M | estado e 44x44 de Todos e Salvos ok #38 e de Estudados ok #39 (`CatalogScreen.test.tsx`); o foco no chip depois do toque fica no passo 10 do roteiro e no #42 |
+| C65 | O termo só vale ao tocar em Buscar (ou Enter); Buscar com o campo vazio volta à lista paginada do filtro | C, E2E | em Todos ok #37 (`CatalogScreen.test.tsx`; o `.maestro/search.yaml` cobre a volta com o campo vazio); em Salvos ok #38 e em Estudados ok #39 (`CatalogScreen.test.tsx`) |
 | C66 | O botão do Catálogo alterna `numColumns` entre 1 e 2 (padrão 2), com label que diz a ação, alvo de 44x44, `key` nova no `FlatList` e a lista e os favoritos intactos | C, E2E | F2 #140 |
 
 ### Feedback de UI (RF09)

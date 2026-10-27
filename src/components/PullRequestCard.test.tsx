@@ -70,12 +70,17 @@ test('RF10: the title has no fixed height or line height, so a large system font
   expect(style.lineHeight).toBeUndefined();
 });
 
-test('the rating shows and is announced only when given', async () => {
-  await render(card({ rating: 4 }));
-  expect(screen.getByText('Nota 4 de 5')).toBeTruthy();
+test('the rating shows as stars and is announced only when given', async () => {
+  const view = await render(card({ rating: 4 }));
+  expect(screen.getByTestId('catalog.card.0.rating')).toBeTruthy();
+  expect(screen.getByText('★★★★☆')).toBeTruthy();
   expect(
     screen.getByLabelText('PR #42: Fix race in scheduler, de octocat, nota 4 de 5'),
   ).toBeTruthy();
+
+  await view.rerender(card());
+  expect(screen.queryByTestId('catalog.card.0.rating')).toBeNull();
+  expect(screen.getByLabelText('PR #42: Fix race in scheduler, de octocat')).toBeTruthy();
 });
 
 test('C10: no avatar url shows the initial placeholder', async () => {

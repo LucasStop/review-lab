@@ -14,7 +14,7 @@ Legenda: **base** quer dizer que a lógica existe, mas falta a tela.
 | RF04 Favoritos (Context) | 15% com RF05 | `FavoritesContext` por usuário (#24); estrela no card e botão no detalhe, com o mesmo estado nas duas telas (#26) | — | Luc-Bruno |
 | RF05 Favoritos (filtro Salvos no Catálogo) | 15% com RF04 | filtro Salvos no Catálogo, com a busca filtrando a lista local e o vazio que explica como salvar (#38), sobre `useFavorites().favorites` e `EmptyState` (PR #99) | — | Luc-Bruno |
 | RF06 Persistência | 10% | `usePersistedList` no AsyncStorage com chave `rl.<userId>.<nome>`, que recusa gravar antes da hidratação (#24, #25) | #45 (sem dado zerado na carga) | Luc-Bruno |
-| RF07 Login, sessão, estudados | 10% | login e cadastro com hash e sal (#29 e #31), navegação condicional e Sair provisório no Catálogo (#32), exclusão de conta no serviço (#124), `StudiedContext` com nota de 1 a 5 (#25), marcar como estudado com a nota editável no detalhe (#27) | #39 filtro Estudados; Perfil com Sair e Excluir conta (#125, além da rubrica) | LucasStop, Luc-Bruno |
+| RF07 Login, sessão, estudados | 10% | login e cadastro com hash e sal (#29 e #31), navegação condicional e Sair provisório no Catálogo (#32), exclusão de conta no serviço (#124), `StudiedContext` com nota de 1 a 5 (#25), marcar como estudado com a nota editável no detalhe (#27), filtro Estudados no Catálogo com a nota em estrelas (#39) | Perfil com Sair e Excluir conta (#125, além da rubrica) | LucasStop, Luc-Bruno |
 | RF08 Busca (campo e botão no Catálogo) | 10% | campo "Buscar PRs" e botão "Buscar" no Catálogo, com carregando, erro, limite com horário e "Nenhum resultado para" o termo (#37); `searchPullRequests` e `buildSearchQuery` (PR #106) | — | Luc-Bruno |
 | RF09 Feedback | 10% | `ActivityIndicator` e `ErrorState` com "Tentar novamente" no Catálogo e no detalhe; erro da página seguinte no rodapé; `AppError` com horário de volta do limite (PR #104) | #41, que confere todo fluxo | Luc-Bruno |
 | RF10 Acessibilidade | 10% | tokens com contraste testado (#114); label, role e toque 44x44 nos componentes | #42, #43 e #44 | Luc-Bruno |
@@ -64,7 +64,7 @@ Totais da última execução: tabela "Execuções" de [TESTES.md](TESTES.md).
 | `cat:dados` | LucasStop | #15-#22 | — |
 | `cat:auth` | LucasStop | #29-#32, #124 | — |
 | `cat:entrega` | LucasStop | #46 | #47-#56, #111 (com Luc-Bruno) |
-| `cat:navegacao-telas` | Luc-Bruno | #33-#38 | #39, #125, #140 |
+| `cat:navegacao-telas` | Luc-Bruno | #33-#39 | #125, #140 |
 | `cat:estado` | Luc-Bruno | #23-#28 | — |
 | `cat:ux-acessibilidade` | Luc-Bruno | #40, #114, #119, #123, #128, #130 | #41-#45 |
 | `cat:nuvem-bonus` | a definir depois do MVP | — | #57-#59 |
