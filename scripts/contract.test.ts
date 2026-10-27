@@ -1,5 +1,6 @@
-// Contrato com a API real do GitHub (C49): os mocks dos testes podem divergir da API. Gasta 3
-// requisições do limite de 60/h, por isso roda à mão (`yarn test:contract`) e fica fora do CI.
+// Contrato com a API real do GitHub (C49): os mocks dos testes podem divergir da API. Gasta 2
+// requisições do limite `core` de 60/h e 1 do limite próprio de `search`, por isso roda à mão
+// (`yarn test:contract`) e fica fora do CI.
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
