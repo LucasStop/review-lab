@@ -30,7 +30,7 @@ export function parseSession(raw: string | null): Session | null {
     const value: unknown = JSON.parse(raw);
     if (typeof value !== 'object' || value === null) return null;
     const { userId, email } = value as Record<string, unknown>;
-    if (typeof userId !== 'string' || !userId) return null;
+    if (!isUserId(userId)) return null;
     return typeof email === 'string' ? { userId, email } : { userId };
   } catch {
     return null;
