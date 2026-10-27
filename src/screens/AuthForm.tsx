@@ -1,5 +1,6 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
+  AccessibilityInfo,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -45,6 +46,11 @@ export function AuthForm({
   // Guarda síncrona: o `disabled` do botão só vale depois do re-render, e dois toques no mesmo
   // tick chamariam `submit` duas vezes.
   const sending = useRef(false);
+
+  // O role `alert` não anuncia no iOS; o `accessibilityLiveRegion` (só Android) leria duas vezes.
+  useEffect(() => {
+    if (error) AccessibilityInfo.announceForAccessibility(error);
+  }, [error]);
 
   async function onSubmit() {
     if (sending.current) return;
@@ -99,12 +105,7 @@ export function AuthForm({
           testID={`${id}.password`}
         />
         {error && (
-          <Text
-            style={styles.error}
-            accessibilityRole="alert"
-            accessibilityLiveRegion="polite"
-            testID={`${id}.error`}
-          >
+          <Text style={styles.error} accessibilityRole="alert" testID={`${id}.error`}>
             {error}
           </Text>
         )}
@@ -116,6 +117,7 @@ export function AuthForm({
         />
         <Pressable
           accessibilityRole="button"
+          accessibilityLabel={switchLabel}
           onPress={onSwitch}
           style={styles.link}
           testID={switchTestID}

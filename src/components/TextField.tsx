@@ -19,7 +19,10 @@ type Props = Pick<
 export function TextField({ label, ...input }: Props) {
   return (
     <View style={styles.field}>
-      <Text style={styles.label}>{label}</Text>
+      {/* Só o input leva o label ao leitor de tela; com o texto também, o VoiceOver lê duas vezes. */}
+      <Text style={styles.label} accessibilityElementsHidden importantForAccessibility="no">
+        {label}
+      </Text>
       <TextInput
         {...input}
         accessibilityLabel={label}

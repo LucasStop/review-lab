@@ -25,6 +25,7 @@ export function Avatar({ uri, name, size, accessible = true }: Props) {
         key={uri}
         source={{ uri }}
         accessible={accessible}
+        accessibilityRole={accessible ? 'image' : undefined}
         accessibilityLabel={accessible ? `Avatar de ${name}` : undefined}
         onError={() => setFailedUri(uri)}
         style={[box, styles.image]}
@@ -36,6 +37,7 @@ export function Avatar({ uri, name, size, accessible = true }: Props) {
   return (
     <View
       accessible={accessible}
+      accessibilityRole={accessible ? 'image' : undefined}
       accessibilityLabel={accessible ? `Avatar de ${name}` : undefined}
       style={[box, styles.placeholder, { backgroundColor: avatarColor(name) }]}
       testID="avatar.placeholder"

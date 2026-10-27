@@ -33,6 +33,6 @@ test('C47: the stars wrap to a new line when the system font is at its largest',
 test('the read-only rating is a single element with the value in its label', async () => {
   await render(<StarRating value={4} />);
 
-  expect(screen.getByLabelText('Nota 4 de 5')).toBeTruthy();
+  expect(screen.getByRole('image', { name: 'Nota 4 de 5' })).toBeTruthy();
   expect(screen.queryAllByRole('button')).toHaveLength(0);
 });

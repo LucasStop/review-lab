@@ -1,5 +1,12 @@
-import { useRef, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View, type HostInstance } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import {
+  AccessibilityInfo,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+  type HostInstance,
+} from 'react-native';
 
 import { Avatar } from '../components/Avatar';
 import { Button } from '../components/Button';
@@ -39,6 +46,11 @@ export function ProfileScreen() {
   const sending = useRef(false);
   const logoutRef = useRef<HostInstance>(null);
   const deleteRef = useRef<HostInstance>(null);
+
+  // O role `alert` não anuncia nada no iOS.
+  useEffect(() => {
+    if (error) AccessibilityInfo.announceForAccessibility(error);
+  }, [error]);
 
   const avg = averageRating(studied);
   const avgText = avg === null ? '—' : avg.toFixed(1).replace('.', ',');

@@ -3,7 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react-native';
-import { Dimensions, Keyboard, StyleSheet, Text } from 'react-native';
+import { AccessibilityInfo, Dimensions, Keyboard, StyleSheet, Text } from 'react-native';
 
 import type { PullRequestPage, PullRequestSummary } from '../types/github';
 import { FavoritesProvider } from '../contexts/FavoritesContext';
@@ -83,6 +83,10 @@ async function searchFor(term: string) {
   await fireEvent.press(screen.getByTestId('catalog.search-submit'));
 }
 
+// O preset já troca o announce por um jest.fn, e o spyOn devolve esse mesmo mock, com as chamadas
+// dos testes anteriores.
+const spyAnnounce = () => jest.spyOn(AccessibilityInfo, 'announceForAccessibility').mockClear();
+
 async function showFilter(name: 'Todos' | 'Salvos' | 'Estudados') {
   await fireEvent.press(screen.getByRole('button', { name }));
 }
@@ -90,6 +94,7 @@ async function showFilter(name: 'Todos' | 'Salvos' | 'Estudados') {
 beforeEach(async () => {
   mockList.mockReset();
   mockSearch.mockReset();
+  jest.restoreAllMocks();
   await AsyncStorage.clear();
 });
 
@@ -98,7 +103,7 @@ test('C36: shows the ActivityIndicator on the first load, then page 1 as cards',
   mockList.mockReturnValue(new Promise((resolve) => (release = resolve)));
   await renderCatalog();
 
-  expect(screen.getByTestId('loading')).toBeTruthy();
+  expect(screen.getByLabelText('Carregando')).toBe(screen.getByTestId('loading'));
   await act(async () => release(page([3, 2, 1], true)));
   expect(screen.getByTestId('catalog.card.0')).toBeTruthy();
   expect(mockList).toHaveBeenCalledWith(1, undefined, false);
@@ -127,7 +132,9 @@ test('C36: shows the footer loader while the next page is loading', async () => 
   await screen.findByTestId('catalog.card.0');
 
   await reachEnd();
-  expect(screen.getByTestId('catalog.footer-loader')).toBeTruthy();
+  expect(screen.getByLabelText('Carregando mais')).toBe(
+    screen.getByTestId('catalog.footer-loader'),
+  );
 
   await act(async () => release(page([1], false)));
   expect(screen.queryByTestId('catalog.footer-loader')).toBeNull();
@@ -248,7 +255,7 @@ test('C65 and C31: the term only applies on Buscar, and a result opens its own d
   mockSearch.mockResolvedValue([pr(7), pr(8)]);
   await renderCatalog();
   await screen.findByTestId('catalog.card.0');
-  expect(screen.getByText('Buscar PRs')).toBeTruthy();
+  expect(screen.getByLabelText('Buscar PRs')).toBeTruthy();
 
   await fireEvent.changeText(screen.getByLabelText('Buscar PRs'), '  fix  ');
   expect(mockSearch).not.toHaveBeenCalled();
@@ -713,4 +720,104 @@ test('C66: the layout is per user, so another account opens in 2 columns', async
     'Ver em 1 coluna',
   );
   expect(await AsyncStorage.getItem('rl.u1.layout')).toBe('1');
+});
+
+test('C43: the first load and a new page do not announce anything', async () => {
+  const announce = spyAnnounce();
+  mockList.mockResolvedValueOnce(page([3, 2], true)).mockResolvedValueOnce(page([1], false));
+  await renderCatalog();
+  await screen.findByTestId('catalog.card.0');
+
+  await reachEnd();
+
+  await waitFor(() => expect(screen.getByText('PR 1')).toBeTruthy());
+  expect(announce).not.toHaveBeenCalled();
+});
+
+test('C43: a remote search announces how many PRs it found, or the empty text', async () => {
+  const announce = spyAnnounce();
+  mockList.mockResolvedValue(page([1], false));
+  mockSearch.mockResolvedValueOnce([pr(7), pr(8)]).mockResolvedValueOnce([]);
+  await renderCatalog();
+  await screen.findByTestId('catalog.card.0');
+
+  await searchFor('fix');
+  await screen.findByText('PR 8');
+  expect(announce).toHaveBeenLastCalledWith('2 PRs');
+
+  await searchFor('zzzqqq');
+  await screen.findByTestId('catalog.empty');
+  expect(announce).toHaveBeenLastCalledWith('Nenhum resultado para “zzzqqq”. Tente outro termo.');
+  expect(announce).toHaveBeenCalledTimes(2);
+});
+
+test('C43: Salvos announces the empty text, and the count when it has PRs', async () => {
+  const announce = spyAnnounce();
+  mockList.mockResolvedValue(page([3, 2, 1], false));
+  await renderCatalog();
+  await screen.findByTestId('catalog.card.0');
+
+  await showFilter('Salvos');
+  expect(announce).toHaveBeenLastCalledWith(
+    'Você ainda não salvou nenhum PR. Toque em ☆ em um card ou no detalhe.',
+  );
+
+  await showFilter('Todos');
+  await fireEvent.press(screen.getByTestId('catalog.save.0'));
+  await fireEvent.press(screen.getByTestId('catalog.save.1'));
+  announce.mockClear();
+  await showFilter('Salvos');
+  expect(announce).toHaveBeenLastCalledWith('2 PRs');
+  expect(announce).toHaveBeenCalledTimes(1);
+});
+
+test('C43: the layout button announces the new layout', async () => {
+  const announce = spyAnnounce();
+  mockList.mockResolvedValue(page([3, 2], false));
+  await renderCatalog();
+  await screen.findByTestId('catalog.card.0');
+
+  await fireEvent.press(screen.getByTestId('catalog.layout-toggle'));
+  expect(announce).toHaveBeenLastCalledWith('1 coluna');
+  await fireEvent.press(screen.getByTestId('catalog.layout-toggle'));
+  expect(announce).toHaveBeenLastCalledWith('2 colunas');
+});
+
+test('C64: in Salvos, unsaving a card moves the focus to the Salvos chip', async () => {
+  const send = jest
+    .spyOn(AccessibilityInfo, 'sendAccessibilityEvent')
+    .mockClear()
+    .mockImplementation(() => {});
+  mockList.mockResolvedValue(page([3, 2, 1], false));
+  await renderCatalog();
+  await fireEvent.press(await screen.findByTestId('catalog.save.1'));
+  await showFilter('Salvos');
+  expect(send).not.toHaveBeenCalled();
+
+  await fireEvent.press(screen.getByTestId('catalog.save.0'));
+
+  expect(screen.queryByText('PR 2')).toBeNull();
+  // No jest a ref aponta para o View mockado, que guarda o testID nas props.
+  const [target, event] = send.mock.lastCall ?? [];
+  expect((target as { props?: { testID?: string } } | undefined)?.props?.testID).toBe(
+    'catalog.filter.saved',
+  );
+  expect(event).toBe('focus');
+});
+
+test('C64: in Todos, unsaving a card keeps the focus where it is', async () => {
+  const send = jest
+    .spyOn(AccessibilityInfo, 'sendAccessibilityEvent')
+    .mockClear()
+    .mockImplementation(() => {});
+  mockList.mockResolvedValue(page([3, 2, 1], false));
+  await renderCatalog();
+
+  await fireEvent.press(await screen.findByTestId('catalog.save.0'));
+  await fireEvent.press(screen.getByTestId('catalog.save.0'));
+
+  expect(screen.getByTestId('catalog.save.0').props.accessibilityState).toMatchObject({
+    selected: false,
+  });
+  expect(send).not.toHaveBeenCalled();
 });
