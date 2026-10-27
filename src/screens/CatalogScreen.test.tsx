@@ -46,11 +46,11 @@ const Detail = ({ route }: { route: { params: { number: number } } }) => (
   <Text>{`Detalhe ${route.params.number}`}</Text>
 );
 
-async function renderCatalog() {
+async function renderCatalog(layoutUser = 'u1') {
   await render(
     <FavoritesProvider userId="u1">
       <StudiedProvider userId="u1">
-        <LayoutProvider userId="u1">
+        <LayoutProvider userId={layoutUser}>
           <NavigationContainer>
             <Stack.Navigator>
               <Stack.Screen name="Catalog" component={CatalogScreen as never} />
@@ -674,7 +674,7 @@ test('C66: the chosen layout comes back after the catalog mounts again', async (
   await fireEvent.press(screen.getByTestId('catalog.layout-toggle'));
   const oneColumn = cardWidth(0);
   expect(oneColumn).toBe(Dimensions.get('window').width - spacing.lg * 2);
-  screen.unmount();
+  await screen.unmount();
 
   await renderCatalog();
   await screen.findByTestId('catalog.card.0');
@@ -682,5 +682,35 @@ test('C66: the chosen layout comes back after the catalog mounts again', async (
     'Ver em 2 colunas',
   );
   expect(cardWidth(0)).toBe(oneColumn);
+  expect(await AsyncStorage.getItem('rl.u1.layout')).toBe('1');
+});
+
+test.each([
+  ['a number that is not 1 or 2', '3'],
+  ['text that is not JSON', 'one column'],
+])('C66: %s on disk opens in 2 columns', async (_, stored) => {
+  await AsyncStorage.setItem('rl.u1.layout', stored);
+  mockList.mockResolvedValue(page([3, 2], false));
+  await renderCatalog();
+  await screen.findByTestId('catalog.card.0');
+
+  expect(screen.getByTestId('catalog.layout-toggle').props.accessibilityLabel).toBe(
+    'Ver em 1 coluna',
+  );
+  expect(cardWidth(0)).toBe((Dimensions.get('window').width - spacing.lg * 2 - spacing.md) / 2);
+});
+
+test('C66: the layout is per user, so another account opens in 2 columns', async () => {
+  mockList.mockResolvedValue(page([3, 2], false));
+  await renderCatalog();
+  await screen.findByTestId('catalog.card.0');
+  await fireEvent.press(screen.getByTestId('catalog.layout-toggle'));
+  await screen.unmount();
+
+  await renderCatalog('u2');
+  await screen.findByTestId('catalog.card.0');
+  expect(screen.getByTestId('catalog.layout-toggle').props.accessibilityLabel).toBe(
+    'Ver em 1 coluna',
+  );
   expect(await AsyncStorage.getItem('rl.u1.layout')).toBe('1');
 });
