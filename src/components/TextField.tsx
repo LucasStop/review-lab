@@ -13,6 +13,7 @@ type Props = Pick<
   | 'returnKeyType'
   | 'onSubmitEditing'
   | 'testID'
+  | 'autoFocus'
 > & { label: string };
 
 export function TextField({ label, ...input }: Props) {
