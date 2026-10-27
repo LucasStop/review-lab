@@ -2,7 +2,7 @@ import { expect, jest, test } from '@jest/globals';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { StyleSheet } from 'react-native';
 
-import { touch } from '../theme';
+import { glyph, touch } from '../theme';
 import type { PullRequestSummary } from '../types/github';
 import { Avatar } from './Avatar';
 import { PullRequestCard } from './PullRequestCard';
@@ -125,5 +125,5 @@ test('C47: the star glyph caps the font scale so it fits the 44 target and stays
   await render(card());
 
   const cap = screen.getByText('☆').props.maxFontSizeMultiplier;
-  expect(cap * 24).toBeLessThanOrEqual(touch.min);
+  expect(cap * glyph.md).toBeLessThanOrEqual(touch.min);
 });
