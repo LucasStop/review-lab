@@ -9,7 +9,7 @@ RF07 pede login local, sessão persistente, senha fora de texto puro (expo-secur
 ## Decisão
 
 - Cadastro gera salt aleatório (`expo-crypto`) e guarda salt e hash da senha (SHA-256 com salt, repetido N vezes) no expo-secure-store, chave `rl.cred.<SHA-256 do e-mail normalizado>` (SecureStore só aceita `A-Za-z0-9._-` em chave, e o hash evita e-mail em texto puro; o mesmo hash é o `userId`). Verificação em tempo constante; 2000 voltas de SHA-256. Senha nunca é gravada nem logada.
-- Sessão é o `userId` em expo-secure-store (`rl.session`). O `AuthContext` lê no `useEffect` inicial e expõe `hydrated`; o `RootNavigator` escolhe AuthStack ou AppStack. Logout apaga a chave de sessão.
+- Sessão é o `userId` e o e-mail normalizado, em JSON, em expo-secure-store (`rl.session`), cifrado. O e-mail serve só para o Perfil mostrar e nunca vai ao AsyncStorage nem a `rl.cred.*`, nem a log ou mensagem de erro. Sessão gravada no formato antigo (só o `userId`) continua válida, sem e-mail; valor corrompido vira "sem sessão" (#125). O `AuthContext` lê no `useEffect` inicial e expõe `hydrated`; o `RootNavigator` escolhe AuthStack ou AppStack. Logout apaga a chave de sessão.
 - Dados do usuário ficam em AsyncStorage com prefixo do `userId`, ver [0004](0004-asyncstorage-vs-sqlite.md).
 
 ## Alternativas

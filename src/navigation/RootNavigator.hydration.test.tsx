@@ -5,11 +5,12 @@ import { act, fireEvent, render, screen } from '@testing-library/react-native';
 
 import { AuthProvider } from '../contexts/AuthContext';
 import type { AuthResult } from '../services/credentials';
+import type { Session } from '../services/session';
 import type { PullRequestDetailView, PullRequestPage } from '../types/github';
 import { RootNavigator } from './RootNavigator';
 
 const mockAuth = {
-  restore: jest.fn<() => Promise<string | null>>(),
+  restore: jest.fn<() => Promise<Session | null>>(),
   signIn: jest.fn<(email: string, password: string) => Promise<AuthResult>>(),
   signUp: jest.fn<(email: string, password: string) => Promise<AuthResult>>(),
   signOut: jest.fn<() => Promise<void>>(),
@@ -64,7 +65,7 @@ async function renderApp(initialState?: InitialState) {
 
 beforeEach(async () => {
   Object.values(mockAuth).forEach((fn) => fn.mockReset());
-  mockAuth.restore.mockResolvedValue('u1');
+  mockAuth.restore.mockResolvedValue({ userId: 'u1', email: 'ana@exemplo.com' });
   mockList.mockResolvedValue({
     items: [{ number: 1, title: 'Remote PR', author: 'bia' }],
     hasNext: false,

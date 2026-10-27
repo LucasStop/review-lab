@@ -3,11 +3,7 @@
 appId: host.exp.Exponent
 name: favorite
 ---
-- runFlow: subflows/open-app.yaml
-- extendedWaitUntil:
-    notVisible:
-      id: 'loading'
-    timeout: 90000
+- runFlow: subflows/session.yaml
 - extendedWaitUntil:
     visible:
       id: 'catalog.card.0'

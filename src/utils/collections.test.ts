@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
 import {
+  averageRating,
   filterByTerm,
   isFavoriteList,
   isStudiedList,
@@ -110,4 +111,16 @@ test('C63: filterByTerm matches the title, the author or the number, ignoring ca
   );
   assert.deepEqual(filterByTerm(list, 'zzz'), []);
   assert.equal(filterByTerm(list, ''), list);
+});
+
+test('averageRating is null without studied PRs and the mean of the ratings otherwise', () => {
+  assert.equal(averageRating([]), null);
+  assert.equal(averageRating([{ ...pr(1), rating: 4 }]), 4);
+  assert.equal(
+    averageRating([
+      { ...pr(1), rating: 4 },
+      { ...pr(2), rating: 5 },
+    ]),
+    4.5,
+  );
 });

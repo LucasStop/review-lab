@@ -12,6 +12,7 @@ defaults write com.apple.iphonesimulator ConnectHardwareKeyboard -bool false
 - O `brew install maestro` sem o tap instala outro programa (o cask "Maestro", agente de IA). Use o tap.
 - Teclado de hardware ligado no simulador faz o `inputText` falhar; o comando acima desliga.
 - O Expo Go do simulador tem que ser o do SDK 58 (`~/.expo/ios-simulator-app-cache/` pode ter uma versão velha). `yarn start` e `i` baixa a certa.
+- O botão flutuante de ferramentas do Expo Go (a engrenagem) nasce no canto de cima, em cima do botão Perfil do header: o toque em `catalog.profile` abre o menu do Expo e o fluxo falha. Arraste a engrenagem para um canto de baixo uma vez; o Expo Go guarda a posição entre as aberturas.
 
 ## Rodar
 
@@ -29,4 +30,6 @@ Com mais de um simulador ligado: `maestro --device <UDID> test ...` (`xcrun simc
 - O Metro escuta em IPv6; o link é `exp://localhost:8081`, nunca `127.0.0.1`.
 - Seletor por `id:` com o `testID` no formato `tela.elemento` (`login.email`, `catalog.card.123`). Texto só quando não há `testID`.
 - Na primeira abertura o Expo Go cobre o app com o menu de dev; o fluxo toca no fundo para fechar.
-- Todo fluxo começa com `launchApp: stopApp: true` para não herdar estado. Quando precisar de login, usa um e-mail novo por execução.
+- Todo fluxo começa com `launchApp: stopApp: true` para não herdar estado (`subflows/open-app.yaml`).
+- `subflows/session.yaml` abre o app e garante uma sessão: com sessão salva segue no Catálogo; no Login, cadastra um e-mail novo e guarda em `output.email`. Os fluxos que precisam de login começam por ele, e o regex de espera (`login\.screen|catalog\.profile`) fica só ali.
+- `auth.yaml` e `profile.yaml` saem pelo Perfil para começar de uma conta nova; `profile.yaml` termina logado com essa conta.

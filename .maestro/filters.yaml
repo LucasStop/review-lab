@@ -3,27 +3,7 @@
 appId: host.exp.Exponent
 name: filters
 ---
-- runFlow: subflows/open-app.yaml
-- extendedWaitUntil:
-    visible:
-      id: 'login\.screen|catalog\.logout'
-    timeout: 90000
-- runFlow:
-    when:
-      visible:
-        id: 'login.screen'
-    commands:
-      - evalScript: ${output.email = 'e2e' + Date.now() + '@exemplo.com'}
-      - tapOn:
-          id: 'login.signup'
-      - tapOn:
-          id: 'signup.email'
-      - inputText: ${output.email}
-      - tapOn:
-          id: 'signup.password'
-      - inputText: 'segredo123'
-      - tapOn:
-          id: 'signup.submit'
+- runFlow: subflows/session.yaml
 - extendedWaitUntil:
     visible:
       id: 'catalog.card.0'

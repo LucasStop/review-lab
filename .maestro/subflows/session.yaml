@@ -1,0 +1,30 @@
+# Abre o app e garante uma sessão: com sessão salva segue no Catálogo; no Login, cadastra um
+# e-mail novo (o cadastro recusa e-mail repetido), guardado em output.email.
+appId: host.exp.Exponent
+---
+- runFlow: open-app.yaml
+# O botão Perfil do header existe em todo estado do Catálogo: a lista some quando a API falha.
+- extendedWaitUntil:
+    visible:
+      id: 'login\.screen|catalog\.profile'
+    timeout: 90000
+- runFlow:
+    when:
+      visible:
+        id: 'login.screen'
+    commands:
+      - evalScript: ${output.email = 'e2e' + Date.now() + '@exemplo.com'}
+      - tapOn:
+          id: 'login.signup'
+      - tapOn:
+          id: 'signup.email'
+      - inputText: ${output.email}
+      - tapOn:
+          id: 'signup.password'
+      - inputText: 'segredo123'
+      - tapOn:
+          id: 'signup.submit'
+- extendedWaitUntil:
+    visible:
+      id: 'catalog.profile'
+    timeout: 20000

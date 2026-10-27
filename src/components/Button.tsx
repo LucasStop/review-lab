@@ -1,21 +1,33 @@
-import { ActivityIndicator, Pressable, StyleSheet, Text } from 'react-native';
+import type { Ref } from 'react';
+import { ActivityIndicator, Pressable, StyleSheet, Text, type HostInstance } from 'react-native';
 
 import { colors, radius, spacing, touch, typography } from '../theme';
 
 type Props = {
   label: string;
   onPress: () => void;
-  variant?: 'primary' | 'secondary';
+  variant?: 'primary' | 'secondary' | 'danger';
   loading?: boolean;
   disabled?: boolean;
   testID?: string;
+  // Para devolver o foco a este botão (ConfirmDialog).
+  ref?: Ref<HostInstance>;
 };
 
-export function Button({ label, onPress, variant = 'primary', loading, disabled, testID }: Props) {
+export function Button({
+  label,
+  onPress,
+  variant = 'primary',
+  loading,
+  disabled,
+  testID,
+  ref,
+}: Props) {
   const blocked = !!(disabled || loading);
-  const primary = variant === 'primary';
+  const filled = variant !== 'secondary';
   return (
     <Pressable
+      ref={ref}
       accessibilityRole="button"
       // O label fica mesmo com o spinner no lugar do texto: o leitor de tela não perde o botão.
       accessibilityLabel={label}
@@ -23,12 +35,12 @@ export function Button({ label, onPress, variant = 'primary', loading, disabled,
       disabled={blocked}
       onPress={onPress}
       testID={testID}
-      style={[styles.button, primary ? styles.primary : styles.secondary, blocked && styles.dim]}
+      style={[styles.button, styles[variant], blocked && styles.dim]}
     >
       {loading ? (
-        <ActivityIndicator testID="loading" color={primary ? colors.onPrimary : colors.text} />
+        <ActivityIndicator testID="loading" color={filled ? colors.onPrimary : colors.text} />
       ) : (
-        <Text style={[styles.text, { color: primary ? colors.onPrimary : colors.text }]}>
+        <Text style={[styles.text, { color: filled ? colors.onPrimary : colors.text }]}>
           {label}
         </Text>
       )}
@@ -47,6 +59,7 @@ const styles = StyleSheet.create({
   },
   primary: { backgroundColor: colors.primary },
   secondary: { backgroundColor: colors.surface },
+  danger: { backgroundColor: colors.danger },
   dim: { opacity: 0.6 },
   text: typography.button,
 });

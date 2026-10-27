@@ -12,7 +12,7 @@ src/
   contexts/    AuthContext, FavoritesContext, StudiedContext
   hooks/       useFetch (detalhe), usePullRequestList (paginação), usePersistedList (listas por usuário)
   components/  PullRequestCard, StarRating, ErrorState, EmptyState, Avatar, BodyBlocks, Button, TextField
-  screens/     Login, SignUp, Catalog, Detail, Profile (#125)
+  screens/     Login, SignUp, Catalog, Detail, Profile
   utils/       sanitizeHtml, linkHeader, appError, pullRequest, collections, mergePage, avatar
   navigation/  AuthStack, AppStack, RootNavigator
 ```
@@ -68,7 +68,7 @@ Decisão em [ADR 0004](adr/0004-asyncstorage-vs-sqlite.md) e [ADR 0003](adr/0003
 | Dado | Onde | Chave |
 |---|---|---|
 | Credencial (salt + hash) | expo-secure-store | `rl.cred.<sha256 do e-mail>` |
-| Sessão (userId) | expo-secure-store | `rl.session` |
+| Sessão (userId e e-mail normalizado, em JSON; o formato antigo, só o userId, ainda é lido) | expo-secure-store | `rl.session` |
 | Salvos | AsyncStorage | `rl.<userId>.favorites` (snapshot do PR) |
 | Estudados e nota | AsyncStorage | `rl.<userId>.studied` |
 | Cache HTTP | AsyncStorage | `rl.cache.list:<repo>:<página>` e `rl.cache.detail:<repo>:<número>` |

@@ -9,12 +9,12 @@ Legenda: **base** quer dizer que a lógica existe, mas falta a tela.
 | RF | Peso | Já existe | Falta | Dono |
 |---|---|---|---|---|
 | RF01 Catálogo | 15% | grade de 2 colunas com avatar, título, número e autor, rolagem infinita e pull-to-refresh ([screens/CatalogScreen.tsx](../src/screens/CatalogScreen.tsx), #34 e #35); `listPullRequests` com paginação por `Link` (PR #103) e cache (PR #109) | #140 botão que alterna entre 1 e 2 colunas | Luc-Bruno |
-| RF02 Navegação | 10% com RF03 | `RootNavigator` no `App.tsx`, com a AuthStack sem sessão e a AppStack com sessão (#32); o detalhe recebe `number` e põe o título do PR no header (#36) | Perfil pelo header do Catálogo (#125) | LucasStop, Luc-Bruno |
+| RF02 Navegação | 10% com RF03 | `RootNavigator` no `App.tsx`, com a AuthStack sem sessão e a AppStack com sessão (#32); o detalhe recebe `number` e põe o título do PR no header (#36); Perfil pelo botão do header do Catálogo (#125) | — | LucasStop, Luc-Bruno |
 | RF03 Detalhe | 10% com RF02 | estatísticas e corpo em blocos sanitizados ([screens/DetailScreen.tsx](../src/screens/DetailScreen.tsx), #36), com links só http(s) filtrados no `sanitizeHtml` e de novo no `BodyBlocks` | — | Luc-Bruno |
 | RF04 Favoritos (Context) | 15% com RF05 | `FavoritesContext` por usuário (#24); estrela no card e botão no detalhe, com o mesmo estado nas duas telas (#26) | — | Luc-Bruno |
 | RF05 Favoritos (filtro Salvos no Catálogo) | 15% com RF04 | filtro Salvos no Catálogo, com a busca filtrando a lista local e o vazio que explica como salvar (#38), sobre `useFavorites().favorites` e `EmptyState` (PR #99) | — | Luc-Bruno |
 | RF06 Persistência | 10% | `usePersistedList` no AsyncStorage com chave `rl.<userId>.<nome>`, que recusa gravar antes da hidratação (#24, #25); portão no `RootNavigator` que segura as telas até favoritos e estudados saírem do disco, sem lista zerada na carga (#45) | — | Luc-Bruno |
-| RF07 Login, sessão, estudados | 10% | login e cadastro com hash e sal (#29 e #31), navegação condicional e Sair provisório no Catálogo (#32), exclusão de conta no serviço (#124), `StudiedContext` com nota de 1 a 5 (#25), marcar como estudado com a nota editável no detalhe (#27), filtro Estudados no Catálogo com a nota em estrelas (#39) | Perfil com Sair e Excluir conta (#125, além da rubrica) | LucasStop, Luc-Bruno |
+| RF07 Login, sessão, estudados | 10% | login e cadastro com hash e sal (#29 e #31), navegação condicional (#32), exclusão de conta no serviço (#124), `StudiedContext` com nota de 1 a 5 (#25), marcar como estudado com a nota editável no detalhe (#27), filtro Estudados no Catálogo com a nota em estrelas (#39), Perfil com e-mail, totais e nota média, e Sair e Excluir conta com confirmação (#125, além da rubrica) | — | LucasStop, Luc-Bruno |
 | RF08 Busca (campo e botão no Catálogo) | 10% | campo "Buscar PRs" e botão "Buscar" no Catálogo, com carregando, erro, limite com horário e "Nenhum resultado para" o termo (#37); `searchPullRequests` e `buildSearchQuery` (PR #106) | — | Luc-Bruno |
 | RF09 Feedback | 10% | `ActivityIndicator` e `ErrorState` com "Tentar novamente" no Catálogo e no detalhe; erro da página seguinte no rodapé; `AppError` com horário de volta do limite (PR #104); `useFetch` com teste próprio de carga, erro, retry, cancelamento e troca de fetcher (#41) | conferir cada fluxo no simulador com a rede lenta, no roteiro do #111 | Luc-Bruno |
 | RF10 Acessibilidade | 10% | tokens com contraste testado (#114); tema de navegação feito dos tokens, com o voltar do iOS em `link`, e `link` sobre `surface` no teste de contraste (#44); label, role e toque 44x44 nos componentes | #42 e #43 | Luc-Bruno |
@@ -34,14 +34,14 @@ Padrão do projeto: a lógica fica numa fábrica `create*` pura, que recebe as d
 | [src/services/appStorage.ts](../src/services/appStorage.ts) | AsyncStorage | binding |
 | [src/services/credentials.ts](../src/services/credentials.ts) | cadastro e login com SHA-256 com sal (2000 iterações) e comparação sem saída antecipada (tempo constante dentro do possível em JS) | 10 |
 | [src/services/secureCredentials.ts](../src/services/secureCredentials.ts) | expo-crypto e expo-secure-store | binding |
-| [src/services/session.ts](../src/services/session.ts) | `restore`, `signIn`, `signUp`, `signOut` e `deleteAccount` | 9 |
+| [src/services/session.ts](../src/services/session.ts) | `restore`, `signIn`, `signUp`, `signOut` e `deleteAccount`; a sessão guarda `{ userId, email }` em JSON e ainda lê o formato antigo (`parseSession`) | 13 |
 | [src/services/appAuth.ts](../src/services/appAuth.ts) | sessão em SecureStore | binding |
 | [src/utils/sanitizeHtml.ts](../src/utils/sanitizeHtml.ts) | converte `body_html` em blocos tipados e descarta script, style, iframe e img | 12 |
 | [src/utils/appError.ts](../src/utils/appError.ts) | erro normalizado em 7 tipos, com mensagem fixa sem token nem URL | 8 |
 | [src/utils/linkHeader.ts](../src/utils/linkHeader.ts) | parse do header `Link` | 4 |
 | [src/utils/pullRequest.ts](../src/utils/pullRequest.ts) | `toSummary`, `toDetail` e `buildSearchQuery` | 8 |
 | [src/utils/avatar.ts](../src/utils/avatar.ts) | inicial e cor de fundo do avatar sem foto, com o contraste conferido | 3 |
-| [src/utils/collections.ts](../src/utils/collections.ts) | validação e operações das listas de salvos e estudados (`toggleFavorite`, `withStudied`, `withoutStudied`) e a busca local (`filterByTerm`) | 8 |
+| [src/utils/collections.ts](../src/utils/collections.ts) | validação e operações das listas de salvos e estudados (`toggleFavorite`, `withStudied`, `withoutStudied`) a busca local (`filterByTerm`) e a nota média do Perfil (`averageRating`) | 9 |
 | [src/utils/mergePage.ts](../src/utils/mergePage.ts) | junta a página nova à lista sem repetir PR | 3 |
 | [src/theme/index.ts](../src/theme/index.ts) | tokens e pares de texto e fundo | 5 (contraste, borda, label, espaçamento e alvo de toque) |
 | [src/hooks/useFetch.ts](../src/hooks/useFetch.ts) | `{status, data, error, retry}` com cancelamento por `AbortController` | `useFetch.test.tsx` (#41), além do `DetailScreen.test.tsx` e do `CatalogScreen.test.tsx` |
@@ -50,9 +50,9 @@ Padrão do projeto: a lógica fica numa fábrica `create*` pura, que recebe as d
 | [src/contexts/AuthContext.tsx](../src/contexts/AuthContext.tsx) | `AuthProvider` e `useAuth` com hidratação | `AuthContext.test.tsx`, `RootNavigator.test.tsx` |
 | [src/contexts/FavoritesContext.tsx](../src/contexts/FavoritesContext.tsx) | `FavoritesProvider` e `useFavorites` | `FavoritesContext.test.tsx` |
 | [src/contexts/StudiedContext.tsx](../src/contexts/StudiedContext.tsx) | `StudiedProvider` e `useStudied`, com nota de 1 a 5 | `StudiedContext.test.tsx` |
-| [src/components/](../src/components/) | `Avatar`, `BodyBlocks`, `Button`, `EmptyState`, `ErrorState`, `PullRequestCard`, `StarRating` e `TextField` | `ErrorState`, `PullRequestCard` e `StarRating`; os outros pelas telas |
-| [src/screens/](../src/screens/) | Login e Cadastro (com `AuthForm`), Catálogo e Detalhe | um arquivo por tela e `FavoritesFlow.test.tsx` |
-| [src/navigation/](../src/navigation/) | tipos de rota, `RootNavigator` (com o portão de hidratação), `AuthStack`, `AppStack` e `Placeholder` (Perfil até o #125) | `RootNavigator.test.tsx` e `RootNavigator.hydration.test.tsx`; E2E em `.maestro/` |
+| [src/components/](../src/components/) | `Avatar`, `BodyBlocks`, `Button`, `ConfirmDialog`, `EmptyState`, `ErrorState`, `PullRequestCard`, `StarRating` e `TextField` | `ErrorState`, `PullRequestCard` e `StarRating`; os outros pelas telas |
+| [src/screens/](../src/screens/) | Login e Cadastro (com `AuthForm`), Catálogo, Detalhe e Perfil | um arquivo por tela e `FavoritesFlow.test.tsx` |
+| [src/navigation/](../src/navigation/) | tipos de rota, `RootNavigator` (com o portão de hidratação), `AuthStack` e `AppStack` | `RootNavigator.test.tsx` e `RootNavigator.hydration.test.tsx`; E2E em `.maestro/` |
 
 Totais da última execução: tabela "Execuções" de [TESTES.md](TESTES.md).
 
@@ -64,7 +64,7 @@ Totais da última execução: tabela "Execuções" de [TESTES.md](TESTES.md).
 | `cat:dados` | LucasStop | #15-#22 | — |
 | `cat:auth` | LucasStop | #29-#32, #124 | — |
 | `cat:entrega` | LucasStop | #46 | #47-#56, #111 (com Luc-Bruno) |
-| `cat:navegacao-telas` | Luc-Bruno | #33-#39 | #125, #140 |
+| `cat:navegacao-telas` | Luc-Bruno | #33-#39, #125 | #140 |
 | `cat:estado` | Luc-Bruno | #23-#28 | — |
 | `cat:ux-acessibilidade` | Luc-Bruno | #40, #41, #44, #45, #114, #119, #123, #128, #130 | #42, #43 |
 | `cat:nuvem-bonus` | a definir depois do MVP | — | #57-#59 |

@@ -59,10 +59,10 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 | C02 | E-mail repetido é recusado, mesmo com outra caixa ou com espaços, e a tela mostra a mensagem | U, C | U ok; C ok (#31) |
 | C03 | Senha com menos de 6 caracteres ou e-mail sem `@` é recusado antes de gravar | U, C | U ok; C ok (#31) |
 | C04 | Senha errada e e-mail desconhecido recebem a mesma mensagem | U, E2E | ok (U e E2E `.maestro/auth.yaml`) #32 |
-| C05 | Senha e e-mail em texto puro nunca chegam ao store | U | ok |
+| C05 | Senha e e-mail em texto puro nunca chegam ao store: o e-mail só fica na sessão, cifrado no SecureStore, nunca no AsyncStorage nem em `rl.cred.*` | U, I | ok (`credentials.test.ts`; sessão em `session.test.ts`, #125; varredura do AsyncStorage e de `rl.cred.*` no C58 de `RootNavigator.test.tsx`, #125) |
 | C51 | Sem sessão, o app abre no Login e não chega à AppStack (login obrigatório) | I, E2E | ok (I `RootNavigator.test.tsx`, E2E `.maestro/auth.yaml`) #32 |
 | C06 | Fechar e reabrir o app mantém a sessão | I, E2E | ok (I e E2E `.maestro/auth.yaml`) #32 |
-| C07 | Logout volta ao login e apaga a sessão (o botão Sair fica no Perfil, #125) | U, E2E | ok #32 (botão Sair provisório no Catálogo, E2E em `.maestro/auth.yaml`); move para o Perfil no #125 |
+| C07 | Logout volta ao login e apaga a sessão (o botão Sair fica no Perfil, com confirmação) | U, I, E2E | ok #32, #125 (U `session.test.ts`, I `RootNavigator.test.tsx` pelo Perfil); E2E em `.maestro/auth.yaml` |
 | C08 | `ActivityIndicator` durante o login e o cadastro | C | ok (#31) |
 
 ### Catálogo (RF01)
@@ -96,7 +96,7 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 | C21 | Salvar no detalhe muda o ícone do mesmo PR no card do catálogo | I, E2E | I ok (`CatalogScreen.test.tsx`, `DetailScreen.test.tsx`); E2E em `.maestro/favorite.yaml` |
 | C22 | O filtro Salvos do Catálogo lista os salvos e atualiza ao remover | C, E2E | ok #38 (`CatalogScreen.test.tsx`, `.maestro/filters.yaml`) |
 | C23 | Filtro Salvos vazio mostra `EmptyState` amigável (`ListEmptyComponent`) | C, E2E | ok #38 (`CatalogScreen.test.tsx`, `.maestro/filters.yaml`) |
-| C54 | Busca, filtros Salvos e Estudados e Perfil são acessíveis na tela do Catálogo | E2E | busca ok #37, Salvos ok #38 e Estudados ok #39 (`.maestro/search.yaml`, `.maestro/filters.yaml`, `.maestro/studied.yaml`); Perfil no #125 |
+| C54 | Busca, filtros Salvos e Estudados e Perfil são acessíveis na tela do Catálogo | E2E | busca ok #37, Salvos ok #38 e Estudados ok #39 (`.maestro/search.yaml`, `.maestro/filters.yaml`, `.maestro/studied.yaml`); Perfil #125 (`catalog.profile` no header, tocado em `.maestro/auth.yaml` e `.maestro/profile.yaml`) |
 
 ### Persistência (RF06)
 
@@ -120,13 +120,13 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 
 | ID | Cenário | Nível | Status |
 |---|---|---|---|
-| C56 | O Perfil mostra o e-mail, o total de salvos, o total de estudados e a nota média (traço sem estudados) | C, E2E | F2 #125 |
-| C57 | Sair pede confirmação; Cancelar mantém a sessão e a tela | C, E2E | F2 #125 |
-| C58 | Confirmar Sair limpa só a sessão: salvos e estudados voltam no próximo login | I | F2 #125 |
-| C59 | Excluir conta com senha errada recusa, mostra "Senha incorreta." e não apaga nada | U, C | U ok #124 (`session.test.ts`; estado em `AuthContext.test.tsx`); C e tela em #125 |
-| C60 | Excluir conta com a senha certa apaga credencial, sessão e as chaves `rl.<userId>.*` e volta ao Login | U, I, E2E | U ok #124; I e E2E em #125 |
-| C61 | Excluir conta não toca nos dados de outro usuário do aparelho; cadastrar o mesmo e-mail depois funciona | U, I | U ok #124 (`session.test.ts`, `storage.test.ts`, `credentials.test.ts`); I em #125 |
-| C62 | O foco entra no diálogo de confirmação e volta ao botão que o abriu ao cancelar ou fechar com Esc | C | F2 #125 |
+| C56 | O Perfil mostra o e-mail, o total de salvos, o total de estudados e a nota média (traço sem estudados) | C, E2E | C ok #125 (`ProfileScreen.test.tsx`, também a sessão antiga sem e-mail); E2E em `.maestro/profile.yaml` |
+| C57 | Sair pede confirmação; Cancelar mantém a sessão e a tela | C, E2E | C ok #125 (`ProfileScreen.test.tsx`); E2E em `.maestro/auth.yaml` |
+| C58 | Confirmar Sair limpa só a sessão: salvos e estudados voltam no próximo login | I | ok #125 (`RootNavigator.test.tsx`, com o `createAuth` de verdade) |
+| C59 | Excluir conta com senha errada recusa, mostra "Senha incorreta." e não apaga nada | U, C | U ok #124 (`session.test.ts`; estado em `AuthContext.test.tsx`); C ok #125 (`ProfileScreen.test.tsx`, também campo vazio, toque duplo no mesmo ciclo de render, nova tentativa depois da senha errada, Cancelar/Esc/voltar travados durante a exclusão e falha do `deleteAccount`); E2E em `.maestro/profile.yaml` |
+| C60 | Excluir conta com a senha certa apaga credencial, sessão e as chaves `rl.<userId>.*` e volta ao Login | U, I, E2E | U ok #124; I ok #125 (`RootNavigator.test.tsx`, que confere a limpeza das chaves); E2E em `.maestro/profile.yaml`, que só confere a volta ao Login |
+| C61 | Excluir conta não toca nos dados de outro usuário do aparelho; cadastrar o mesmo e-mail depois funciona | U, I | U ok #124 (`session.test.ts`, `storage.test.ts`, `credentials.test.ts`); I ok #125 (`RootNavigator.test.tsx`); recadastro também em `.maestro/profile.yaml` |
+| C62 | O foco entra no diálogo de confirmação e volta ao botão que o abriu ao cancelar ou fechar com Esc | C | C ok #125 (`ProfileScreen.test.tsx`, espião em `sendAccessibilityEvent`, que também exige o diálogo já fechado quando o foco volta); VoiceOver no passo 11 do roteiro manual |
 
 ### Busca (RF08)
 
@@ -182,12 +182,13 @@ Rodar no simulador iOS com o Expo Go, sem token no `.env`, salvo o que o passo p
 2. Navegar pela grade até a página 3, puxar para atualizar e conferir que a lista volta ao topo (C11, C13).
 3. Abrir um PR com descrição longa e outro sem descrição (C16, C17).
 4. Salvar 2 PRs, marcar 1 como estudado com nota 4, fechar o app pelo multitarefa e reabrir (C21, C24, C28, C06).
-5. Sair, cadastrar `b@b.com` e conferir que salvos e estudados estão vazios (C27).
+5. Abrir o Perfil e conferir o e-mail, os totais e a nota média (C56). Tocar em Sair, Cancelar, e depois Sair de novo e confirmar (C57, C07). Cadastrar `b@b.com` e conferir que salvos e estudados estão vazios (C27). No Perfil de `b@b.com`, Excluir conta com a senha errada e depois com a certa (C59, C60). Entrar de novo com `a@a.com` e ver os salvos e estudados de volta (C58, C61).
 6. Buscar `fix` e um termo sem resultado como `zzzqqq`, depois tocar em Buscar com o campo vazio e ver a lista paginada voltar; buscar dentro de Salvos e de Estudados, trocar de filtro com o termo aplicado e alternar entre 1 e 2 colunas (C31, C32, C63, C65, C66).
 7. Ligar o modo avião (Network Link Conditioner ou o Wi-Fi do Mac desligado), abrir um PR já visto e depois um novo (C37, C40).
 8. Esgotar o limite da rede do Mac (é por IP): `until [ "$(curl -s https://api.github.com/rate_limit | python3 -c 'import sys,json;print(json.load(sys.stdin)["rate"]["remaining"])')" = 0 ]; do curl -s -o /dev/null 'https://api.github.com/repos/expo/expo/pulls?per_page=1'; done`. O `/rate_limit` não gasta. Depois, abrir um PR nunca aberto e ver a mensagem com o horário (C39). Puxar para atualizar a grade já em cache mostra a lista vencida, não o erro (C40). A busca tem um limite próprio, de 10 por minuto, que esse comando não gasta: `for i in $(seq 10); do curl -s -o /dev/null "https://api.github.com/search/issues?q=type:pr+x$i"; done` e, no mesmo minuto, buscar um termo no app e ver a mensagem com o horário (C39).
 9. Em Ajustes > Acessibilidade > Tela e Tamanho do Texto, colocar o texto no máximo e percorrer as 5 telas (C47).
 10. Ligar o VoiceOver e percorrer o login, a busca (resultado, vazio e erro), o card, os chips de filtro (estado lido e foco no chip depois do toque), o detalhe, o botão de salvar e as estrelas (C48, C64).
+11. Com o VoiceOver, abrir o Perfil: cada bloco é lido inteiro ("Salvos: 2", "Nota média: 4,0" ou "Nota média: nenhuma"). Abrir Sair: o foco vai para Cancelar; o gesto de Esc (esfregar com dois dedos) fecha e o foco volta ao Sair. Abrir Excluir conta: o foco vai para o campo de senha, "Senha incorreta." é anunciado, e Cancelar devolve o foco ao Excluir conta (C62).
 
 ## Execuções
 

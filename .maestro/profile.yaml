@@ -1,0 +1,93 @@
+# C56, C59, C60, C61: o Perfil mostra o e-mail e os totais de uma conta nova; senha errada não
+# exclui; senha certa exclui e volta ao Login; o mesmo e-mail cadastra de novo. Termina logado.
+# Não gasta API do GitHub além da página 1 do Catálogo. Precisa do Metro (ver README.md).
+appId: host.exp.Exponent
+name: profile
+---
+# Começa de uma conta nova: sai da sessão atual e cadastra outra.
+- runFlow: subflows/session.yaml
+- tapOn:
+    id: 'catalog.profile'
+- tapOn:
+    id: 'profile.logout'
+- tapOn:
+    id: 'profile.confirm'
+- extendedWaitUntil:
+    visible:
+      id: 'login.screen'
+    timeout: 10000
+- evalScript: ${output.email = 'e2e' + Date.now() + '@exemplo.com'}
+- tapOn:
+    id: 'login.signup'
+- tapOn:
+    id: 'signup.email'
+- inputText: ${output.email}
+- tapOn:
+    id: 'signup.password'
+- inputText: 'segredo123'
+- tapOn:
+    id: 'signup.submit'
+- extendedWaitUntil:
+    visible:
+      id: 'catalog.profile'
+    timeout: 20000
+# C56: e-mail do cadastro, 0 salvos, 0 estudados e traço na nota média. Os blocos são lidos pelo
+# label acessível ("Salvos: 0"), que junta número e legenda.
+- tapOn:
+    id: 'catalog.profile'
+- extendedWaitUntil:
+    visible:
+      id: 'profile.email'
+      text: ${output.email}
+    timeout: 10000
+- assertVisible:
+    id: 'profile.saved-count'
+    text: 'Salvos: 0'
+- assertVisible:
+    id: 'profile.studied-count'
+    text: 'Estudados: 0'
+- assertVisible:
+    id: 'profile.avg'
+    text: 'Nota média: nenhuma'
+# C59: senha errada recusa e a conta continua. profile.confirm e profile.cancel existem nos dois
+# diálogos; o de Excluir é aberto antes de tocar.
+- tapOn:
+    id: 'profile.delete'
+- tapOn:
+    id: 'profile.password'
+- inputText: 'errada123'
+- tapOn:
+    id: 'profile.confirm'
+- extendedWaitUntil:
+    visible: 'Senha incorreta.'
+    timeout: 10000
+- assertNotVisible:
+    id: 'login.screen'
+# C60: senha certa exclui a conta e volta ao Login. Aqui só a volta ao Login é conferida; a
+# limpeza da credencial, da sessão e das chaves rl.<userId>.* é verificada em
+# src/navigation/RootNavigator.test.tsx.
+- tapOn:
+    id: 'profile.password'
+- eraseText: 20
+- inputText: 'segredo123'
+- tapOn:
+    id: 'profile.confirm'
+- extendedWaitUntil:
+    visible:
+      id: 'login.screen'
+    timeout: 20000
+# C61: o mesmo e-mail cadastra de novo.
+- tapOn:
+    id: 'login.signup'
+- tapOn:
+    id: 'signup.email'
+- inputText: ${output.email}
+- tapOn:
+    id: 'signup.password'
+- inputText: 'segredo123'
+- tapOn:
+    id: 'signup.submit'
+- extendedWaitUntil:
+    visible:
+      id: 'catalog.profile'
+    timeout: 20000
