@@ -63,7 +63,9 @@ name: profile
     timeout: 10000
 - assertNotVisible:
     id: 'login.screen'
-# C60: senha certa exclui a conta e volta ao Login.
+# C60: senha certa exclui a conta e volta ao Login. Aqui só a volta ao Login é conferida; a
+# limpeza da credencial, da sessão e das chaves rl.<userId>.* é verificada em
+# src/navigation/RootNavigator.test.tsx.
 - tapOn:
     id: 'profile.password'
 - eraseText: 20
