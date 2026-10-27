@@ -10,7 +10,12 @@ import { AuthStack } from './AuthStack';
 function Loading() {
   return (
     <View style={styles.loading}>
-      <ActivityIndicator testID="loading" accessibilityLabel="Carregando" color={colors.primary} />
+      <ActivityIndicator
+        testID="loading"
+        accessibilityLabel="Carregando"
+        color={colors.primary}
+        size="large"
+      />
     </View>
   );
 }
