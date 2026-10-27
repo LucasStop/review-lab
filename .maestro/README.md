@@ -12,6 +12,7 @@ defaults write com.apple.iphonesimulator ConnectHardwareKeyboard -bool false
 - O `brew install maestro` sem o tap instala outro programa (o cask "Maestro", agente de IA). Use o tap.
 - Teclado de hardware ligado no simulador faz o `inputText` falhar; o comando acima desliga.
 - O Expo Go do simulador tem que ser o do SDK 58 (`~/.expo/ios-simulator-app-cache/` pode ter uma versão velha). `yarn start` e `i` baixa a certa.
+- O botão flutuante de ferramentas do Expo Go (a engrenagem) nasce no canto de cima, em cima do botão Perfil do header: o toque em `catalog.profile` abre o menu do Expo e o fluxo falha. Arraste a engrenagem para um canto de baixo uma vez; o Expo Go guarda a posição entre as aberturas.
 
 ## Rodar
 
