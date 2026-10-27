@@ -48,7 +48,7 @@ Alvo de toque e fonte grande (RF10, #43):
 
 ## Componentes
 
-`StarRating`, `ErrorState` e `EmptyState` já existem em [src/components/](../../src/components/). O resto entra na Fase 2, no PR da primeira tela que o usa. O contrato abaixo é o que o PR tem que entregar, e todo componente usa os tokens.
+Todos os componentes abaixo já existem em [src/components/](../../src/components/). O contrato é o que cada um entrega, e todo componente usa os tokens.
 
 | Componente | Props | Acessibilidade | Estado |
 |---|---|---|---|
@@ -65,16 +65,18 @@ Todos os componentes feitos já usam os tokens; o último a migrar foi o `StarRa
 
 ## Convenção de testID
 
-Formato `tela.elemento`, em minúsculas, para o Maestro e para os testes de componente. Item de lista leva o número do PR.
+Formato `tela.elemento`, em minúsculas, para o Maestro e para os testes de componente. Item de lista leva o índice do card na lista (`<n>`, a partir de 0), não o número do PR.
 
 | Tela | testIDs |
 |---|---|
-| Login | `login.email`, `login.password`, `login.submit`, `login.signup`, `login.error` |
-| Cadastro | `signup.email`, `signup.password`, `signup.submit`, `signup.login`, `signup.error` |
-| Catálogo | `catalog.list`, `catalog.card.<n>`, `catalog.card.<n>.rating`, `catalog.save.<n>`, `catalog.search-input`, `catalog.search-submit`, `catalog.filter.all`, `catalog.filter.saved`, `catalog.filter.studied`, `catalog.layout-toggle`, `catalog.profile`, `catalog.footer-loader`, `catalog.empty` |
-| Detalhe | `detail.title`, `detail.body`, `detail.save`, `detail.studied`, `detail.rating`, `detail.error` |
+| Login | `login.screen`, `login.email`, `login.password`, `login.submit`, `login.signup`, `login.error` |
+| Cadastro | `signup.screen`, `signup.email`, `signup.password`, `signup.submit`, `signup.login`, `signup.error` |
+| Catálogo | `catalog.list`, `catalog.card.<n>`, `catalog.card.<n>.rating`, `catalog.save.<n>`, `catalog.search-input`, `catalog.search-submit`, `catalog.filter.all`, `catalog.filter.saved`, `catalog.filter.studied`, `catalog.layout-toggle`, `catalog.profile`, `catalog.footer-loader`, `catalog.footer-error`, `catalog.error`, `catalog.empty` |
+| Detalhe | `detail.title`, `detail.stats`, `detail.body`, `detail.save`, `detail.studied`, `detail.rating`, `detail.error` |
 | Perfil | `profile.email`, `profile.saved-count`, `profile.studied-count`, `profile.avg`, `profile.logout`, `profile.delete`, `profile.password`, `profile.confirm`, `profile.cancel`, `profile.error`; `profile.confirm` e `profile.cancel` existem nos dois diálogos, mas só o aberto é renderizado; os três blocos de totais são um elemento acessível cada, lido pelo label ("Salvos: 0", "Estudados: 0", "Nota média: nenhuma") |
-| Comum | `error.retry`, `loading` |
+| Comum | `loading` (o `ActivityIndicator` do catálogo, do detalhe, da sessão e do `Button` em `loading`), `avatar.image` e `avatar.placeholder` (o `Avatar` com foto ou com a inicial) |
+
+O `ErrorState` não tem `testID`: o botão se acha pelo texto "Tentar novamente", e a tela dona leva o seu (`catalog.error`, `detail.error`). O `ConfirmDialog` monta `<testIDPrefix>.cancel` e `<testIDPrefix>.confirm`, e o Perfil o usa com o prefixo `profile`.
 
 ## Telas e estados
 
