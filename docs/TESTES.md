@@ -89,6 +89,7 @@ Aceitos, sem teste:
 | #133 | logout com falha no SecureStore deixava a tela logada | `RootNavigator.test.tsx`, "when clearing the stored session fails" |
 | #132 | Login aceitava toque duplo e travava com a promessa rejeitada | `LoginScreen.test.tsx`, "rejected sign-in" e "two presses" |
 | #111 | HTML aninhado estourava a pilha; `save` do cache concorrente; `retry-after` | os três da tabela acima |
+| #111 | o Detalhe escrevia "1 comentários" e "1 arquivos" (achado no passo 3 do roteiro) | `DetailScreen.test.tsx` C16, "singular" |
 
 Sem teste de unidade ou componente, só fluxo, doc ou configuração: #149 (peso do título e tint do tema), #148 (tamanho do loader), #150 (diálogo acima do teclado), o fix do `e2e` que toca no fundo só com o menu de dev aberto, o timeout do jest no CI (#134) e o alinhamento de docs e protótipo (#126).
 
@@ -135,7 +136,7 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 |---|---|---|---|
 | C15 | Tocar no card abre o detalhe com o número em `route.params` | E2E | ok (`.maestro/detail.yaml`) |
 | C53 | O detalhe faz a segunda requisição pelo número e põe o título do PR no header com `navigation.setOptions` (o header mostra "PR #n" enquanto carrega) | C | ok (`DetailScreen.test.tsx`) |
-| C16 | O detalhe mostra avatar maior, estatísticas (comentários, arquivos, +/-) e os blocos de texto | C | ok |
+| C16 | O detalhe mostra avatar maior, estatísticas (comentários, arquivos, +/-, no singular com 1) e os blocos de texto | C | ok (`DetailScreen.test.tsx`) |
 | C17 | PR sem descrição mostra "Sem descrição", não erro | U, C | U ok; C ok |
 | C18 | HTML hostil (`script`, `on*`, `javascript:`, `iframe`, `img`) não chega à tela | U | ok |
 | C19 | HTML malformado não quebra nem vaza tag | U | ok |
