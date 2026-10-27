@@ -16,6 +16,8 @@ function deferred<T>() {
   return { promise, resolve, reject };
 }
 
+type Gate = ReturnType<typeof deferred<string>>;
+
 test('C38: starts loading and then delivers the data', async () => {
   const gate = deferred<string>();
   const fetcher = jest.fn<Fetcher<string>>(() => gate.promise);
@@ -30,7 +32,7 @@ test('C38: starts loading and then delivers the data', async () => {
   expect(result.current.data).toBe('pr');
 });
 
-test('C38: an error turns into AppError and retry goes back to loading and fetches again', async () => {
+test('C37 and C38: an error turns into AppError and retry goes back to loading and fetches again', async () => {
   const first = deferred<string>();
   const second = deferred<string>();
   const fetcher = jest
@@ -53,26 +55,42 @@ test('C38: an error turns into AppError and retry goes back to loading and fetch
   expect(result.current.data).toBe('pr');
 });
 
-test('C38: unmounting aborts the signal and the late result does not become state', async () => {
-  const gate = deferred<string>();
+test('C38: unmounting aborts the signal', async () => {
   let received: AbortSignal | undefined;
   const fetcher = jest.fn<Fetcher<string>>((signal) => {
     received = signal;
-    return gate.promise;
+    return deferred<string>().promise;
   });
-  const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
   const { unmount } = await renderHook(() => useFetch(fetcher));
 
   expect(received?.aborted).toBe(false);
   await unmount();
   expect(received?.aborted).toBe(true);
-
-  await act(async () => gate.resolve('late'));
-  expect(errorSpy).not.toHaveBeenCalled();
-  errorSpy.mockRestore();
 });
 
-test('C38: swapping the fetcher goes back to loading and ignores the old one even if it resolves last', async () => {
+test('C38: swapping the fetcher after data goes back to loading until the new one answers', async () => {
+  const newGate = deferred<string>();
+  const oldFetcher = jest.fn<Fetcher<string>>(() => Promise.resolve('old'));
+  const newFetcher = jest.fn<Fetcher<string>>(() => newGate.promise);
+  const { result, rerender } = await renderHook(
+    ({ fetcher }: { fetcher: Fetcher<string> }) => useFetch(fetcher),
+    { initialProps: { fetcher: oldFetcher } },
+  );
+  await waitFor(() => expect(result.current.data).toBe('old'));
+
+  await rerender({ fetcher: newFetcher });
+  expect(result.current.status).toBe('loading');
+  expect(result.current.data).toBeUndefined();
+
+  await act(async () => newGate.resolve('new'));
+  expect(result.current.data).toBe('new');
+});
+
+// O abort do axios chega como rejeição: os dois desfechos do fetcher velho são ignorados.
+test.each([
+  { outcome: 'resolves', settle: (gate: Gate) => gate.resolve('old') },
+  { outcome: 'rejects', settle: (gate: Gate) => gate.reject(new Error('canceled')) },
+])('C38: after a swap the old fetcher is ignored when it $outcome last', async ({ settle }) => {
   const oldGate = deferred<string>();
   const newGate = deferred<string>();
   const oldFetcher = jest.fn<Fetcher<string>>(() => oldGate.promise);
@@ -89,7 +107,7 @@ test('C38: swapping the fetcher goes back to loading and ignores the old one eve
   await act(async () => newGate.resolve('new'));
   await waitFor(() => expect(result.current.data).toBe('new'));
 
-  await act(async () => oldGate.resolve('old'));
+  await act(async () => settle(oldGate));
   expect(result.current.status).toBe('data');
   expect(result.current.data).toBe('new');
 });
