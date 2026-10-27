@@ -1,5 +1,5 @@
 # C28: marcar como estudado no detalhe e trocar a nota. C24: salvo e estudado sobrevivem a fechar
-# e reabrir o app.
+# e reabrir o app. C30: o filtro Estudados do Catálogo lista o PR com a nota.
 # Gasta requisições da API do GitHub (60 por hora sem token). Precisa do Metro (ver README.md).
 appId: host.exp.Exponent
 name: studied
@@ -105,6 +105,22 @@ name: studied
 - assertVisible:
     text: 'Dar nota 2 de 5'
     selected: true
+# C30: o PR marcado por último é o primeiro de Estudados, com a nota no label do card.
+- tapOn: 'Review Lab'
+- tapOn:
+    id: 'catalog.filter.studied'
+- assertVisible:
+    id: 'catalog.filter.studied'
+    selected: true
+- assertVisible:
+    id: 'catalog.card.0'
+    text: '.*, nota 2 de 5'
+- tapOn:
+    id: 'catalog.card.0'
+- extendedWaitUntil:
+    visible:
+      id: 'detail.studied'
+    timeout: 30000
 # Desmarcar esconde a nota. Deixa o estado limpo para a próxima execução.
 - tapOn:
     id: 'detail.studied'
