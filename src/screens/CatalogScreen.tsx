@@ -1,6 +1,7 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { useCallback, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import {
+  AccessibilityInfo,
   ActivityIndicator,
   FlatList,
   Keyboard,
@@ -9,6 +10,7 @@ import {
   Text,
   View,
   useWindowDimensions,
+  type HostInstance,
 } from 'react-native';
 
 import { Button } from '../components/Button';
@@ -40,27 +42,22 @@ const FILTERS: { key: Filter; label: string }[] = [
 
 const NO_RESULTS: PullRequestSummary[] = [];
 
-function Empty({ filter, term }: { filter: Filter; term: string }) {
+// O mesmo texto aparece no vazio e é anunciado ao leitor de tela.
+function emptyCopy(filter: Filter, term: string): { title: string; text?: string } {
   if (term) {
-    return (
-      <EmptyState
-        title={`Nenhum resultado para “${term}”`}
-        text={filter === 'all' ? 'Tente outro termo.' : 'Tente outro termo ou troque o filtro.'}
-      />
-    );
+    return {
+      title: `Nenhum resultado para “${term}”`,
+      text: filter === 'all' ? 'Tente outro termo.' : 'Tente outro termo ou troque o filtro.',
+    };
   }
   if (filter === 'saved') {
-    return (
-      <EmptyState
-        title="Você ainda não salvou nenhum PR"
-        text="Toque em ☆ em um card ou no detalhe."
-      />
-    );
+    return {
+      title: 'Você ainda não salvou nenhum PR',
+      text: 'Toque em ☆ em um card ou no detalhe.',
+    };
   }
-  if (filter === 'studied') {
-    return <EmptyState title="Você ainda não marcou nenhum PR como estudado" />;
-  }
-  return <EmptyState title="Nenhum PR encontrado" />;
+  if (filter === 'studied') return { title: 'Você ainda não marcou nenhum PR como estudado' };
+  return { title: 'Nenhum PR encontrado' };
 }
 
 export function CatalogScreen({ navigation }: Props) {
@@ -86,6 +83,7 @@ export function CatalogScreen({ navigation }: Props) {
   const search = useFetch(searcher);
   const searching = term !== '';
   const paginated = remote && !searching;
+  const savedChip = useRef<HostInstance>(null);
 
   const submit = () => {
     Keyboard.dismiss();
@@ -111,11 +109,44 @@ export function CatalogScreen({ navigation }: Props) {
     error = list.status === 'error' ? list.error : undefined;
   }
 
+  // Resultado da busca ou do filtro local; a lista paginada (primeira carga e páginas novas) fica
+  // em silêncio. O filtro e o termo entram nas dependências: Salvos e Estudados com a mesma
+  // quantidade anunciam de novo.
+  let result: string | undefined;
+  if (!loading && !error && (searching || !remote)) {
+    const empty = emptyCopy(filter, term);
+    if (items.length === 1) result = '1 PR';
+    else if (items.length) result = `${items.length} PRs`;
+    else result = empty.text ? `${empty.title}. ${empty.text}` : empty.title;
+  }
+  useEffect(() => {
+    if (result) AccessibilityInfo.announceForAccessibility(result);
+  }, [result, filter, term]);
+
+  const onToggleSave = (item: PullRequestSummary) => {
+    // Em Salvos o card some com o toque; sem isto o foco do leitor de tela fica perdido.
+    const leaves = filter === 'saved' && isFavorite(item.number);
+    toggle(item);
+    if (leaves && savedChip.current) {
+      AccessibilityInfo.sendAccessibilityEvent(savedChip.current, 'focus');
+    }
+  };
+
+  const onToggleLayout = () => {
+    toggleLayout();
+    AccessibilityInfo.announceForAccessibility(columns === 2 ? '1 coluna' : '2 colunas');
+  };
+
   let body: ReactNode;
   if (loading) {
     body = (
       <View style={styles.center}>
-        <ActivityIndicator testID="loading" color={colors.primary} size="large" />
+        <ActivityIndicator
+          testID="loading"
+          accessibilityLabel="Carregando"
+          color={colors.primary}
+          size="large"
+        />
       </View>
     );
   } else if (error) {
@@ -151,7 +182,7 @@ export function CatalogScreen({ navigation }: Props) {
               saved={isFavorite(item.number)}
               rating={filter === 'studied' ? getRating(item.number) : undefined}
               onPress={() => navigation.navigate('Detail', { number: item.number })}
-              onToggleSave={() => toggle(item)}
+              onToggleSave={() => onToggleSave(item)}
               testID={`catalog.card.${index}`}
               saveTestID={`catalog.save.${index}`}
             />
@@ -159,13 +190,14 @@ export function CatalogScreen({ navigation }: Props) {
         )}
         ListEmptyComponent={
           <View testID="catalog.empty">
-            <Empty filter={filter} term={term} />
+            <EmptyState {...emptyCopy(filter, term)} />
           </View>
         }
         ListFooterComponent={
           !paginated ? undefined : list.loadingMore ? (
             <ActivityIndicator
               testID="catalog.footer-loader"
+              accessibilityLabel="Carregando mais"
               color={colors.primary}
               style={styles.footer}
             />
@@ -203,6 +235,7 @@ export function CatalogScreen({ navigation }: Props) {
             return (
               <Pressable
                 key={key}
+                ref={key === 'saved' ? savedChip : undefined}
                 accessibilityRole="button"
                 accessibilityLabel={label}
                 accessibilityState={{ selected }}
@@ -219,7 +252,7 @@ export function CatalogScreen({ navigation }: Props) {
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={columns === 2 ? 'Ver em 1 coluna' : 'Ver em 2 colunas'}
-          onPress={toggleLayout}
+          onPress={onToggleLayout}
           style={styles.chip}
           testID="catalog.layout-toggle"
         >

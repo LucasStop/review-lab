@@ -72,6 +72,7 @@ test('C36: shows the loader while the detail loads', async () => {
   await renderDetail();
 
   expect(screen.getByTestId('loading')).toBeTruthy();
+  expect(screen.getByLabelText('Carregando')).toBe(screen.getByTestId('loading'));
   expect(mockGet).toHaveBeenCalledWith(7, expect.anything());
 });
 

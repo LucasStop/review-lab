@@ -38,7 +38,12 @@ export function DetailScreen({ navigation, route }: Props) {
   if (pr.status === 'loading') {
     return (
       <View style={styles.center}>
-        <ActivityIndicator testID="loading" color={colors.primary} size="large" />
+        <ActivityIndicator
+          testID="loading"
+          accessibilityLabel="Carregando"
+          color={colors.primary}
+          size="large"
+        />
       </View>
     );
   }
