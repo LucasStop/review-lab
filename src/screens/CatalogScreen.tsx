@@ -17,6 +17,7 @@ import { ErrorState } from '../components/ErrorState';
 import { PullRequestCard } from '../components/PullRequestCard';
 import { TextField } from '../components/TextField';
 import { useFavorites } from '../contexts/FavoritesContext';
+import { useLayout } from '../contexts/LayoutContext';
 import { useStudied } from '../contexts/StudiedContext';
 import { useFetch } from '../hooks/useFetch';
 import { usePullRequestList } from '../hooks/usePullRequestList';
@@ -37,7 +38,6 @@ const FILTERS: { key: Filter; label: string }[] = [
   { key: 'studied', label: 'Estudados' },
 ];
 
-const COLUMNS = 2;
 const NO_RESULTS: PullRequestSummary[] = [];
 
 function Empty({ filter, term }: { filter: Filter; term: string }) {
@@ -67,8 +67,9 @@ export function CatalogScreen({ navigation }: Props) {
   const list = usePullRequestList();
   const { favorites, isFavorite, toggle } = useFavorites();
   const { studied, getRating } = useStudied();
+  const { columns, toggle: toggleLayout } = useLayout();
   const { width } = useWindowDimensions();
-  const cardWidth = (width - spacing.lg * 2 - spacing.md * (COLUMNS - 1)) / COLUMNS;
+  const cardWidth = (width - spacing.lg * 2 - spacing.md * (columns - 1)) / columns;
   const [query, setQuery] = useState('');
   // O termo só vale ao tocar em Buscar (ou Enter): a busca tem limite de 10 por minuto, então
   // nada de buscar a cada tecla. Termo vazio volta à lista paginada sem recarregar: as páginas
@@ -127,14 +128,16 @@ export function CatalogScreen({ navigation }: Props) {
     body = (
       <FlatList
         // Filtro ou termo novo monta outra lista, no topo: no iOS o deslocamento de uma lista longa
-        // não se ajusta quando o conteúdo encolhe, e Salvos abriria numa área vazia.
-        key={`${filter}:${term}`}
+        // não se ajusta quando o conteúdo encolhe, e Salvos abriria numa área vazia. Colunas novas
+        // também: o RN lança ao trocar `numColumns` na mesma lista.
+        key={`${columns}:${filter}:${term}`}
         testID="catalog.list"
         style={styles.list}
         data={items}
-        numColumns={COLUMNS}
+        numColumns={columns}
         keyExtractor={(pr) => String(pr.number)}
-        columnWrapperStyle={styles.row}
+        // Até `{}` lança em lista de uma coluna.
+        columnWrapperStyle={columns > 1 ? styles.row : undefined}
         contentContainerStyle={styles.content}
         keyboardShouldPersistTaps="handled"
         onEndReached={paginated ? list.loadMore : undefined}
@@ -193,23 +196,35 @@ export function CatalogScreen({ navigation }: Props) {
         <Button label="Buscar" onPress={submit} testID="catalog.search-submit" />
       </View>
       {/* Os chips ficam fora do corpo: trocar de filtro não os remonta e o foco continua no chip. */}
-      <View style={styles.filters}>
-        {FILTERS.map(({ key, label }) => {
-          const selected = filter === key;
-          return (
-            <Pressable
-              key={key}
-              accessibilityRole="button"
-              accessibilityLabel={label}
-              accessibilityState={{ selected }}
-              onPress={() => setFilter(key)}
-              style={[styles.chip, selected && styles.chipSelected]}
-              testID={`catalog.filter.${key}`}
-            >
-              <Text style={[styles.chipText, selected && styles.chipTextSelected]}>{label}</Text>
-            </Pressable>
-          );
-        })}
+      <View style={styles.toolbar}>
+        <View style={styles.filters}>
+          {FILTERS.map(({ key, label }) => {
+            const selected = filter === key;
+            return (
+              <Pressable
+                key={key}
+                accessibilityRole="button"
+                accessibilityLabel={label}
+                accessibilityState={{ selected }}
+                onPress={() => setFilter(key)}
+                style={[styles.chip, selected && styles.chipSelected]}
+                testID={`catalog.filter.${key}`}
+              >
+                <Text style={[styles.chipText, selected && styles.chipTextSelected]}>{label}</Text>
+              </Pressable>
+            );
+          })}
+        </View>
+        {/* Fora do grupo dos filtros: não tem estado selecionado e o label diz o que o toque faz. */}
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={columns === 2 ? 'Ver em 1 coluna' : 'Ver em 2 colunas'}
+          onPress={toggleLayout}
+          style={styles.chip}
+          testID="catalog.layout-toggle"
+        >
+          <Text style={styles.chipText}>{columns === 2 ? '☰' : '▦'}</Text>
+        </Pressable>
       </View>
       {body}
     </View>
@@ -227,13 +242,14 @@ const styles = StyleSheet.create({
     paddingTop: spacing.md,
   },
   field: { flexGrow: 1, flexBasis: 200 },
-  filters: {
+  toolbar: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
+    alignItems: 'flex-start',
     gap: spacing.sm,
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.md,
   },
+  filters: { flex: 1, flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
   chip: {
     minHeight: touch.min,
     minWidth: touch.min,

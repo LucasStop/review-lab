@@ -28,3 +28,21 @@ name: catalog
     visible:
       id: 'catalog.card.0'
     timeout: 30000
+# C09 e C66: grade de 2 colunas, botão para 1 coluna e de volta.
+- assertVisible:
+    id: 'catalog.card.1'
+    rightOf:
+      id: 'catalog.card.0'
+- tapOn:
+    id: 'catalog.layout-toggle'
+- assertVisible:
+    id: 'catalog.card.1'
+    below:
+      id: 'catalog.card.0'
+# A escolha persiste por usuário: voltar a 2 colunas para não vazar para os outros fluxos.
+- tapOn:
+    id: 'catalog.layout-toggle'
+- assertVisible:
+    id: 'catalog.card.1'
+    rightOf:
+      id: 'catalog.card.0'

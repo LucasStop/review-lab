@@ -69,7 +69,7 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 
 | ID | Cenário | Nível | Status |
 |---|---|---|---|
-| C09 | Grade em 2 colunas com avatar e título | C, E2E | ok #35 (card em `PullRequestCard.test.tsx`; as 2 colunas só aparecem no simulador: conferidas a olho no screenshot, o fluxo `.maestro/catalog.yaml` cobre a carga e a rolagem) |
+| C09 | Grade em 2 colunas com avatar e título | C, E2E | ok #35 (card em `PullRequestCard.test.tsx`; o fluxo `.maestro/catalog.yaml` cobre a carga e a rolagem); as 2 colunas são conferidas pelo `rightOf` entre `catalog.card.1` e `catalog.card.0` no `.maestro/catalog.yaml` desde o #140 |
 | C10 | Autor apagado (`ghost`) ou sem avatar mostra placeholder | U, C | U ok; C ok #34 (`PullRequestCard.test.tsx`, `avatar.test.ts`) |
 | C11 | Rolagem infinita anexa a próxima página, com loader no rodapé | I, E2E | ok #35 (`CatalogScreen.test.tsx`, `.maestro/catalog.yaml`) |
 | C12 | Na última página não há mais pedidos (`hasNext` falso) | U, I | ok #35 (U do parser de `Link`; I em `CatalogScreen.test.tsx`) |
@@ -140,7 +140,7 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 | C63 | Busca e filtro se combinam: buscar dentro de Salvos ou Estudados filtra a lista local; trocar de filtro mantém o termo aplicado | C | Salvos ok #38 e Estudados ok #39 (`CatalogScreen.test.tsx`) |
 | C64 | Cada chip de filtro informa o estado (`accessibilityState.selected`, `aria-pressed` no protótipo), tem alvo de 44x44 e o foco continua nele depois de tocar | C, M | estado e 44x44 de Todos e Salvos ok #38 e de Estudados ok #39 (`CatalogScreen.test.tsx`); o foco no chip depois do toque fica no passo 10 do roteiro e no #42 |
 | C65 | O termo só vale ao tocar em Buscar (ou Enter); Buscar com o campo vazio volta à lista paginada do filtro | C, E2E | em Todos ok #37 (`CatalogScreen.test.tsx`; o `.maestro/search.yaml` cobre a volta com o campo vazio); em Salvos ok #38 e em Estudados ok #39 (`CatalogScreen.test.tsx`) |
-| C66 | O botão do Catálogo alterna `numColumns` entre 1 e 2 (padrão 2), com label que diz a ação, alvo de 44x44, `key` nova no `FlatList` e a lista e os favoritos intactos | C, E2E | F2 #140 |
+| C66 | O botão do Catálogo alterna `numColumns` entre 1 e 2 (padrão 2), com label que diz a ação, alvo de 44x44, `key` nova no `FlatList` e a lista e os favoritos intactos | C, E2E | ok #140 (`CatalogScreen.test.tsx`: label da ação, largura do card de 2 para 1 coluna, sem nova busca, favorito marcado, 44x44 e a escolha de volta depois de remontar; `RootNavigator.hydration.test.tsx`: o portão espera `rl.<userId>.layout`; `.maestro/catalog.yaml`: `rightOf`, toque, `below` e volta a 2 colunas) |
 
 ### Feedback de UI (RF09)
 

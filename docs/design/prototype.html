@@ -116,6 +116,7 @@
   @media (prefers-reduced-motion: reduce) { .spin { animation-duration: 3s; } }
 
   .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding: 12px; }
+  .grid.one { grid-template-columns: minmax(0, 1fr); }
   .card { background: var(--a-surface); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 8px; min-width: 0; position: relative; }
   .card .open { all: unset; cursor: pointer; display: flex; flex-direction: column; gap: 8px; min-width: 0; min-height: 44px; }
   .avatar { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #fff; flex: none; }
@@ -149,7 +150,8 @@
   .actions { display: flex; gap: 8px; flex-wrap: wrap; }
   .searchbar { display: flex; align-items: flex-end; gap: 8px; padding: 12px 16px; }
   .searchbar .field { flex: 1; min-width: 0; }
-  .filters { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 16px 8px; flex: none; }
+  .toolbar { display: flex; align-items: flex-start; gap: 8px; padding: 0 16px 8px; flex: none; }
+  .filters { display: flex; flex-wrap: wrap; gap: 8px; flex: 1; }
   .fchip { min-height: 44px; padding: 0 16px; border-radius: 22px; border: 1px solid var(--a-border); background: var(--a-bg); color: var(--a-text); font: inherit; font-size: 15px; font-weight: 600; cursor: pointer; }
   .fchip[aria-pressed='true'] { background: var(--a-primary); color: var(--a-on-primary); border-color: var(--a-primary); }
   #toast:empty { display: none; }
@@ -181,7 +183,7 @@
     <div class="group notes">
       <h2>Como ler</h2>
       <ul>
-        <li>Catálogo: campo de busca com rótulo visível e botão Buscar no topo, filtros Todos, Salvos e Estudados logo abaixo e a grade de 2 colunas. A busca e o filtro se combinam.</li>
+        <li>Catálogo: campo de busca com rótulo visível e botão Buscar no topo, filtros Todos, Salvos e Estudados logo abaixo e a grade de 2 colunas, com o botão ao lado dos filtros que alterna para 1 coluna e diz a ação ("Ver em 1 coluna" / "Ver em 2 colunas"). A busca e o filtro se combinam.</li>
         <li>Salvos e Estudados não são mais telas: o header do Catálogo só leva ao Perfil.</li>
         <li>Detalhe: salvar e estudado mudam de label e de estado. A nota vale de 1 a 5.</li>
         <li>Carregando, Erro e Vazio mostram <code>ActivityIndicator</code>, <code>ErrorState</code> e <code>EmptyState</code>.</li>
@@ -221,7 +223,7 @@
     ['code', 'if (insets.equals(last)) return;'],
     ['p', 'More context in the linked issue.'],
   ];
-  var st = { screen: 'login', state: 'dados', saved: { 31204: true, 31166: true, 31152: true }, studied: { 31187: 5, 31152: 4 }, filter: 'todos', applied: '', query: '', open: PRS[0], toast: '', email: 'ana@exemplo.com', pass: 'segredo123', pw: '', focusSel: null };
+  var st = { screen: 'login', state: 'dados', saved: { 31204: true, 31166: true, 31152: true }, studied: { 31187: 5, 31152: 4 }, filter: 'todos', cols: 2, applied: '', query: '', open: PRS[0], toast: '', email: 'ana@exemplo.com', pass: 'segredo123', pw: '', focusSel: null };
   var app = document.getElementById('app'), viewEl = document.getElementById('view'), toastEl = document.getElementById('toast');
   var focusReset = false;
 
@@ -289,9 +291,10 @@
     if (s === 'catalog') {
       var h = nav('Review Lab', false, '<button class="icon-btn" data-go="profile" aria-label="Perfil">Perfil</button>') +
         '<div class="searchbar"><div class="field"><label for="p-q">Buscar PRs</label><input id="p-q" type="search" enterkeyhint="search" placeholder="Ex.: navigation bar" value="' + esc(st.query) + '"></div><button class="btn" data-run>Buscar</button></div>' +
-        '<div class="filters" role="group" aria-label="Filtrar lista">' + [['todos', 'Todos'], ['salvos', 'Salvos'], ['estudados', 'Estudados']].map(function (f) {
+        '<div class="toolbar"><div class="filters" role="group" aria-label="Filtrar lista">' + [['todos', 'Todos'], ['salvos', 'Salvos'], ['estudados', 'Estudados']].map(function (f) {
           return '<button class="fchip" data-filter="' + f[0] + '" aria-pressed="' + (st.filter === f[0]) + '">' + f[1] + '</button>';
-        }).join('') + '</div>';
+        }).join('') + '</div>' +
+        '<button class="fchip" data-cols aria-label="' + (st.cols === 2 ? 'Ver em 1 coluna' : 'Ver em 2 colunas') + '">' + (st.cols === 2 ? '☰' : '▦') + '</button></div>';
       if (state === 'carregando') return h + loading();
       if (state === 'erro') return h + error('Sem conexão. Verifique a internet e tente de novo.');
       var q = st.applied.toLowerCase();
@@ -306,7 +309,7 @@
         if (st.filter === 'estudados') return h + empty('Você ainda não marcou nenhum PR como estudado');
         return h + empty('Nenhum PR encontrado', 'Tente atualizar a lista.');
       }
-      return h + '<div class="body"><div class="grid">' + list.map(card).join('') + '</div>' + (st.filter === 'todos' && !st.applied ? '<div class="footer-loader" role="status" aria-label="Carregando mais"><div class="spin"></div></div>' : '') + '</div>';
+      return h + '<div class="body"><div class="grid' + (st.cols === 1 ? ' one' : '') + '">' + list.map(card).join('') + '</div>' + (st.filter === 'todos' && !st.applied ? '<div class="footer-loader" role="status" aria-label="Carregando mais"><div class="spin"></div></div>' : '') + '</div>';
     }
     if (s === 'detail') {
       var pr = st.open, done = st.studied[pr.n];
@@ -415,6 +418,7 @@
       st.toast = st.studied[m] ? 'Marcado como estudado, nota 4' : 'Desmarcado'; return render();
     }
     if (t.dataset.rate) { st.studied[st.open.n] = Number(t.dataset.rate); st.toast = ''; return render(); }
+    if (t.dataset.cols !== undefined) { st.cols = st.cols === 2 ? 1 : 2; st.focusSel = '[data-cols]'; return render(); }
     if (t.dataset.filter) { st.filter = t.dataset.filter; st.state = 'dados'; return render(); }
     if (t.dataset.run !== undefined) { st.applied = document.getElementById('p-q').value.trim(); st.state = 'dados'; return render(); }
   });

@@ -3,12 +3,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react-native';
-import { Keyboard, StyleSheet, Text } from 'react-native';
+import { Dimensions, Keyboard, StyleSheet, Text } from 'react-native';
 
 import type { PullRequestPage, PullRequestSummary } from '../types/github';
 import { FavoritesProvider } from '../contexts/FavoritesContext';
+import { LayoutProvider } from '../contexts/LayoutContext';
 import { StudiedProvider } from '../contexts/StudiedContext';
-import { touch } from '../theme';
+import { spacing, touch } from '../theme';
 import { AppError } from '../utils/appError';
 import { CatalogScreen } from './CatalogScreen';
 
@@ -45,19 +46,29 @@ const Detail = ({ route }: { route: { params: { number: number } } }) => (
   <Text>{`Detalhe ${route.params.number}`}</Text>
 );
 
-async function renderCatalog() {
+async function renderCatalog(layoutUser = 'u1') {
   await render(
     <FavoritesProvider userId="u1">
       <StudiedProvider userId="u1">
-        <NavigationContainer>
-          <Stack.Navigator>
-            <Stack.Screen name="Catalog" component={CatalogScreen as never} />
-            <Stack.Screen name="Detail" component={Detail as never} />
-          </Stack.Navigator>
-        </NavigationContainer>
+        <LayoutProvider userId={layoutUser}>
+          <NavigationContainer>
+            <Stack.Navigator>
+              <Stack.Screen name="Catalog" component={CatalogScreen as never} />
+              <Stack.Screen name="Detail" component={Detail as never} />
+            </Stack.Navigator>
+          </NavigationContainer>
+        </LayoutProvider>
       </StudiedProvider>
     </FavoritesProvider>,
   );
+}
+
+// O card não tem `width`; quem o recebe é o `View` em volta, montado pelo `renderItem`. Sobe
+// pelos pais até ele, porque o RNTL 14 não tem mais `UNSAFE_getByType`.
+function cardWidth(index: number) {
+  let node = screen.getByTestId(`catalog.card.${index}`).parent;
+  while (node && StyleSheet.flatten(node.props.style)?.width === undefined) node = node.parent;
+  return node ? StyleSheet.flatten(node.props.style).width : undefined;
 }
 
 async function reachEnd() {
@@ -605,4 +616,101 @@ test('while a search is shown the list does not page, refresh or show its footer
   expect(list.props.keyboardShouldPersistTaps).toBe('handled');
   expect(screen.queryByTestId('catalog.footer-loader')).toBeNull();
   dismiss.mockRestore();
+});
+
+test('C66: the layout button switches between 2 and 1 columns and says the action it does', async () => {
+  mockList.mockResolvedValue(page([3, 2], false));
+  await renderCatalog();
+  await screen.findByTestId('catalog.card.0');
+  const button = () => screen.getByTestId('catalog.layout-toggle');
+
+  expect(button().props.accessibilityRole).toBe('button');
+  expect(button().props.accessibilityLabel).toBe('Ver em 1 coluna');
+  const twoColumns = cardWidth(0);
+  expect(twoColumns).toBe((Dimensions.get('window').width - spacing.lg * 2 - spacing.md) / 2);
+
+  await fireEvent.press(button());
+  expect(button().props.accessibilityLabel).toBe('Ver em 2 colunas');
+  // Na largura do teste, 353 em 2 colunas e 718 em 1: a coluna única ocupa a linha toda.
+  expect(cardWidth(0)).toBe(Dimensions.get('window').width - spacing.lg * 2);
+  expect(cardWidth(0)).toBeGreaterThan(twoColumns);
+  expect(cardWidth(0)).toBe(cardWidth(1));
+
+  await fireEvent.press(button());
+  expect(button().props.accessibilityLabel).toBe('Ver em 1 coluna');
+  expect(cardWidth(0)).toBe(twoColumns);
+});
+
+test('C66: switching columns keeps the list and the saved PR without fetching again', async () => {
+  mockList.mockResolvedValue(page([3, 2], false));
+  await renderCatalog();
+  await fireEvent.press(await screen.findByTestId('catalog.save.1'));
+
+  await fireEvent.press(screen.getByTestId('catalog.layout-toggle'));
+
+  expect(screen.getByText('PR 3')).toBeTruthy();
+  expect(screen.getByText('PR 2')).toBeTruthy();
+  expect(screen.getByTestId('catalog.save.1').props.accessibilityState).toMatchObject({
+    selected: true,
+  });
+  expect(mockList).toHaveBeenCalledTimes(1);
+});
+
+test('C66: the layout button is at least 44x44', async () => {
+  mockList.mockResolvedValue(page([1], false));
+  await renderCatalog();
+
+  const style = StyleSheet.flatten(
+    (await screen.findByTestId('catalog.layout-toggle')).props.style,
+  );
+  expect(style.minWidth).toBe(touch.min);
+  expect(style.minHeight).toBe(touch.min);
+});
+
+test('C66: the chosen layout comes back after the catalog mounts again', async () => {
+  mockList.mockResolvedValue(page([3, 2], false));
+  await renderCatalog();
+  await screen.findByTestId('catalog.card.0');
+  await fireEvent.press(screen.getByTestId('catalog.layout-toggle'));
+  const oneColumn = cardWidth(0);
+  expect(oneColumn).toBe(Dimensions.get('window').width - spacing.lg * 2);
+  await screen.unmount();
+
+  await renderCatalog();
+  await screen.findByTestId('catalog.card.0');
+  expect(screen.getByTestId('catalog.layout-toggle').props.accessibilityLabel).toBe(
+    'Ver em 2 colunas',
+  );
+  expect(cardWidth(0)).toBe(oneColumn);
+  expect(await AsyncStorage.getItem('rl.u1.layout')).toBe('1');
+});
+
+test.each([
+  ['a number that is not 1 or 2', '3'],
+  ['text that is not JSON', 'one column'],
+])('C66: %s on disk opens in 2 columns', async (_, stored) => {
+  await AsyncStorage.setItem('rl.u1.layout', stored);
+  mockList.mockResolvedValue(page([3, 2], false));
+  await renderCatalog();
+  await screen.findByTestId('catalog.card.0');
+
+  expect(screen.getByTestId('catalog.layout-toggle').props.accessibilityLabel).toBe(
+    'Ver em 1 coluna',
+  );
+  expect(cardWidth(0)).toBe((Dimensions.get('window').width - spacing.lg * 2 - spacing.md) / 2);
+});
+
+test('C66: the layout is per user, so another account opens in 2 columns', async () => {
+  mockList.mockResolvedValue(page([3, 2], false));
+  await renderCatalog();
+  await screen.findByTestId('catalog.card.0');
+  await fireEvent.press(screen.getByTestId('catalog.layout-toggle'));
+  await screen.unmount();
+
+  await renderCatalog('u2');
+  await screen.findByTestId('catalog.card.0');
+  expect(screen.getByTestId('catalog.layout-toggle').props.accessibilityLabel).toBe(
+    'Ver em 1 coluna',
+  );
+  expect(await AsyncStorage.getItem('rl.u1.layout')).toBe('1');
 });

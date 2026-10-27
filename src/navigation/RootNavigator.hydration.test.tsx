@@ -39,7 +39,7 @@ const studiedOnly = { number: 9, title: 'Studied cache review', author: 'bia', r
 function holdLists({
   fail = false,
   only,
-}: { fail?: boolean; only?: 'favorites' | 'studied' } = {}) {
+}: { fail?: boolean; only?: 'favorites' | 'studied' | 'layout' } = {}) {
   const read = async (key: string) => (await AsyncStorage.multiGet([key]))[0][1];
   const held = new RegExp(`\\.(${only ?? 'favorites|studied'})$`);
   let open: () => void = () => {};
@@ -114,6 +114,17 @@ test('C26: the gate waits for favorites even after studied loaded', async () => 
 
   await release();
   expect(await screen.findByTestId('catalog.filter.saved')).toBeTruthy();
+});
+
+test('C26 and C66: the gate waits for the layout even after both lists loaded', async () => {
+  const release = holdLists({ only: 'layout' });
+  await renderApp();
+
+  expect(screen.getByLabelText('Carregando')).toBeTruthy();
+  expect(screen.queryByTestId('catalog.layout-toggle')).toBeNull();
+
+  await release();
+  expect(await screen.findByTestId('catalog.layout-toggle')).toBeTruthy();
 });
 
 test('C26: Salvos never shows the empty state while favorites load, then lists the saved PR', async () => {
