@@ -21,12 +21,20 @@ export function createCache({
   now?: () => number;
   maxEntries?: number;
 }) {
-  async function save<T>(key: string, entry: Entry<T>) {
-    await storage.write(`rl.cache.${key}`, entry);
-    const index = (await storage.read<string[]>(INDEX, [], isList)).filter((k) => k !== key);
-    index.push(key);
-    while (index.length > maxEntries) await storage.remove(`rl.cache.${index.shift()}`);
-    await storage.write(INDEX, index);
+  // Dois save concorrentes leriam o mesmo índice e o último gravaria por cima: a chave perdida
+  // nunca sairia do storage. A fila serializa; uma falha não trava os próximos.
+  let queue: Promise<unknown> = Promise.resolve();
+
+  function save<T>(key: string, entry: Entry<T>) {
+    const run = queue.then(async () => {
+      await storage.write(`rl.cache.${key}`, entry);
+      const index = (await storage.read<string[]>(INDEX, [], isList)).filter((k) => k !== key);
+      index.push(key);
+      while (index.length > maxEntries) await storage.remove(`rl.cache.${index.shift()}`);
+      await storage.write(INDEX, index);
+    });
+    queue = run.catch(() => {});
+    return run;
   }
 
   async function get<T>(

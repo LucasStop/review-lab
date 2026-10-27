@@ -104,3 +104,19 @@ test('a corrupted entry is ignored', async () => {
   const f = counter('B');
   assert.equal(await cache.get('k', { ttlMs: MIN }, f.fetch), 'B');
 });
+
+test('concurrent saves of different keys both end up in the index', async () => {
+  const data = new Map<string, string>();
+  const tick = () => new Promise<void>((resolve) => setTimeout(resolve, 1));
+  const storage = createStorage({
+    get: async (key) => (await tick(), data.get(key) ?? null),
+    set: async (key, value) => (await tick(), void data.set(key, value)),
+    remove: async (key) => (await tick(), void data.delete(key)),
+  });
+  const cache = createCache({ storage, now: () => 1_000_000 });
+  await Promise.all([
+    cache.get('a', { ttlMs: MIN }, async () => ({ value: 'A' })),
+    cache.get('b', { ttlMs: MIN }, async () => ({ value: 'B' })),
+  ]);
+  assert.deepEqual(JSON.parse(data.get('rl.cache.index')!).sort(), ['a', 'b']);
+});
