@@ -461,18 +461,22 @@ test.each(LOCAL_FILTERS)(
   },
 );
 
-test('switching between Salvos and Estudados starts a new list', async () => {
-  await AsyncStorage.setItem('rl.u1.favorites', JSON.stringify([pr(5)]));
+test('C63: switching between Salvos and Estudados keeps the term and starts a new list', async () => {
+  await AsyncStorage.setItem('rl.u1.favorites', JSON.stringify([pr(5), pr(6)]));
   await AsyncStorage.setItem('rl.u1.studied', JSON.stringify(studied));
   mockList.mockResolvedValue(page([1], false));
   await renderCatalog();
   await screen.findByTestId('catalog.card.0');
 
   await showFilter('Salvos');
+  await searchFor('6');
   const salvos = screen.getByTestId('catalog.list');
   await showFilter('Estudados');
 
   expect(screen.getByTestId('catalog.list')).not.toBe(salvos);
+  expect(screen.getByText('PR 6')).toBeTruthy();
+  expect(screen.queryByText('PR 5')).toBeNull();
+  expect(mockSearch).not.toHaveBeenCalled();
 });
 
 test('C64: each filter chip states whether it is selected and is at least 44x44', async () => {
