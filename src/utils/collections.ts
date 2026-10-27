@@ -68,3 +68,7 @@ export function filterByTerm<T extends PullRequestSummary>(list: T[], term: stri
   if (!q) return list;
   return list.filter((pr) => `${pr.title} ${pr.author} #${pr.number}`.toLowerCase().includes(q));
 }
+
+// Sem estudados não há média: null, e a tela mostra o traço.
+export const averageRating = (list: StudiedEntry[]) =>
+  list.length ? list.reduce((sum, item) => sum + item.rating, 0) / list.length : null;
