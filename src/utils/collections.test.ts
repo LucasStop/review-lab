@@ -103,6 +103,11 @@ test('C63: filterByTerm matches the title, the author or the number, ignoring ca
     filterByTerm(list, '56').map((p) => p.number),
     [56],
   );
+  // O card mostra "#12", então quem digita o número como ele aparece também acha.
+  assert.deepEqual(
+    filterByTerm(list, '#12').map((p) => p.number),
+    [12],
+  );
   assert.deepEqual(filterByTerm(list, 'zzz'), []);
   assert.equal(filterByTerm(list, ''), list);
 });

@@ -66,5 +66,5 @@ export const withoutStudied = (list: StudiedEntry[], number: number) =>
 export function filterByTerm<T extends PullRequestSummary>(list: T[], term: string): T[] {
   const q = term.toLowerCase();
   if (!q) return list;
-  return list.filter((pr) => `${pr.title} ${pr.author} ${pr.number}`.toLowerCase().includes(q));
+  return list.filter((pr) => `${pr.title} ${pr.author} #${pr.number}`.toLowerCase().includes(q));
 }
