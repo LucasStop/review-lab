@@ -138,7 +138,7 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 | C34 | Qualificadores (`repo:`, `is:`) e operadores (`AND`, `OR`, `NOT`) digitados são neutralizados | U | ok; operadores no #37 (mais de 5 davam 422) |
 | C35 | Loader durante a busca | C | ok #37 (`CatalogScreen.test.tsx`, com o campo de busca na tela) |
 | C63 | Busca e filtro se combinam: buscar dentro de Salvos ou Estudados filtra a lista local; trocar de filtro mantém o termo aplicado | C | Salvos ok #38 e Estudados ok #39 (`CatalogScreen.test.tsx`) |
-| C64 | Cada chip de filtro informa o estado (`accessibilityState.selected`, `aria-pressed` no protótipo), tem alvo de 44x44 e o foco continua nele depois de tocar | C, M | estado e 44x44 de Todos e Salvos ok #38 e de Estudados ok #39 (`CatalogScreen.test.tsx`); o foco no chip depois do toque fica no passo 10 do roteiro e no #42 |
+| C64 | Cada chip de filtro informa o estado (`accessibilityState.selected`, `aria-pressed` no protótipo), tem alvo de 44x44 e o foco continua nele depois de tocar | C, M | estado e 44x44 de Todos e Salvos ok #38 e de Estudados ok #39 (`CatalogScreen.test.tsx`); o foco no chip depois do toque fica no passo 10 do roteiro; o foco volta ao chip Salvos depois de tirar o salvo de um card, ok #42 (`CatalogScreen.test.tsx`, "in Salvos, unsaving a card moves the focus to the Salvos chip"), e no VoiceOver no passo 10 |
 | C65 | O termo só vale ao tocar em Buscar (ou Enter); Buscar com o campo vazio volta à lista paginada do filtro | C, E2E | em Todos ok #37 (`CatalogScreen.test.tsx`; o `.maestro/search.yaml` cobre a volta com o campo vazio); em Salvos ok #38 e em Estudados ok #39 (`CatalogScreen.test.tsx`) |
 | C66 | O botão do Catálogo alterna `numColumns` entre 1 e 2 (padrão 2), com label que diz a ação, alvo de 44x44, `key` nova no `FlatList` e a lista e os favoritos intactos | C, E2E | ok #140 (`CatalogScreen.test.tsx`: label da ação, largura do card de 2 para 1 coluna, sem nova busca, favorito marcado, 44x44 e a escolha de volta depois de remontar; `RootNavigator.hydration.test.tsx`: o portão espera `rl.<userId>.layout`; `.maestro/catalog.yaml`: `rightOf`, toque, `below` e volta a 2 colunas) |
 
@@ -158,8 +158,8 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 
 | ID | Cenário | Nível | Status |
 |---|---|---|---|
-| C43 | Todo tocável e toda imagem tem `accessibilityRole` e `accessibilityLabel` | C | F2 #42 (`StarRating` e `ErrorState` já têm) |
-| C44 | Botão de estado informa o estado (`selected` ou label que muda) | C | ok #26; #42 pendente |
+| C43 | Todo tocável e toda imagem tem `accessibilityRole` e `accessibilityLabel` | C | ok #42 (`Avatar.test.tsx`, `StarRating.test.tsx`, `TextField.test.tsx`, `ErrorState.test.tsx`, link de `LoginScreen.test.tsx`, labels "Carregando" em `CatalogScreen.test.tsx` e `DetailScreen.test.tsx`; anúncios nos testes C43 de `CatalogScreen`, `LoginScreen`, `ErrorState` e no C59 de `ProfileScreen`) |
+| C44 | Botão de estado informa o estado (`selected` ou label que muda) | C | ok #26, conferido no #42: `detail.save`, `detail.studied`, a estrela do card e os chips já têm `selected` e label que muda (`DetailScreen.test.tsx` C44, `PullRequestCard.test.tsx`, `CatalogScreen.test.tsx` C64) |
 | C45 | Alvo de toque de pelo menos 44x44 | C | botão salvar do card ok #34; restante F2 #43 |
 | C46 | Pares de cor dos tokens com contraste de pelo menos 4.5:1 | U | ok #44 (`theme.test.ts`); o tema de navegação (`App.tsx`) usa `link` como tint do header e não tem teste automatizado. No simulador com iOS 26.5, o voltar do Detalhe é o botão de vidro do sistema, com a seta quase preta (`#191919` no print), e ignora o tint; o `link` no voltar vale antes do iOS 26 |
 | C47 | Fonte do sistema no máximo não corta texto nem sobrepõe; nenhum `allowFontScaling={false}` no código (`git grep`) | C, M | C da quebra de linha das estrelas ok #27 (`StarRating.test.tsx`); roteiro |
