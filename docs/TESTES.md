@@ -59,7 +59,7 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 | C02 | E-mail repetido é recusado, mesmo com outra caixa ou com espaços, e a tela mostra a mensagem | U, C | U ok; C ok (#31) |
 | C03 | Senha com menos de 6 caracteres ou e-mail sem `@` é recusado antes de gravar | U, C | U ok; C ok (#31) |
 | C04 | Senha errada e e-mail desconhecido recebem a mesma mensagem | U, E2E | ok (U e E2E `.maestro/auth.yaml`) #32 |
-| C05 | Senha e e-mail em texto puro nunca chegam ao store: o e-mail só fica na sessão, cifrado no SecureStore, nunca no AsyncStorage nem em `rl.cred.*` | U | ok (`credentials.test.ts`; sessão em `session.test.ts`, #125) |
+| C05 | Senha e e-mail em texto puro nunca chegam ao store: o e-mail só fica na sessão, cifrado no SecureStore, nunca no AsyncStorage nem em `rl.cred.*` | U, I | ok (`credentials.test.ts`; sessão em `session.test.ts`, #125; varredura do AsyncStorage e de `rl.cred.*` no C58 de `RootNavigator.test.tsx`, #125) |
 | C51 | Sem sessão, o app abre no Login e não chega à AppStack (login obrigatório) | I, E2E | ok (I `RootNavigator.test.tsx`, E2E `.maestro/auth.yaml`) #32 |
 | C06 | Fechar e reabrir o app mantém a sessão | I, E2E | ok (I e E2E `.maestro/auth.yaml`) #32 |
 | C07 | Logout volta ao login e apaga a sessão (o botão Sair fica no Perfil, com confirmação) | U, I, E2E | ok #32, #125 (U `session.test.ts`, I `RootNavigator.test.tsx` pelo Perfil); E2E em `.maestro/auth.yaml` |
@@ -123,10 +123,10 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 | C56 | O Perfil mostra o e-mail, o total de salvos, o total de estudados e a nota média (traço sem estudados) | C, E2E | C ok #125 (`ProfileScreen.test.tsx`, também a sessão antiga sem e-mail); E2E em `.maestro/profile.yaml` |
 | C57 | Sair pede confirmação; Cancelar mantém a sessão e a tela | C, E2E | C ok #125 (`ProfileScreen.test.tsx`); E2E em `.maestro/auth.yaml` |
 | C58 | Confirmar Sair limpa só a sessão: salvos e estudados voltam no próximo login | I | ok #125 (`RootNavigator.test.tsx`, com o `createAuth` de verdade) |
-| C59 | Excluir conta com senha errada recusa, mostra "Senha incorreta." e não apaga nada | U, C | U ok #124 (`session.test.ts`; estado em `AuthContext.test.tsx`); C ok #125 (`ProfileScreen.test.tsx`, também campo vazio, toque duplo e falha do `deleteAccount`); E2E em `.maestro/profile.yaml` |
-| C60 | Excluir conta com a senha certa apaga credencial, sessão e as chaves `rl.<userId>.*` e volta ao Login | U, I, E2E | U ok #124; I ok #125 (`RootNavigator.test.tsx`); E2E em `.maestro/profile.yaml` |
+| C59 | Excluir conta com senha errada recusa, mostra "Senha incorreta." e não apaga nada | U, C | U ok #124 (`session.test.ts`; estado em `AuthContext.test.tsx`); C ok #125 (`ProfileScreen.test.tsx`, também campo vazio, toque duplo no mesmo ciclo de render, nova tentativa depois da senha errada, Cancelar/Esc/voltar travados durante a exclusão e falha do `deleteAccount`); E2E em `.maestro/profile.yaml` |
+| C60 | Excluir conta com a senha certa apaga credencial, sessão e as chaves `rl.<userId>.*` e volta ao Login | U, I, E2E | U ok #124; I ok #125 (`RootNavigator.test.tsx`, que confere a limpeza das chaves); E2E em `.maestro/profile.yaml`, que só confere a volta ao Login |
 | C61 | Excluir conta não toca nos dados de outro usuário do aparelho; cadastrar o mesmo e-mail depois funciona | U, I | U ok #124 (`session.test.ts`, `storage.test.ts`, `credentials.test.ts`); I ok #125 (`RootNavigator.test.tsx`); recadastro também em `.maestro/profile.yaml` |
-| C62 | O foco entra no diálogo de confirmação e volta ao botão que o abriu ao cancelar ou fechar com Esc | C | C ok #125 (`ProfileScreen.test.tsx`, espião em `sendAccessibilityEvent`); VoiceOver no passo 11 do roteiro manual |
+| C62 | O foco entra no diálogo de confirmação e volta ao botão que o abriu ao cancelar ou fechar com Esc | C | C ok #125 (`ProfileScreen.test.tsx`, espião em `sendAccessibilityEvent`, que também exige o diálogo já fechado quando o foco volta); VoiceOver no passo 11 do roteiro manual |
 
 ### Busca (RF08)
 
