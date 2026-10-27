@@ -17,6 +17,7 @@ import { ErrorState } from '../components/ErrorState';
 import { PullRequestCard } from '../components/PullRequestCard';
 import { TextField } from '../components/TextField';
 import { useFavorites } from '../contexts/FavoritesContext';
+import { useStudied } from '../contexts/StudiedContext';
 import { useFetch } from '../hooks/useFetch';
 import { usePullRequestList } from '../hooks/usePullRequestList';
 import type { AppStackParamList } from '../navigation/types';
@@ -28,11 +29,12 @@ import { filterByTerm } from '../utils/collections';
 
 type Props = NativeStackScreenProps<AppStackParamList, 'Catalog'>;
 
-type Filter = 'all' | 'saved';
+type Filter = 'all' | 'saved' | 'studied';
 
 const FILTERS: { key: Filter; label: string }[] = [
   { key: 'all', label: 'Todos' },
   { key: 'saved', label: 'Salvos' },
+  { key: 'studied', label: 'Estudados' },
 ];
 
 const COLUMNS = 2;
@@ -55,12 +57,16 @@ function Empty({ filter, term }: { filter: Filter; term: string }) {
       />
     );
   }
+  if (filter === 'studied') {
+    return <EmptyState title="Você ainda não marcou nenhum PR como estudado" />;
+  }
   return <EmptyState title="Nenhum PR encontrado" />;
 }
 
 export function CatalogScreen({ navigation }: Props) {
   const list = usePullRequestList();
   const { favorites, isFavorite, toggle } = useFavorites();
+  const { studied, getRating } = useStudied();
   const { width } = useWindowDimensions();
   const cardWidth = (width - spacing.lg * 2 - spacing.md * (COLUMNS - 1)) / COLUMNS;
   const [query, setQuery] = useState('');
@@ -69,7 +75,7 @@ export function CatalogScreen({ navigation }: Props) {
   // ficam no hook, mas a rolagem volta ao topo, porque a lista sai da tela enquanto a busca roda.
   const [term, setTerm] = useState('');
   const [filter, setFilter] = useState<Filter>('all');
-  // Só Todos vai ao GitHub; Salvos vem do Context e a busca filtra a lista local.
+  // Só Todos vai ao GitHub; Salvos e Estudados vêm dos Contexts e a busca filtra a lista local.
   const remote = filter === 'all';
   const searcher = useCallback(
     (signal: AbortSignal) =>
@@ -93,7 +99,7 @@ export function CatalogScreen({ navigation }: Props) {
   let loading = false;
   let error: AppError | undefined;
   if (!remote) {
-    items = filterByTerm(favorites, term);
+    items = filterByTerm(filter === 'saved' ? favorites : studied, term);
   } else if (searching) {
     items = search.data ?? NO_RESULTS;
     loading = search.status === 'loading';
@@ -140,6 +146,7 @@ export function CatalogScreen({ navigation }: Props) {
             <PullRequestCard
               pr={item}
               saved={isFavorite(item.number)}
+              rating={filter === 'studied' ? getRating(item.number) : undefined}
               onPress={() => navigation.navigate('Detail', { number: item.number })}
               onToggleSave={() => toggle(item)}
               testID={`catalog.card.${index}`}

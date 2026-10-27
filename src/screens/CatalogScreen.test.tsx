@@ -7,6 +7,7 @@ import { Keyboard, StyleSheet, Text } from 'react-native';
 
 import type { PullRequestPage, PullRequestSummary } from '../types/github';
 import { FavoritesProvider } from '../contexts/FavoritesContext';
+import { StudiedProvider } from '../contexts/StudiedContext';
 import { touch } from '../theme';
 import { AppError } from '../utils/appError';
 import { CatalogScreen } from './CatalogScreen';
@@ -38,12 +39,14 @@ const Detail = ({ route }: { route: { params: { number: number } } }) => (
 async function renderCatalog() {
   await render(
     <FavoritesProvider userId="u1">
-      <NavigationContainer>
-        <Stack.Navigator>
-          <Stack.Screen name="Catalog" component={CatalogScreen as never} />
-          <Stack.Screen name="Detail" component={Detail as never} />
-        </Stack.Navigator>
-      </NavigationContainer>
+      <StudiedProvider userId="u1">
+        <NavigationContainer>
+          <Stack.Navigator>
+            <Stack.Screen name="Catalog" component={CatalogScreen as never} />
+            <Stack.Screen name="Detail" component={Detail as never} />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </StudiedProvider>
     </FavoritesProvider>,
   );
 }
@@ -60,7 +63,7 @@ async function searchFor(term: string) {
   await fireEvent.press(screen.getByTestId('catalog.search-submit'));
 }
 
-async function showFilter(name: 'Todos' | 'Salvos') {
+async function showFilter(name: 'Todos' | 'Salvos' | 'Estudados') {
   await fireEvent.press(screen.getByRole('button', { name }));
 }
 
@@ -443,16 +446,76 @@ test('C64: each filter chip states whether it is selected and is at least 44x44'
   await screen.findByTestId('catalog.card.0');
   const chip = (name: string) => screen.getByRole('button', { name });
 
-  expect(chip('Todos').props.accessibilityState).toMatchObject({ selected: true });
-  expect(chip('Salvos').props.accessibilityState).toMatchObject({ selected: false });
-  await showFilter('Salvos');
-  expect(chip('Todos').props.accessibilityState).toMatchObject({ selected: false });
-  expect(chip('Salvos').props.accessibilityState).toMatchObject({ selected: true });
-  for (const name of ['Todos', 'Salvos']) {
+  const names = ['Todos', 'Salvos', 'Estudados'] as const;
+  for (const shown of names) {
+    await showFilter(shown);
+    for (const name of names) {
+      expect(chip(name).props.accessibilityState).toMatchObject({ selected: name === shown });
+    }
+  }
+  for (const name of names) {
     const style = StyleSheet.flatten(chip(name).props.style);
     expect(style.minWidth).toBe(touch.min);
     expect(style.minHeight).toBe(touch.min);
   }
+});
+
+const studied = [
+  { ...pr(5), rating: 4 },
+  { ...pr(6), rating: 2 },
+];
+
+test('C30: Estudados lists each studied PR with its rating, without the network', async () => {
+  await AsyncStorage.setItem('rl.u1.studied', JSON.stringify(studied));
+  mockList.mockResolvedValue(page([5, 1], false));
+  await renderCatalog();
+  await screen.findByTestId('catalog.card.0');
+  // Em Todos o card não mostra a nota, como no protótipo.
+  expect(screen.queryByTestId('catalog.card.0.rating')).toBeNull();
+
+  await showFilter('Estudados');
+
+  expect(screen.getByLabelText('PR #5: PR 5, de ana, nota 4 de 5')).toBeTruthy();
+  expect(screen.getByLabelText('PR #6: PR 6, de ana, nota 2 de 5')).toBeTruthy();
+  expect(screen.getByText('★★★★☆')).toBeTruthy();
+  expect(screen.getByText('★★☆☆☆')).toBeTruthy();
+  expect(screen.queryByText('PR 1')).toBeNull();
+  expect(mockList).toHaveBeenCalledTimes(1);
+  expect(mockSearch).not.toHaveBeenCalled();
+  await fireEvent.press(screen.getByTestId('catalog.card.1'));
+  expect(await screen.findByText('Detalhe 6')).toBeTruthy();
+});
+
+test('C55: an empty Estudados says no PR was marked as studied', async () => {
+  mockList.mockResolvedValue(page([1], false));
+  await renderCatalog();
+  await screen.findByTestId('catalog.card.0');
+
+  await showFilter('Estudados');
+
+  expect(screen.getByTestId('catalog.empty')).toBeTruthy();
+  expect(screen.getByText('Você ainda não marcou nenhum PR como estudado')).toBeTruthy();
+});
+
+test('C63 and C65: the term filters Estudados locally and an empty Buscar shows them all', async () => {
+  await AsyncStorage.setItem('rl.u1.studied', JSON.stringify(studied));
+  mockList.mockResolvedValue(page([1], false));
+  await renderCatalog();
+  await screen.findByTestId('catalog.card.0');
+  await showFilter('Estudados');
+
+  await searchFor('6');
+  expect(screen.getByText('PR 6')).toBeTruthy();
+  expect(screen.queryByText('PR 5')).toBeNull();
+  expect(mockSearch).not.toHaveBeenCalled();
+
+  await searchFor('zzz');
+  expect(screen.getByText('Nenhum resultado para “zzz”')).toBeTruthy();
+  expect(screen.getByText('Tente outro termo ou troque o filtro.')).toBeTruthy();
+
+  await searchFor('');
+  expect(screen.getByText('PR 5')).toBeTruthy();
+  expect(screen.getByText('PR 6')).toBeTruthy();
 });
 
 test('Buscar with the same term after the limit searches again, like Tentar novamente', async () => {
