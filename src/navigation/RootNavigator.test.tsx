@@ -4,10 +4,11 @@ import { fireEvent, render, screen } from '@testing-library/react-native';
 
 import { AuthProvider } from '../contexts/AuthContext';
 import type { AuthResult } from '../services/credentials';
+import type { Session } from '../services/session';
 import { RootNavigator } from './RootNavigator';
 
 const mockAuth = {
-  restore: jest.fn<() => Promise<string | null>>(),
+  restore: jest.fn<() => Promise<Session | null>>(),
   signIn: jest.fn<(email: string, password: string) => Promise<AuthResult>>(),
   signUp: jest.fn<(email: string, password: string) => Promise<AuthResult>>(),
   signOut: jest.fn<() => Promise<void>>(),
@@ -56,7 +57,7 @@ test('shows only the ActivityIndicator while the session is being read, never th
 });
 
 test('C06: a stored session opens the catalog directly', async () => {
-  mockAuth.restore.mockResolvedValue('u1');
+  mockAuth.restore.mockResolvedValue({ userId: 'u1', email: 'ana@exemplo.com' });
   await renderApp();
 
   expect(await screen.findByTestId('catalog.logout')).toBeTruthy();
@@ -64,7 +65,7 @@ test('C06: a stored session opens the catalog directly', async () => {
 });
 
 test('C07: logging out clears the session and shows the login without navigate()', async () => {
-  mockAuth.restore.mockResolvedValue('u1');
+  mockAuth.restore.mockResolvedValue({ userId: 'u1', email: 'ana@exemplo.com' });
   await renderApp();
 
   await fireEvent.press(await screen.findByTestId('catalog.logout'));
@@ -74,7 +75,7 @@ test('C07: logging out clears the session and shows the login without navigate()
 });
 
 test('logging out still shows the login when clearing the stored session fails', async () => {
-  mockAuth.restore.mockResolvedValue('u1');
+  mockAuth.restore.mockResolvedValue({ userId: 'u1', email: 'ana@exemplo.com' });
   mockAuth.signOut.mockRejectedValue(new Error('storage down'));
   await renderApp();
 

@@ -9,9 +9,10 @@ import {
 } from 'react';
 
 import { auth } from '../services/appAuth';
-import type { AuthResult } from '../services/credentials';
+import { normalizeEmail, type AuthResult } from '../services/credentials';
 
-export type User = { id: string };
+// Sem e-mail quando a sessão foi gravada no formato antigo (só o userId).
+export type User = { id: string; email?: string };
 
 type AuthValue = {
   user: User | null;
@@ -35,7 +36,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let alive = true;
     auth
       .restore()
-      .then((id) => alive && id && setUser({ id }))
+      .then((session) => alive && session && setUser({ id: session.userId, email: session.email }))
       .catch(() => {})
       .finally(() => alive && setHydrated(true));
     return () => {
@@ -43,17 +44,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const enter = useCallback(async (result: AuthResult) => {
-    if (result.ok) setUser({ id: result.userId });
+  const enter = useCallback(async (result: AuthResult, email: string) => {
+    if (result.ok) setUser({ id: result.userId, email: normalizeEmail(email) });
     return result;
   }, []);
 
   const signIn = useCallback(
-    async (email: string, password: string) => enter(await auth.signIn(email, password)),
+    async (email: string, password: string) => enter(await auth.signIn(email, password), email),
     [enter],
   );
   const signUp = useCallback(
-    async (email: string, password: string) => enter(await auth.signUp(email, password)),
+    async (email: string, password: string) => enter(await auth.signUp(email, password), email),
     [enter],
   );
   const signOut = useCallback(async () => {

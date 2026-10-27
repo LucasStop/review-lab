@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { createAuth } from './session.ts';
+import { createAuth, parseSession } from './session.ts';
 
 function setup() {
   const data = new Map<string, string>();
@@ -46,11 +46,11 @@ test('restore returns null when there is no session', async () => {
   assert.equal(await setup().auth.restore(), null);
 });
 
-test('signIn stores the session and restore brings the user back', async () => {
+test('signIn stores the session with the normalized email and restore brings the user back', async () => {
   const { auth, data } = setup();
-  assert.deepEqual(await auth.signIn('a@x.com', 'certa123'), { ok: true, userId: 'u1' });
-  assert.equal(data.get('rl.session'), 'u1');
-  assert.equal(await auth.restore(), 'u1');
+  assert.deepEqual(await auth.signIn(' Ana@X.com ', 'certa123'), { ok: true, userId: 'u1' });
+  assert.deepEqual(JSON.parse(data.get('rl.session')!), { userId: 'u1', email: 'ana@x.com' });
+  assert.deepEqual(await auth.restore(), { userId: 'u1', email: 'ana@x.com' });
 });
 
 test('a failed signIn leaves no session', async () => {
@@ -66,8 +66,8 @@ test('signUp logs the new user in; a duplicate email does not', async () => {
   const { auth, data } = setup();
   assert.equal((await auth.signUp('taken@x.com', 'certa123')).ok, false);
   assert.equal(data.size, 0);
-  assert.equal((await auth.signUp('new@x.com', 'certa123')).ok, true);
-  assert.equal(data.get('rl.session'), 'u1');
+  assert.equal((await auth.signUp('New@x.com', 'certa123')).ok, true);
+  assert.deepEqual(await auth.restore(), { userId: 'u1', email: 'new@x.com' });
 });
 
 test('signOut deletes the session', async () => {
@@ -83,7 +83,8 @@ test('C59: deleteAccount with a wrong password deletes nothing', async () => {
   await auth.signIn('a@x.com', 'certa123');
   const result = await auth.deleteAccount('u1', 'errada123');
   assert.deepEqual(result, { ok: false, reason: 'invalid-credentials' });
-  assert.equal(data.get('rl.session'), 'u1');
+  assert.equal((await auth.restore())?.userId, 'u1');
+  assert.ok(data.has('rl.session'));
   assert.equal(userData.size, 3);
   assert.equal(calls.filter((c) => c.startsWith('remove')).length, 0);
 });
@@ -111,4 +112,34 @@ test('deleteAccount removes the session before the credential, so a failure keep
   await auth.deleteAccount('u1', 'certa123');
   const removals = calls.filter((c) => c.startsWith('remove'));
   assert.deepEqual(removals, ['remove rl.session', 'remove-credential u1']);
+});
+
+const OLD_ID = 'a'.repeat(64);
+
+test('parseSession reads the new JSON format', () => {
+  assert.deepEqual(parseSession(JSON.stringify({ userId: OLD_ID, email: 'a@x.com' })), {
+    userId: OLD_ID,
+    email: 'a@x.com',
+  });
+});
+
+test('parseSession keeps a session stored in the old format (only the userId), without email', () => {
+  assert.deepEqual(parseSession(OLD_ID), { userId: OLD_ID });
+  // Só dígitos: o JSON.parse devolveria um número e a sessão sumiria.
+  const digits = '1'.repeat(64);
+  assert.deepEqual(parseSession(digits), { userId: digits });
+});
+
+test('parseSession turns corrupted or unknown values into no session', () => {
+  for (const raw of ['{"userId":', '12345', '"texto"', 'null', '[]', '{}', '{"email":"a@x.com"}']) {
+    assert.equal(parseSession(raw), null, raw);
+  }
+  assert.equal(parseSession('{"userId":42}'), null);
+  assert.equal(parseSession(null), null);
+});
+
+test('restore reads a session from the old format', async () => {
+  const { auth, data } = setup();
+  data.set('rl.session', OLD_ID);
+  assert.deepEqual(await auth.restore(), { userId: OLD_ID });
 });

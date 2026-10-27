@@ -3,10 +3,11 @@ import { act, renderHook, waitFor } from '@testing-library/react-native';
 import type { ReactNode } from 'react';
 
 import type { AuthResult } from '../services/credentials';
+import type { Session } from '../services/session';
 import { AuthProvider, useAuth } from './AuthContext';
 
 const mockAuth = {
-  restore: jest.fn<() => Promise<string | null>>(),
+  restore: jest.fn<() => Promise<Session | null>>(),
   signIn: jest.fn<(email: string, password: string) => Promise<AuthResult>>(),
   signUp: jest.fn<(email: string, password: string) => Promise<AuthResult>>(),
   signOut: jest.fn<() => Promise<void>>(),
@@ -21,9 +22,11 @@ jest.mock('../services/appAuth', () => ({
 const wrapper = ({ children }: { children: ReactNode }) => <AuthProvider>{children}</AuthProvider>;
 
 async function signedIn() {
-  mockAuth.restore.mockResolvedValue('u1');
+  mockAuth.restore.mockResolvedValue({ userId: 'u1', email: 'ana@exemplo.com' });
   const hook = await renderHook(() => useAuth(), { wrapper });
-  await waitFor(() => expect(hook.result.current.user).toEqual({ id: 'u1' }));
+  await waitFor(() =>
+    expect(hook.result.current.user).toEqual({ id: 'u1', email: 'ana@exemplo.com' }),
+  );
   return hook;
 }
 
@@ -42,7 +45,7 @@ test('C59: a wrong password keeps the session and returns the login error', asyn
 
   expect(outcome).toEqual({ ok: false, reason: 'invalid-credentials' });
   expect(mockAuth.deleteAccount).toHaveBeenCalledWith('u1', 'errada123');
-  expect(result.current.user).toEqual({ id: 'u1' });
+  expect(result.current.user).toEqual({ id: 'u1', email: 'ana@exemplo.com' });
 });
 
 test('C60: the right password deletes the account and drops the session', async () => {

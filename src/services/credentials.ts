@@ -40,14 +40,16 @@ function sameHash(a: string, b: string): boolean {
   return diff === 0;
 }
 
+// Mesma regra para o userId e para o e-mail guardado na sessão.
+export const normalizeEmail = (email: string) => email.trim().toLowerCase();
+
 export function createCredentials({ kv, sha256, randomSalt }: Deps) {
-  const normalize = (email: string) => email.trim().toLowerCase();
   // SecureStore só aceita [A-Za-z0-9._-] em chave; o hash do e-mail também serve de userId
   // e evita e-mail em texto puro no storage.
-  const userIdOf = (email: string) => sha256(normalize(email));
+  const userIdOf = (email: string) => sha256(normalizeEmail(email));
 
   async function register(email: string, password: string): Promise<AuthResult> {
-    if (!normalize(email).includes('@') || password.length < MIN_PASSWORD) {
+    if (!normalizeEmail(email).includes('@') || password.length < MIN_PASSWORD) {
       return { ok: false, reason: 'invalid-input' };
     }
     const userId = await userIdOf(email);
