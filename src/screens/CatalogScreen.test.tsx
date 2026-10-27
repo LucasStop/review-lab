@@ -378,6 +378,50 @@ test('Salvos still shows the saved PRs when the list fails, and Todos keeps its 
   expect(screen.getByTestId('catalog.error')).toBeTruthy();
 });
 
+test('Salvos does not page, refresh, show the footer or wait for the list', async () => {
+  await AsyncStorage.setItem('rl.u1.favorites', JSON.stringify([pr(5)]));
+  mockList.mockResolvedValueOnce(page([2], true)).mockReturnValueOnce(new Promise(() => {}));
+  await renderCatalog();
+  await screen.findByTestId('catalog.card.0');
+  await reachEnd();
+  expect(screen.getByTestId('catalog.footer-loader')).toBeTruthy();
+
+  await showFilter('Salvos');
+
+  const list = screen.getByTestId('catalog.list');
+  expect(list.props.onEndReached).toBeUndefined();
+  expect(list.props.onRefresh).toBeUndefined();
+  expect(screen.queryByTestId('catalog.footer-loader')).toBeNull();
+  expect(screen.getByText('PR 5')).toBeTruthy();
+});
+
+test('Salvos shows the saved PRs while the first page of Todos is still loading', async () => {
+  await AsyncStorage.setItem('rl.u1.favorites', JSON.stringify([pr(5)]));
+  mockList.mockReturnValue(new Promise(() => {}));
+  await renderCatalog();
+  expect(screen.getByTestId('loading')).toBeTruthy();
+
+  await showFilter('Salvos');
+
+  expect(await screen.findByText('PR 5')).toBeTruthy();
+  expect(screen.queryByTestId('loading')).toBeNull();
+});
+
+test('C65: in Salvos typing does not filter until Buscar', async () => {
+  await AsyncStorage.setItem('rl.u1.favorites', JSON.stringify([pr(5), pr(6)]));
+  mockList.mockResolvedValue(page([1], false));
+  await renderCatalog();
+  await screen.findByTestId('catalog.card.0');
+  await showFilter('Salvos');
+
+  await fireEvent.changeText(screen.getByLabelText('Buscar PRs'), '6');
+  expect(screen.getByText('PR 5')).toBeTruthy();
+
+  await fireEvent.press(screen.getByTestId('catalog.search-submit'));
+  expect(screen.queryByText('PR 5')).toBeNull();
+  expect(screen.getByText('PR 6')).toBeTruthy();
+});
+
 test('changing the filter or the term in Salvos starts a new list', async () => {
   await AsyncStorage.setItem('rl.u1.favorites', JSON.stringify([pr(5), pr(6)]));
   mockList.mockResolvedValue(page([3, 2, 1], false));
