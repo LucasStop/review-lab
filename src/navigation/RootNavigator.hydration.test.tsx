@@ -30,6 +30,7 @@ jest.mock('../services/github', () => ({
 }));
 
 const saved = { number: 7, title: 'Saved parser fix', author: 'ana' };
+const studiedOnly = { number: 9, title: 'Studied cache review', author: 'bia', rating: 3 };
 
 // Segura a leitura de favoritos e estudados até o teste chamar `release`; o resto do
 // AsyncStorage responde na hora. O mock do AsyncStorage já é um jest.fn, então o spy é ele
@@ -77,7 +78,10 @@ beforeEach(async () => {
   });
   await AsyncStorage.clear();
   await AsyncStorage.setItem('rl.u1.favorites', JSON.stringify([saved]));
-  await AsyncStorage.setItem('rl.u1.studied', JSON.stringify([{ ...saved, rating: 5 }]));
+  await AsyncStorage.setItem(
+    'rl.u1.studied',
+    JSON.stringify([{ ...saved, rating: 5 }, studiedOnly]),
+  );
 });
 
 test('C26: Salvos never shows the empty state while favorites load, then lists the saved PR', async () => {
@@ -92,6 +96,20 @@ test('C26: Salvos never shows the empty state while favorites load, then lists t
   await release();
   await fireEvent.press(await screen.findByTestId('catalog.filter.saved'));
   expect(await screen.findByText('Saved parser fix')).toBeTruthy();
+  expect(screen.queryByTestId('catalog.empty')).toBeNull();
+});
+
+test('C26: Estudados never shows the empty state while studied loads, then lists the studied PR', async () => {
+  const release = holdLists();
+  await renderApp();
+
+  expect(screen.getByTestId('loading')).toBeTruthy();
+  expect(screen.queryByTestId('catalog.filter.studied')).toBeNull();
+  expect(screen.queryByTestId('catalog.empty')).toBeNull();
+
+  await release();
+  await fireEvent.press(await screen.findByTestId('catalog.filter.studied'));
+  expect(await screen.findByText('Studied cache review')).toBeTruthy();
   expect(screen.queryByTestId('catalog.empty')).toBeNull();
 });
 
