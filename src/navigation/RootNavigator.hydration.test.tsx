@@ -164,7 +164,7 @@ test('C26: the detail buttons never show off while the lists load', async () => 
   expect(screen.getByTestId('detail.rating')).toBeTruthy();
 });
 
-test('C26: a failed read lets the gate open on the empty state instead of hanging', async () => {
+test('C25 and C26: a failed read lets the gate open on the empty state instead of hanging', async () => {
   const release = holdLists({ fail: true });
   await renderApp();
 
