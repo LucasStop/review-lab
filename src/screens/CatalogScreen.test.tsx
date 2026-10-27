@@ -378,6 +378,21 @@ test('Salvos still shows the saved PRs when the list fails, and Todos keeps its 
   expect(screen.getByTestId('catalog.error')).toBeTruthy();
 });
 
+test('changing the filter or the term in Salvos starts a new list', async () => {
+  await AsyncStorage.setItem('rl.u1.favorites', JSON.stringify([pr(5), pr(6)]));
+  mockList.mockResolvedValue(page([3, 2, 1], false));
+  await renderCatalog();
+  await screen.findByTestId('catalog.card.0');
+  const todos = screen.getByTestId('catalog.list');
+
+  await showFilter('Salvos');
+  const salvos = screen.getByTestId('catalog.list');
+  expect(salvos).not.toBe(todos);
+
+  await searchFor('6');
+  expect(screen.getByTestId('catalog.list')).not.toBe(salvos);
+});
+
 test('C64: each filter chip states whether it is selected and is at least 44x44', async () => {
   mockList.mockResolvedValue(page([1], false));
   await renderCatalog();

@@ -120,6 +120,9 @@ export function CatalogScreen({ navigation }: Props) {
   } else {
     body = (
       <FlatList
+        // Filtro ou termo novo monta outra lista, no topo: no iOS o deslocamento de uma lista longa
+        // não se ajusta quando o conteúdo encolhe, e Salvos abriria numa área vazia.
+        key={`${filter}:${term}`}
         testID="catalog.list"
         style={styles.list}
         data={items}
