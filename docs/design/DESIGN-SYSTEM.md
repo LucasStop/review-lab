@@ -64,7 +64,7 @@ Formato `tela.elemento`, em minúsculas, para o Maestro e para os testes de comp
 |---|---|
 | Login | `login.email`, `login.password`, `login.submit`, `login.signup`, `login.error` |
 | Cadastro | `signup.email`, `signup.password`, `signup.submit`, `signup.login`, `signup.error` |
-| Catálogo | `catalog.list`, `catalog.card.<n>`, `catalog.card.<n>.rating`, `catalog.save.<n>`, `catalog.search-input`, `catalog.search-submit`, `catalog.filter.all`, `catalog.filter.saved`, `catalog.filter.studied`, `catalog.profile`, `catalog.footer-loader`, `catalog.empty` |
+| Catálogo | `catalog.list`, `catalog.card.<n>`, `catalog.card.<n>.rating`, `catalog.save.<n>`, `catalog.search-input`, `catalog.search-submit`, `catalog.filter.all`, `catalog.filter.saved`, `catalog.filter.studied`, `catalog.layout-toggle`, `catalog.profile`, `catalog.footer-loader`, `catalog.empty` |
 | Detalhe | `detail.title`, `detail.body`, `detail.save`, `detail.studied`, `detail.rating`, `detail.error` |
 | Perfil | `profile.email`, `profile.saved-count`, `profile.studied-count`, `profile.avg`, `profile.logout`, `profile.delete`, `profile.password`, `profile.confirm`, `profile.cancel`, `profile.error`; `profile.confirm` e `profile.cancel` existem nos dois diálogos, mas só o aberto é renderizado; os três blocos de totais são um elemento acessível cada, lido pelo label ("Salvos: 0", "Estudados: 0", "Nota média: nenhuma") |
 | Comum | `error.retry`, `loading` |

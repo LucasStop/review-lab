@@ -74,7 +74,7 @@ Decisão em [ADR 0004](adr/0004-asyncstorage-vs-sqlite.md) e [ADR 0003](adr/0003
 | Colunas do Catálogo | AsyncStorage | `rl.<userId>.layout` (`1` ou `2`; ausente ou inválido abre em 2) |
 | Cache HTTP | AsyncStorage | `rl.cache.list:<repo>:<página>` e `rl.cache.detail:<repo>:<número>` |
 
-Os Contexts carregam no `useEffect` inicial e expõem `hydrated`. No `RootNavigator`, o `HydrationGate` fica dentro do `FavoritesProvider` e do `StudiedProvider` e mostra o mesmo `ActivityIndicator` da sessão até as duas listas hidratarem; só então monta a `AppStack`, então Catálogo, Detalhe e Perfil nunca exibem dado zerado (RF06, C26). Leitura que falhou conta como hidratada: a lista abre vazia e recusa gravar, para não apagar o dado bom do disco, e o loader não trava. Favoritos guardam um snapshot (número, título, autor, avatar) para o filtro Salvos funcionar sem requisição.
+Os Contexts carregam no `useEffect` inicial e expõem `hydrated`. No `RootNavigator`, o `HydrationGate` fica dentro do `FavoritesProvider`, do `StudiedProvider` e do `LayoutProvider` e mostra o mesmo `ActivityIndicator` da sessão até as duas listas e o layout hidratarem; só então monta a `AppStack`, então Catálogo, Detalhe e Perfil nunca exibem dado zerado (RF06, C26) e o Catálogo não pisca de 2 para 1 coluna (C66). Leitura que falhou conta como hidratada: a lista abre vazia e recusa gravar, para não apagar o dado bom do disco, e o loader não trava. Favoritos guardam um snapshot (número, título, autor, avatar) para o filtro Salvos funcionar sem requisição.
 
 ## Erros e acessibilidade
 
