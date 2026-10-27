@@ -1,4 +1,4 @@
-import { beforeEach, expect, jest, test } from '@jest/globals';
+import { afterEach, beforeEach, expect, jest, test } from '@jest/globals';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NavigationContainer, type InitialState } from '@react-navigation/native';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
@@ -32,15 +32,19 @@ jest.mock('../services/github', () => ({
 const saved = { number: 7, title: 'Saved parser fix', author: 'ana' };
 const studiedOnly = { number: 9, title: 'Studied cache review', author: 'bia', rating: 3 };
 
-// Segura a leitura de favoritos e estudados até o teste chamar `release`; o resto do
+// Segura a leitura das listas (ou só de `only`) até o teste chamar `release`; o resto do
 // AsyncStorage responde na hora. O mock do AsyncStorage já é um jest.fn, então o spy é ele
 // mesmo: ler pelo `getItem` original entraria em loop, e o `multiGet` lê o mesmo armazenamento.
-function holdLists({ fail = false } = {}) {
+function holdLists({
+  fail = false,
+  only,
+}: { fail?: boolean; only?: 'favorites' | 'studied' } = {}) {
   const read = async (key: string) => (await AsyncStorage.multiGet([key]))[0][1];
+  const held = new RegExp(`\\.(${only ?? 'favorites|studied'})$`);
   let open: () => void = () => {};
   const gate = new Promise<void>((resolve) => (open = resolve));
   jest.spyOn(AsyncStorage, 'getItem').mockImplementation(async (key: string) => {
-    if (!/\.(favorites|studied)$/.test(key)) return read(key);
+    if (!held.test(key)) return read(key);
     await gate;
     if (fail) throw new Error('disk down');
     return read(key);
@@ -82,6 +86,33 @@ beforeEach(async () => {
     'rl.u1.studied',
     JSON.stringify([{ ...saved, rating: 5 }, studiedOnly]),
   );
+});
+
+afterEach(() => {
+  jest.restoreAllMocks();
+});
+
+// O portão espera as duas listas: com só uma presa, o app ainda não pode abrir.
+test('C26: the gate waits for studied even after favorites loaded', async () => {
+  const release = holdLists({ only: 'studied' });
+  await renderApp();
+
+  expect(screen.getByTestId('loading')).toBeTruthy();
+  expect(screen.queryByTestId('catalog.filter.saved')).toBeNull();
+
+  await release();
+  expect(await screen.findByTestId('catalog.filter.saved')).toBeTruthy();
+});
+
+test('C26: the gate waits for favorites even after studied loaded', async () => {
+  const release = holdLists({ only: 'favorites' });
+  await renderApp();
+
+  expect(screen.getByTestId('loading')).toBeTruthy();
+  expect(screen.queryByTestId('catalog.filter.saved')).toBeNull();
+
+  await release();
+  expect(await screen.findByTestId('catalog.filter.saved')).toBeTruthy();
 });
 
 test('C26: Salvos never shows the empty state while favorites load, then lists the saved PR', async () => {
