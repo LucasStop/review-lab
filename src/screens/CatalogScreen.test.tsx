@@ -516,6 +516,13 @@ test('C30: Estudados lists each studied PR with its rating, without the network'
   expect(screen.queryByText('PR 1')).toBeNull();
   expect(mockList).toHaveBeenCalledTimes(1);
   expect(mockSearch).not.toHaveBeenCalled();
+  // A estrela de salvar continua valendo dentro de Estudados.
+  const star = screen.getByTestId('catalog.save.0');
+  expect(star.props.accessibilityState).toMatchObject({ selected: false });
+  await fireEvent.press(star);
+  expect(screen.getByTestId('catalog.save.0').props.accessibilityState).toMatchObject({
+    selected: true,
+  });
   await fireEvent.press(screen.getByTestId('catalog.card.1'));
   expect(await screen.findByText('Detalhe 6')).toBeTruthy();
 });
@@ -531,9 +538,10 @@ test('C55: an empty Estudados says no PR was marked as studied', async () => {
   expect(screen.getByText('Você ainda não marcou nenhum PR como estudado')).toBeTruthy();
 });
 
-test('C63 and C65: the term filters Estudados locally and an empty Buscar shows them all', async () => {
+test('C63 and C65: the term filters Estudados locally, stays across filters and clears on an empty Buscar', async () => {
   await AsyncStorage.setItem('rl.u1.studied', JSON.stringify(studied));
   mockList.mockResolvedValue(page([1], false));
+  mockSearch.mockResolvedValue([pr(7)]);
   await renderCatalog();
   await screen.findByTestId('catalog.card.0');
   await showFilter('Estudados');
@@ -542,6 +550,14 @@ test('C63 and C65: the term filters Estudados locally and an empty Buscar shows 
   expect(screen.getByText('PR 6')).toBeTruthy();
   expect(screen.queryByText('PR 5')).toBeNull();
   expect(mockSearch).not.toHaveBeenCalled();
+
+  await showFilter('Todos');
+  expect(await screen.findByText('PR 7')).toBeTruthy();
+  expect(mockSearch).toHaveBeenCalledWith('6', expect.anything());
+
+  await showFilter('Estudados');
+  expect(screen.getByText('PR 6')).toBeTruthy();
+  expect(screen.queryByText('PR 7')).toBeNull();
 
   await searchFor('zzz');
   expect(screen.getByText('Nenhum resultado para “zzz”')).toBeTruthy();
