@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 
 import { FavoritesProvider } from '../contexts/FavoritesContext';
+import { LayoutProvider } from '../contexts/LayoutContext';
 import { StudiedProvider } from '../contexts/StudiedContext';
 import type { PullRequestDetailView, PullRequestPage } from '../types/github';
 import { CatalogScreen } from './CatalogScreen';
@@ -42,12 +43,14 @@ test('C21: saving in the detail flips the star of the same PR in the catalog wit
   await render(
     <FavoritesProvider userId="u1">
       <StudiedProvider userId="u1">
-        <NavigationContainer>
-          <Stack.Navigator>
-            <Stack.Screen name="Catalog" component={CatalogScreen as never} />
-            <Stack.Screen name="Detail" component={DetailScreen as never} />
-          </Stack.Navigator>
-        </NavigationContainer>
+        <LayoutProvider userId="u1">
+          <NavigationContainer>
+            <Stack.Navigator>
+              <Stack.Screen name="Catalog" component={CatalogScreen as never} />
+              <Stack.Screen name="Detail" component={DetailScreen as never} />
+            </Stack.Navigator>
+          </NavigationContainer>
+        </LayoutProvider>
       </StudiedProvider>
     </FavoritesProvider>,
   );

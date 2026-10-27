@@ -2,6 +2,7 @@ import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
 import { useAuth } from '../contexts/AuthContext';
 import { FavoritesProvider, useFavorites } from '../contexts/FavoritesContext';
+import { LayoutProvider, useLayout } from '../contexts/LayoutContext';
 import { StudiedProvider, useStudied } from '../contexts/StudiedContext';
 import { colors } from '../theme';
 import { AppStack } from './AppStack';
@@ -20,13 +21,15 @@ function Loading() {
   );
 }
 
-// Fica dentro dos providers porque só eles enxergam o próprio `hydrated`. Até favoritos e
-// estudados saírem do disco nenhuma tela monta: Salvos, Estudados e os botões do Detalhe
-// nunca aparecem zerados (C26). Leitura que falhou também conta como hidratada e abre vazia.
+// Fica dentro dos providers porque só eles enxergam o próprio `hydrated`. Até favoritos,
+// estudados e o layout saírem do disco nenhuma tela monta: Salvos, Estudados e os botões do
+// Detalhe nunca aparecem zerados (C26), e o Catálogo não pisca de 2 para 1 coluna (C66).
+// Leitura que falhou também conta como hidratada e abre no padrão.
 function HydrationGate() {
   const favorites = useFavorites();
   const studied = useStudied();
-  if (!favorites.hydrated || !studied.hydrated) return <Loading />;
+  const layout = useLayout();
+  if (!favorites.hydrated || !studied.hydrated || !layout.hydrated) return <Loading />;
   return <AppStack />;
 }
 
@@ -37,11 +40,13 @@ export function RootNavigator() {
 
   if (!hydrated) return <Loading />;
   if (!user) return <AuthStack />;
-  // `key` remonta os providers a cada troca de usuário: favoritos e estudados são por conta.
+  // `key` remonta os providers a cada troca de usuário: listas e layout são por conta.
   return (
     <FavoritesProvider key={user.id} userId={user.id}>
       <StudiedProvider userId={user.id}>
-        <HydrationGate />
+        <LayoutProvider userId={user.id}>
+          <HydrationGate />
+        </LayoutProvider>
       </StudiedProvider>
     </FavoritesProvider>
   );
