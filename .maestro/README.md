@@ -29,4 +29,6 @@ Com mais de um simulador ligado: `maestro --device <UDID> test ...` (`xcrun simc
 - O Metro escuta em IPv6; o link é `exp://localhost:8081`, nunca `127.0.0.1`.
 - Seletor por `id:` com o `testID` no formato `tela.elemento` (`login.email`, `catalog.card.123`). Texto só quando não há `testID`.
 - Na primeira abertura o Expo Go cobre o app com o menu de dev; o fluxo toca no fundo para fechar.
-- Todo fluxo começa com `launchApp: stopApp: true` para não herdar estado. Quando precisar de login, usa um e-mail novo por execução.
+- Todo fluxo começa com `launchApp: stopApp: true` para não herdar estado (`subflows/open-app.yaml`).
+- `subflows/session.yaml` abre o app e garante uma sessão: com sessão salva segue no Catálogo; no Login, cadastra um e-mail novo e guarda em `output.email`. Os fluxos que precisam de login começam por ele, e o regex de espera (`login\.screen|catalog\.profile`) fica só ali.
+- `auth.yaml` e `profile.yaml` saem pelo Perfil para começar de uma conta nova; `profile.yaml` termina logado com essa conta.

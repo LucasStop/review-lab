@@ -1,31 +1,48 @@
-# C51, C01, C06, C07: login obrigatório, cadastro entra logado, sessão sobrevive ao reabrir, logout.
+# C57, C07, C51, C01, C06, C04: Sair pede confirmação e Cancelar mantém a sessão, Sair volta ao
+# Login, login obrigatório, cadastro entra logado, sessão sobrevive ao reabrir, senha errada.
 # E-mail novo a cada execução: o cadastro recusa e-mail repetido. Precisa do Metro (ver README.md).
 appId: host.exp.Exponent
 name: auth
 ---
-- runFlow: subflows/open-app.yaml
-- evalScript: ${output.email = 'e2e' + Date.now() + '@exemplo.com'}
-# Sessão de uma execução anterior sobrevive no Expo Go: começa deslogado.
-# O app pode ainda estar no loader de hidratação: espera sumir antes de decidir.
+# Começa logado (sessão anterior ou cadastro novo) para testar o Sair pelo Perfil.
+- runFlow: subflows/session.yaml
+- tapOn:
+    id: 'catalog.profile'
 - extendedWaitUntil:
-    notVisible:
-      id: 'loading'
-    timeout: 90000
-- runFlow:
-    when:
-      visible:
-        id: 'catalog.logout'
-    commands:
-      - tapOn:
-          id: 'catalog.logout'
-# C51: sem sessão o app abre no Login.
+    visible:
+      id: 'profile.logout'
+    timeout: 10000
+# C57: Cancelar fecha o diálogo e mantém a sessão e a tela.
+- tapOn:
+    id: 'profile.logout'
+- tapOn:
+    id: 'profile.cancel'
+- extendedWaitUntil:
+    notVisible: 'Sair da conta?'
+    timeout: 5000
+- assertVisible:
+    id: 'profile.email'
+- assertNotVisible:
+    id: 'login.screen'
+# C07: confirmar o Sair volta ao Login.
+- tapOn:
+    id: 'profile.logout'
+- tapOn:
+    id: 'profile.confirm'
+- extendedWaitUntil:
+    visible:
+      id: 'login.screen'
+    timeout: 10000
+# C51: sem sessão, reabrir o app cai no Login e não chega ao Catálogo.
+- runFlow: subflows/open-app.yaml
 - extendedWaitUntil:
     visible:
       id: 'login.screen'
     timeout: 90000
 - assertNotVisible:
-    id: 'catalog.logout'
+    id: 'catalog.profile'
 # C01: cadastro válido entra logado.
+- evalScript: ${output.email = 'e2e' + Date.now() + '@exemplo.com'}
 - tapOn:
     id: 'login.signup'
 - tapOn:
@@ -38,22 +55,25 @@ name: auth
     id: 'signup.submit'
 - extendedWaitUntil:
     visible:
-      id: 'catalog.logout'
+      id: 'catalog.profile'
     timeout: 20000
 # C06: fechar e reabrir mantém a sessão.
 - runFlow: subflows/open-app.yaml
 - extendedWaitUntil:
     visible:
-      id: 'catalog.logout'
+      id: 'catalog.profile'
     timeout: 90000
-# C07: logout volta ao Login.
+# C04: sair pelo Perfil e errar a senha mostra a mensagem única.
 - tapOn:
-    id: 'catalog.logout'
+    id: 'catalog.profile'
+- tapOn:
+    id: 'profile.logout'
+- tapOn:
+    id: 'profile.confirm'
 - extendedWaitUntil:
     visible:
       id: 'login.screen'
     timeout: 10000
-# C04: senha errada mostra a mensagem única.
 - tapOn:
     id: 'login.email'
 - inputText: ${output.email}
