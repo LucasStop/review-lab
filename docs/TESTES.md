@@ -146,9 +146,9 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 
 | ID | Cenário | Nível | Status |
 |---|---|---|---|
-| C36 | `ActivityIndicator` na carga inicial do catálogo e do detalhe e na próxima página (`ListFooterComponent`) | C | catálogo ok #35; detalhe ok #36, #41 pendente |
-| C37 | Erro de rede mostra `ErrorState`, e "Tentar novamente" recarrega | C, I, M | C em #115; I F2 #41; M no roteiro |
-| C38 | `useFetch`: carregando, depois dados; erro, depois retry; cancela ao desmontar | I | F2 #41 |
+| C36 | `ActivityIndicator` na carga inicial do catálogo e do detalhe e na próxima página (`ListFooterComponent`) | C | catálogo ok #35 (`CatalogScreen.test.tsx`, inclui o rodapé `catalog.footer-loader`); detalhe ok #36 (`DetailScreen.test.tsx`) |
+| C37 | Erro de rede mostra `ErrorState`, e "Tentar novamente" recarrega | C, I, M | C ok #115 (`ErrorState.test.tsx`); I ok #41 (`useFetch.test.tsx` cobre erro e retry), e o ciclo erro, "Tentar novamente", dados com o serviço mockado está nas telas desde #35, #36 e #37 (`CatalogScreen.test.tsx`, `DetailScreen.test.tsx`); M no roteiro |
+| C38 | `useFetch`: carregando, depois dados; erro, depois retry; cancela ao desmontar; trocar o fetcher ignora o resultado do antigo | I | ok #41 (`useFetch.test.tsx`) |
 | C39 | Limite de requisições mostra o horário de volta (só onde não há cache: busca, PR nunca aberto, página nova) | U, C, M | U ok; C da busca ok #37 (`CatalogScreen.test.tsx`); M no roteiro |
 | C40 | Com cache, qualquer falha (offline, 403, 5xx) mostra o valor vencido em vez de erro | U, M | U ok; M no roteiro |
 | C41 | Mensagem de erro nunca carrega token nem URL | U | ok |
