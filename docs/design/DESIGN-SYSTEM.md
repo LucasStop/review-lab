@@ -37,7 +37,7 @@ Cor nunca é o único sinal: o estado "salvo" muda ícone e label, a nota usa �
 | `touch.min` | 44 |
 | `glyph` | `md` 24 (estrela de salvar do card), `lg` 28 (estrela da nota editável) |
 
-Regras de texto (RF10): nunca `allowFontScaling={false}`, nunca `height` ou `lineHeight` fixos em texto de conteúdo, nunca `numberOfLines` que esconda a informação principal. Contêiner de texto usa `minHeight`, não `height`. O teste `src/theme/fontScaling.test.ts` falha se algum arquivo de `src` desligar o `allowFontScaling`.
+Regras de texto (RF10): nunca `allowFontScaling={false}`, nunca `height` ou `lineHeight` fixos em texto de conteúdo, nunca `numberOfLines` que esconda a informação principal. Contêiner de texto usa `minHeight`, não `height`. O teste `src/theme/fontScaling.test.ts` falha se algum arquivo de `src` (fora os `*.test.*`) tiver `allowFontScaling={false}` ou `allowFontScaling: false` literal; prop dinâmica (`allowFontScaling={flag}`) ou spread de objeto não é detectada.
 
 Alvo de toque e fonte grande (RF10, #43):
 
