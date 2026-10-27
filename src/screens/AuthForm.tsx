@@ -139,6 +139,11 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     borderRadius: radius.md,
   },
-  link: { minHeight: touch.min, alignItems: 'center', justifyContent: 'center' },
+  link: {
+    minWidth: touch.min,
+    minHeight: touch.min,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   linkText: { ...typography.body, color: colors.link, textDecorationLine: 'underline' },
 });

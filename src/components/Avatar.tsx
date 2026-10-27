@@ -42,7 +42,10 @@ export function Avatar({ uri, name, size, accessible = true }: Props) {
       style={[box, styles.placeholder, { backgroundColor: avatarColor(name) }]}
       testID="avatar.placeholder"
     >
-      <Text style={[styles.initial, { fontSize: size / 2 }]}>{initialOf(name)}</Text>
+      {/* A inicial é decorativa e o círculo tem tamanho fixo: sem teto, fonte grande a faria estourar. */}
+      <Text maxFontSizeMultiplier={1} style={[styles.initial, { fontSize: size / 2 }]}>
+        {initialOf(name)}
+      </Text>
     </View>
   );
 }

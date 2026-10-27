@@ -54,7 +54,10 @@ export function PullRequestCard({
         style={styles.save}
         testID={saveTestID}
       >
-        <Text style={[styles.saveGlyph, saved && styles.saved]}>{saved ? '★' : '☆'}</Text>
+        {/* Teto de 1,5x: o glifo (24 * 1,5 = 36) cabe no alvo de 44 e não invade o título. */}
+        <Text maxFontSizeMultiplier={1.5} style={[styles.saveGlyph, saved && styles.saved]}>
+          {saved ? '★' : '☆'}
+        </Text>
       </Pressable>
     </View>
   );
