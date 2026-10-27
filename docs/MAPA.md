@@ -12,7 +12,7 @@ Legenda: **base** quer dizer que a lógica existe, mas falta a tela.
 | RF02 Navegação | 10% com RF03 | `RootNavigator` no `App.tsx`, com a AuthStack sem sessão e a AppStack com sessão (#32); o detalhe recebe `number` e põe o título do PR no header (#36) | Perfil pelo header do Catálogo (#125) | LucasStop, Luc-Bruno |
 | RF03 Detalhe | 10% com RF02 | estatísticas e corpo em blocos sanitizados ([screens/DetailScreen.tsx](../src/screens/DetailScreen.tsx), #36), com links só http(s) filtrados no `sanitizeHtml` e de novo no `BodyBlocks` | — | Luc-Bruno |
 | RF04 Favoritos (Context) | 15% com RF05 | `FavoritesContext` por usuário (#24); estrela no card e botão no detalhe, com o mesmo estado nas duas telas (#26) | — | Luc-Bruno |
-| RF05 Favoritos (filtro Salvos no Catálogo) | 15% com RF04 | base: `useFavorites().favorites` e `EmptyState` (PR #99) | #38 | Luc-Bruno |
+| RF05 Favoritos (filtro Salvos no Catálogo) | 15% com RF04 | filtro Salvos no Catálogo, com a busca filtrando a lista local e o vazio que explica como salvar (#38), sobre `useFavorites().favorites` e `EmptyState` (PR #99) | — | Luc-Bruno |
 | RF06 Persistência | 10% | `usePersistedList` no AsyncStorage com chave `rl.<userId>.<nome>`, que recusa gravar antes da hidratação (#24, #25) | #45 (sem dado zerado na carga) | Luc-Bruno |
 | RF07 Login, sessão, estudados | 10% | login e cadastro com hash e sal (#29 e #31), navegação condicional e Sair provisório no Catálogo (#32), exclusão de conta no serviço (#124), `StudiedContext` com nota de 1 a 5 (#25), marcar como estudado com a nota editável no detalhe (#27) | #39 filtro Estudados; Perfil com Sair e Excluir conta (#125, além da rubrica) | LucasStop, Luc-Bruno |
 | RF08 Busca (campo e botão no Catálogo) | 10% | campo "Buscar PRs" e botão "Buscar" no Catálogo, com carregando, erro, limite com horário e "Nenhum resultado para" o termo (#37); `searchPullRequests` e `buildSearchQuery` (PR #106) | — | Luc-Bruno |
@@ -41,7 +41,7 @@ Padrão do projeto: a lógica fica numa fábrica `create*` pura, que recebe as d
 | [src/utils/linkHeader.ts](../src/utils/linkHeader.ts) | parse do header `Link` | 4 |
 | [src/utils/pullRequest.ts](../src/utils/pullRequest.ts) | `toSummary`, `toDetail` e `buildSearchQuery` | 8 |
 | [src/utils/avatar.ts](../src/utils/avatar.ts) | inicial e cor de fundo do avatar sem foto, com o contraste conferido | 3 |
-| [src/utils/collections.ts](../src/utils/collections.ts) | validação e operações das listas de salvos e estudados (`toggleFavorite`, `withStudied`, `withoutStudied`) | 7 |
+| [src/utils/collections.ts](../src/utils/collections.ts) | validação e operações das listas de salvos e estudados (`toggleFavorite`, `withStudied`, `withoutStudied`) e a busca local (`filterByTerm`) | 8 |
 | [src/utils/mergePage.ts](../src/utils/mergePage.ts) | junta a página nova à lista sem repetir PR | 3 |
 | [src/theme/index.ts](../src/theme/index.ts) | tokens e pares de texto e fundo | 4 (contraste, espaçamento e alvo de toque) |
 | [src/hooks/useFetch.ts](../src/hooks/useFetch.ts) | `{status, data, error, retry}` com cancelamento por `AbortController` | pelo `DetailScreen.test.tsx` e pelo `CatalogScreen.test.tsx` |
@@ -64,7 +64,7 @@ Totais da última execução: tabela "Execuções" de [TESTES.md](TESTES.md).
 | `cat:dados` | LucasStop | #15-#22 | — |
 | `cat:auth` | LucasStop | #29-#32, #124 | — |
 | `cat:entrega` | LucasStop | #46 | #47-#56, #111 (com Luc-Bruno) |
-| `cat:navegacao-telas` | Luc-Bruno | #33-#37 | #38, #39, #125, #140 |
+| `cat:navegacao-telas` | Luc-Bruno | #33-#38 | #39, #125, #140 |
 | `cat:estado` | Luc-Bruno | #23-#28 | — |
 | `cat:ux-acessibilidade` | Luc-Bruno | #40, #114, #119, #123, #128, #130 | #41-#45 |
 | `cat:nuvem-bonus` | a definir depois do MVP | — | #57-#59 |

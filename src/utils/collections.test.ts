@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
 import {
+  filterByTerm,
   isFavoriteList,
   isStudiedList,
   toggleFavorite,
@@ -82,4 +83,31 @@ test('validators reject non-positive or fractional numbers and duplicates', () =
     ]),
     false,
   );
+});
+
+test('C63: filterByTerm matches the title, the author or the number, ignoring case', () => {
+  const list = [
+    pr(12, { title: 'Fix the Router' }),
+    pr(34, { author: 'Bruno' }),
+    pr(56, { title: 'Docs' }),
+  ];
+  assert.deepEqual(
+    filterByTerm(list, 'router').map((p) => p.number),
+    [12],
+  );
+  assert.deepEqual(
+    filterByTerm(list, 'BRU').map((p) => p.number),
+    [34],
+  );
+  assert.deepEqual(
+    filterByTerm(list, '56').map((p) => p.number),
+    [56],
+  );
+  // O card mostra "#12", então quem digita o número como ele aparece também acha.
+  assert.deepEqual(
+    filterByTerm(list, '#12').map((p) => p.number),
+    [12],
+  );
+  assert.deepEqual(filterByTerm(list, 'zzz'), []);
+  assert.equal(filterByTerm(list, ''), list);
 });

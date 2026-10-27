@@ -4,7 +4,9 @@ import {
   ActivityIndicator,
   FlatList,
   Keyboard,
+  Pressable,
   StyleSheet,
+  Text,
   View,
   useWindowDimensions,
 } from 'react-native';
@@ -20,16 +22,45 @@ import { usePullRequestList } from '../hooks/usePullRequestList';
 import type { AppStackParamList } from '../navigation/types';
 import { searchPullRequests } from '../services/github';
 import type { PullRequestSummary } from '../types/github';
-import { colors, spacing } from '../theme';
+import { colors, radius, spacing, touch, typography } from '../theme';
+import type { AppError } from '../utils/appError';
+import { filterByTerm } from '../utils/collections';
 
 type Props = NativeStackScreenProps<AppStackParamList, 'Catalog'>;
+
+type Filter = 'all' | 'saved';
+
+const FILTERS: { key: Filter; label: string }[] = [
+  { key: 'all', label: 'Todos' },
+  { key: 'saved', label: 'Salvos' },
+];
 
 const COLUMNS = 2;
 const NO_RESULTS: PullRequestSummary[] = [];
 
+function Empty({ filter, term }: { filter: Filter; term: string }) {
+  if (term) {
+    return (
+      <EmptyState
+        title={`Nenhum resultado para “${term}”`}
+        text={filter === 'all' ? 'Tente outro termo.' : 'Tente outro termo ou troque o filtro.'}
+      />
+    );
+  }
+  if (filter === 'saved') {
+    return (
+      <EmptyState
+        title="Você ainda não salvou nenhum PR"
+        text="Toque em ☆ em um card ou no detalhe."
+      />
+    );
+  }
+  return <EmptyState title="Nenhum PR encontrado" />;
+}
+
 export function CatalogScreen({ navigation }: Props) {
   const list = usePullRequestList();
-  const { isFavorite, toggle } = useFavorites();
+  const { favorites, isFavorite, toggle } = useFavorites();
   const { width } = useWindowDimensions();
   const cardWidth = (width - spacing.lg * 2 - spacing.md * (COLUMNS - 1)) / COLUMNS;
   const [query, setQuery] = useState('');
@@ -37,13 +68,17 @@ export function CatalogScreen({ navigation }: Props) {
   // nada de buscar a cada tecla. Termo vazio volta à lista paginada sem recarregar: as páginas
   // ficam no hook, mas a rolagem volta ao topo, porque a lista sai da tela enquanto a busca roda.
   const [term, setTerm] = useState('');
+  const [filter, setFilter] = useState<Filter>('all');
+  // Só Todos vai ao GitHub; Salvos vem do Context e a busca filtra a lista local.
+  const remote = filter === 'all';
   const searcher = useCallback(
     (signal: AbortSignal) =>
-      term ? searchPullRequests(term, signal) : Promise.resolve(NO_RESULTS),
-    [term],
+      remote && term ? searchPullRequests(term, signal) : Promise.resolve(NO_RESULTS),
+    [remote, term],
   );
   const search = useFetch(searcher);
   const searching = term !== '';
+  const paginated = remote && !searching;
 
   const submit = () => {
     Keyboard.dismiss();
@@ -54,8 +89,20 @@ export function CatalogScreen({ navigation }: Props) {
     else setTerm(next);
   };
 
-  const loading = searching ? search.status === 'loading' : list.status === 'loading';
-  const error = searching ? search.error : list.status === 'error' ? list.error : undefined;
+  let items = NO_RESULTS;
+  let loading = false;
+  let error: AppError | undefined;
+  if (!remote) {
+    items = filterByTerm(favorites, term);
+  } else if (searching) {
+    items = search.data ?? NO_RESULTS;
+    loading = search.status === 'loading';
+    error = search.error;
+  } else {
+    items = list.items;
+    loading = list.status === 'loading';
+    error = list.status === 'error' ? list.error : undefined;
+  }
 
   let body: ReactNode;
   if (loading) {
@@ -73,18 +120,21 @@ export function CatalogScreen({ navigation }: Props) {
   } else {
     body = (
       <FlatList
+        // Filtro ou termo novo monta outra lista, no topo: no iOS o deslocamento de uma lista longa
+        // não se ajusta quando o conteúdo encolhe, e Salvos abriria numa área vazia.
+        key={`${filter}:${term}`}
         testID="catalog.list"
         style={styles.list}
-        data={searching ? (search.data ?? NO_RESULTS) : list.items}
+        data={items}
         numColumns={COLUMNS}
         keyExtractor={(pr) => String(pr.number)}
         columnWrapperStyle={styles.row}
         contentContainerStyle={styles.content}
         keyboardShouldPersistTaps="handled"
-        onEndReached={searching ? undefined : list.loadMore}
+        onEndReached={paginated ? list.loadMore : undefined}
         onEndReachedThreshold={0.5}
         refreshing={list.refreshing}
-        onRefresh={searching ? undefined : list.refresh}
+        onRefresh={paginated ? list.refresh : undefined}
         renderItem={({ item, index }) => (
           <View style={{ width: cardWidth }}>
             <PullRequestCard
@@ -99,15 +149,11 @@ export function CatalogScreen({ navigation }: Props) {
         )}
         ListEmptyComponent={
           <View testID="catalog.empty">
-            {searching ? (
-              <EmptyState title={`Nenhum resultado para “${term}”`} text="Tente outro termo." />
-            ) : (
-              <EmptyState title="Nenhum PR encontrado" />
-            )}
+            <Empty filter={filter} term={term} />
           </View>
         }
         ListFooterComponent={
-          searching ? undefined : list.loadingMore ? (
+          !paginated ? undefined : list.loadingMore ? (
             <ActivityIndicator
               testID="catalog.footer-loader"
               color={colors.primary}
@@ -139,6 +185,25 @@ export function CatalogScreen({ navigation }: Props) {
         </View>
         <Button label="Buscar" onPress={submit} testID="catalog.search-submit" />
       </View>
+      {/* Os chips ficam fora do corpo: trocar de filtro não os remonta e o foco continua no chip. */}
+      <View style={styles.filters}>
+        {FILTERS.map(({ key, label }) => {
+          const selected = filter === key;
+          return (
+            <Pressable
+              key={key}
+              accessibilityRole="button"
+              accessibilityLabel={label}
+              accessibilityState={{ selected }}
+              onPress={() => setFilter(key)}
+              style={[styles.chip, selected && styles.chipSelected]}
+              testID={`catalog.filter.${key}`}
+            >
+              <Text style={[styles.chipText, selected && styles.chipTextSelected]}>{label}</Text>
+            </Pressable>
+          );
+        })}
+      </View>
       {body}
     </View>
   );
@@ -155,6 +220,26 @@ const styles = StyleSheet.create({
     paddingTop: spacing.md,
   },
   field: { flexGrow: 1, flexBasis: 200 },
+  filters: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.sm,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.md,
+  },
+  chip: {
+    minHeight: touch.min,
+    minWidth: touch.min,
+    justifyContent: 'center',
+    paddingHorizontal: spacing.lg,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: radius.pill,
+    backgroundColor: colors.background,
+  },
+  chipSelected: { backgroundColor: colors.primary, borderColor: colors.primary },
+  chipText: { ...typography.button, color: colors.text },
+  chipTextSelected: { color: colors.onPrimary },
   center: { flex: 1, justifyContent: 'center' },
   list: { backgroundColor: colors.background },
   content: { padding: spacing.lg, gap: spacing.md },

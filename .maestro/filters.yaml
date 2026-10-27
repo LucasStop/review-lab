@@ -1,0 +1,77 @@
+# C22, C23: o filtro Salvos lista o PR salvo e o tira da lista ao remover, sem ir à rede. Gasta
+# no máximo a página 1 da lista (o cache dura 10 min). Precisa do Metro (ver README.md).
+appId: host.exp.Exponent
+name: filters
+---
+- runFlow: subflows/open-app.yaml
+- extendedWaitUntil:
+    visible:
+      id: 'login\.screen|catalog\.logout'
+    timeout: 90000
+- runFlow:
+    when:
+      visible:
+        id: 'login.screen'
+    commands:
+      - evalScript: ${output.email = 'e2e' + Date.now() + '@exemplo.com'}
+      - tapOn:
+          id: 'login.signup'
+      - tapOn:
+          id: 'signup.email'
+      - inputText: ${output.email}
+      - tapOn:
+          id: 'signup.password'
+      - inputText: 'segredo123'
+      - tapOn:
+          id: 'signup.submit'
+- extendedWaitUntil:
+    visible:
+      id: 'catalog.card.0'
+    timeout: 30000
+# O estado persiste entre execuções: esvazia Salvos antes de começar (C23).
+- tapOn:
+    id: 'catalog.filter.saved'
+# Confere o filtro antes do laço: em Todos, o laço salvaria e tiraria o mesmo PR sem parar.
+- assertVisible:
+    id: 'catalog.filter.saved'
+    selected: true
+- repeat:
+    times: 30
+    while:
+      visible:
+        id: 'catalog.save.0'
+    commands:
+      - tapOn:
+          id: 'catalog.save.0'
+- assertVisible: 'Você ainda não salvou nenhum PR'
+# C22: salva o primeiro PR de Todos e ele aparece sozinho em Salvos.
+- tapOn:
+    id: 'catalog.filter.all'
+- extendedWaitUntil:
+    visible:
+      id: 'catalog.card.0'
+    timeout: 30000
+- tapOn:
+    id: 'catalog.save.0'
+- assertVisible:
+    id: 'catalog.save.0'
+    selected: true
+- tapOn:
+    id: 'catalog.filter.saved'
+- assertVisible:
+    id: 'catalog.card.0'
+- assertNotVisible:
+    id: 'catalog.card.1'
+# Remover em Salvos tira o PR da lista na hora, e Todos fica sem nada salvo.
+- tapOn:
+    id: 'catalog.save.0'
+- assertVisible: 'Você ainda não salvou nenhum PR'
+- tapOn:
+    id: 'catalog.filter.all'
+- extendedWaitUntil:
+    visible:
+      id: 'catalog.card.0'
+    timeout: 30000
+- assertVisible:
+    id: 'catalog.save.0'
+    selected: false

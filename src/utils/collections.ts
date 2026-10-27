@@ -60,3 +60,11 @@ export function withStudied(list: StudiedEntry[], pr: PullRequestSummary, rating
 
 export const withoutStudied = (list: StudiedEntry[], number: number) =>
   list.filter((item) => item.number !== number);
+
+// Busca dentro de Salvos e Estudados: a lista já está no aparelho, então filtra sem rede, por
+// título, autor ou número, sem diferenciar maiúscula.
+export function filterByTerm<T extends PullRequestSummary>(list: T[], term: string): T[] {
+  const q = term.toLowerCase();
+  if (!q) return list;
+  return list.filter((pr) => `${pr.title} ${pr.author} #${pr.number}`.toLowerCase().includes(q));
+}
