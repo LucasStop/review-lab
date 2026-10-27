@@ -23,7 +23,7 @@ Princípio: nenhuma tela escreve cor, tamanho ou espaçamento solto. Tudo vem de
 | `danger` como fundo | `#b91c1c` | botão "Excluir" do diálogo | 6.47 de `onPrimary` sobre `danger` |
 | `border` | `#6b7280` | borda de campo | 4.83 sobre `background` (mínimo 3:1 para controle) |
 
-O tema de navegação (`App.tsx`) sai dos tokens: no iOS, o tint do header, que pinta o voltar do Detalhe, é `link`, no lugar do padrão `#007AFF`, que dá 4.02 sobre `background`. No Android, o voltar usa `text`. O `Button` desabilitado (opacidade 0.6) dá 4.04 em `onPrimary` sobre `primary`; fica isento pelo WCAG 1.4.3, que não cobra componente inativo.
+O tema de navegação (`App.tsx`) sai dos tokens. Antes do iOS 26, o tint do header, que pinta o voltar do Detalhe, é `link`, no lugar do padrão `#007AFF`, que dá 4.02 sobre `background`. No iOS 26, o voltar é o botão de vidro do sistema, só com a seta, monocromática e quase preta, e ignora o tint. No Android, o voltar usa `text`. O `Button` desabilitado (opacidade 0.6) dá 4.04 em `onPrimary` sobre `primary`; fica isento pelo WCAG 1.4.3, que não cobra componente inativo.
 
 Cor nunca é o único sinal: o estado "salvo" muda ícone e label, a nota usa ★ e ☆, o erro traz texto.
 
