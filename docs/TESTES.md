@@ -161,7 +161,7 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 | C43 | Todo tocável e toda imagem tem `accessibilityRole` e `accessibilityLabel` | C | F2 #42 (`StarRating` e `ErrorState` já têm) |
 | C44 | Botão de estado informa o estado (`selected` ou label que muda) | C | ok #26; #42 pendente |
 | C45 | Alvo de toque de pelo menos 44x44 | C | botão salvar do card ok #34; restante F2 #43 |
-| C46 | Pares de cor dos tokens com contraste de pelo menos 4.5:1 | U | ok #44 (`theme.test.ts`); o tema de navegação (`App.tsx`) usa `link` como tint do header e não tem teste automatizado: conferência no simulador, voltar do Detalhe na cor de `link` |
+| C46 | Pares de cor dos tokens com contraste de pelo menos 4.5:1 | U | ok #44 (`theme.test.ts`); o tema de navegação (`App.tsx`) usa `link` como tint do header e não tem teste automatizado: conferência no simulador iOS, voltar do Detalhe na cor de `link` |
 | C47 | Fonte do sistema no máximo não corta texto nem sobrepõe; nenhum `allowFontScaling={false}` no código (`git grep`) | C, M | C da quebra de linha das estrelas ok #27 (`StarRating.test.tsx`); roteiro |
 | C48 | VoiceOver lê card, botões e estrelas numa ordem que faz sentido | M | roteiro |
 

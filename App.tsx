@@ -6,8 +6,8 @@ import { AuthProvider } from './src/contexts/AuthContext';
 import { RootNavigator } from './src/navigation/RootNavigator';
 import { colors } from './src/theme';
 
-// Sem tema o header nativo usa o tint padrão do iOS (#007AFF, 4,02:1 sobre branco): o voltar do
-// Detalhe fica abaixo de 4,5:1. `primary` é o tint dele.
+// No iOS, sem tema o header nativo usa o tint padrão (#007AFF, 4,02:1 sobre branco): o voltar do
+// Detalhe fica abaixo de 4,5:1. `primary` é o tint dele. No Android o voltar usa `text`.
 const navigationTheme = {
   ...DefaultTheme,
   colors: {

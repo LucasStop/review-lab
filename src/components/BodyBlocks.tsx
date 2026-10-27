@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
   container: { gap: spacing.md },
   text: { ...typography.body, color: colors.text },
   heading: { ...typography.heading, color: colors.text },
-  bold: { fontWeight: '700' },
+  bold: { fontWeight: typography.title.fontWeight },
   italic: { fontStyle: 'italic' },
   link: { color: colors.link, textDecorationLine: 'underline' },
   inlineCode: { fontFamily: mono, backgroundColor: colors.surface },
