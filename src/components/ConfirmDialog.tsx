@@ -1,5 +1,14 @@
 import { useRef, type ReactNode, type RefObject } from 'react';
-import { AccessibilityInfo, Modal, StyleSheet, Text, View, type HostInstance } from 'react-native';
+import {
+  AccessibilityInfo,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  StyleSheet,
+  Text,
+  View,
+  type HostInstance,
+} from 'react-native';
 
 import { colors, radius, spacing, typography } from '../theme';
 import { Button } from './Button';
@@ -60,7 +69,12 @@ export function ConfirmDialog({
       onRequestClose={cancel}
     >
       <View style={styles.scrim} />
-      <View style={styles.center} pointerEvents="box-none">
+      {/* O teclado do campo de senha cobriria os botões. */}
+      <KeyboardAvoidingView
+        style={styles.center}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        pointerEvents="box-none"
+      >
         <View style={styles.dialog} accessibilityViewIsModal onAccessibilityEscape={cancel}>
           <Text style={styles.title} accessibilityRole="header">
             {title}
@@ -88,7 +102,7 @@ export function ConfirmDialog({
             />
           </View>
         </View>
-      </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }
