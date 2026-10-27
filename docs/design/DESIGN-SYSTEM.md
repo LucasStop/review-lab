@@ -16,12 +16,14 @@ Princípio: nenhuma tela escreve cor, tamanho ou espaçamento solto. Tudo vem de
 | `textMuted` | `#4b5563` | autor, número do PR, legenda | 7.56 sobre `background`, 6.87 sobre `surface` |
 | `primary` | `#1f2937` | botão principal | |
 | `onPrimary` | `#ffffff` | texto do botão principal | 14.68 sobre `primary` |
-| `link` | `#1d4ed8` | link do corpo do PR | 6.70 sobre `background` |
+| `link` | `#1d4ed8` | link do corpo do PR | 6.70 sobre `background`, 6.09 sobre `surface` |
 | `danger` | `#b91c1c` | texto de erro | 5.91 sobre `dangerSurface` |
 | `dangerSurface` | `#fef2f2` | fundo de erro | |
 | `star` | `#b45309` | estrela da nota | 5.02 sobre `background`, 4.56 sobre `surface` |
 | `danger` como fundo | `#b91c1c` | botão "Excluir" do diálogo | 6.47 de `onPrimary` sobre `danger` |
 | `border` | `#6b7280` | borda de campo | 4.83 sobre `background` (mínimo 3:1 para controle) |
+
+O tema de navegação (`App.tsx`) sai dos tokens. Antes do iOS 26, o tint do header, que pinta o voltar do Detalhe, é `link`, no lugar do padrão `#007AFF`, que dá 4.02 sobre `background`. No iOS 26, o voltar é o botão de vidro do sistema, só com a seta, monocromática e quase preta, e ignora o tint. No Android, o voltar usa `text`. O `Button` desabilitado (opacidade 0.6) dá 4.04 em `onPrimary` sobre `primary`; fica isento pelo WCAG 1.4.3, que não cobra componente inativo.
 
 Cor nunca é o único sinal: o estado "salvo" muda ícone e label, a nota usa ★ e ☆, o erro traz texto.
 
@@ -31,7 +33,7 @@ Cor nunca é o único sinal: o estado "salvo" muda ícone e label, a nota usa �
 |---|---|
 | `spacing` | `xs` 4, `sm` 8, `md` 12, `lg` 16, `xl` 24, `xxl` 32 (escala de 4) |
 | `radius` | `sm` 4, `md` 8, `lg` 12, `pill` 999 |
-| `typography` | `title` 22/700, `heading` 18/600, `body` 16/400, `caption` 14/400, `button` 16/600 |
+| `typography` | `title` 22/700, `heading` 18/600, `body` 16/400, `caption` 14/400, `label` 14/600, `button` 16/600 |
 | `touch.min` | 44 |
 | `glyph` | `md` 24 (estrela de salvar do card), `lg` 28 (estrela da nota editável) |
 
