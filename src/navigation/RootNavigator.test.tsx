@@ -127,6 +127,14 @@ test('C45: the Profile button in the header is at least 44x44', async () => {
   expect(style.minHeight).toBeGreaterThanOrEqual(touch.min);
 });
 
+test('C47: the Profile button text caps the font scale at 2 because the native header has a fixed height', async () => {
+  mockAuth.restore.mockResolvedValue({ userId: 'u1', email: 'ana@exemplo.com' });
+  await renderApp();
+
+  const button = await screen.findByTestId('catalog.profile');
+  expect(within(button).getByText('Perfil').props.maxFontSizeMultiplier).toBe(2);
+});
+
 test('C07: logging out from the Profile clears the session and shows the login without navigate()', async () => {
   mockAuth.restore.mockResolvedValue({ userId: 'u1', email: 'ana@exemplo.com' });
   await renderApp();
