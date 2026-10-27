@@ -31,16 +31,18 @@ name: filters
 # O estado persiste entre execuções: esvazia Salvos antes de começar (C23).
 - tapOn:
     id: 'catalog.filter.saved'
+# Confere o filtro antes do laço: em Todos, o laço salvaria e tiraria o mesmo PR sem parar.
+- assertVisible:
+    id: 'catalog.filter.saved'
+    selected: true
 - repeat:
+    times: 30
     while:
       visible:
         id: 'catalog.save.0'
     commands:
       - tapOn:
           id: 'catalog.save.0'
-- assertVisible:
-    id: 'catalog.filter.saved'
-    selected: true
 - assertVisible: 'Você ainda não salvou nenhum PR'
 # C22: salva o primeiro PR de Todos e ele aparece sozinho em Salvos.
 - tapOn:
