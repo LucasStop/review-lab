@@ -15,6 +15,7 @@ export function StarRating({ value, onChange }: Props) {
   return (
     <View
       accessible={readOnly}
+      accessibilityRole={readOnly ? 'image' : undefined}
       accessibilityLabel={readOnly ? `Nota ${value} de 5` : undefined}
       style={styles.row}
     >
