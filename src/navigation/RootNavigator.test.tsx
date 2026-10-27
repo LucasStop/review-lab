@@ -167,6 +167,14 @@ test('C58: confirming logout clears only the session; saved and studied come bac
   expect(await within(screen.getByTestId('profile.avg')).findByText('4,0')).toBeTruthy();
   expect(screen.getByTestId('profile.saved-count')).toHaveTextContent('1salvos');
   expect(screen.getByTestId('profile.studied-count')).toHaveTextContent('1estudados');
+
+  // C05: depois do cadastro e de dois logins, o e-mail só existe na sessão do SecureStore.
+  const stored = await AsyncStorage.multiGet(await AsyncStorage.getAllKeys());
+  const credentialEntries = [...secure].filter(([key]) => key.startsWith('rl.cred.'));
+  for (const [key, value] of [...stored, ...credentialEntries]) {
+    expect(`${key} ${value}`).not.toContain('ana@exemplo.com');
+  }
+  expect(credentialEntries).toHaveLength(1);
 });
 
 test('C60, C61: deleting the account removes only its data, goes to the login and the email can sign up again', async () => {
