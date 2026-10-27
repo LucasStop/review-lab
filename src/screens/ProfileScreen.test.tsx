@@ -149,6 +149,15 @@ test('C59: a wrong password shows "Senha incorreta." and keeps the account', asy
   expect(screen.getByTestId('profile.email')).toHaveTextContent('ana@exemplo.com');
 });
 
+test('with the keyboard open, the first tap on Excluir confirms instead of only closing the keyboard', async () => {
+  await renderProfile();
+  await openDelete('errada123');
+
+  // O ConfirmDialog é filho da ScrollView na árvore do React, então herda a regra dela.
+  expect(screen.root?.type).toBe('RCTScrollView');
+  expect(screen.root?.props.keyboardShouldPersistTaps).toBe('handled');
+});
+
 test('a rejected deleteAccount shows an error and frees the button instead of spinning forever', async () => {
   mockAuth.deleteAccount.mockRejectedValue(new Error('secure store down'));
   await renderProfile();

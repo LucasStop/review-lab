@@ -73,7 +73,11 @@ export function ProfileScreen() {
   }
 
   return (
-    <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
+    <ScrollView
+      style={styles.screen}
+      contentContainerStyle={styles.content}
+      keyboardShouldPersistTaps="handled"
+    >
       <View style={styles.account}>
         <Avatar name={user?.email ?? '?'} size={56} accessible={false} />
         <View style={styles.flex}>
