@@ -32,7 +32,7 @@ export function TextField({ label, ...input }: Props) {
 
 const styles = StyleSheet.create({
   field: { gap: spacing.xs },
-  label: { ...typography.caption, fontWeight: '600', color: colors.text },
+  label: { ...typography.label, color: colors.text },
   input: {
     minHeight: touch.min,
     paddingHorizontal: spacing.md,

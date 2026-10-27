@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { colors, spacing, textPairs, touch } from './index.ts';
+import { colors, spacing, textPairs, touch, typography } from './index.ts';
 
 function luminance(hex: string): number {
   const [r, g, b] = [1, 3, 5].map((i) => {
@@ -28,6 +28,11 @@ test('every text pair has at least 4.5:1', () => {
     const ratio = contrast(colors[fg], colors[bg]);
     assert.ok(ratio >= 4.5, `${fg} sobre ${bg}: ${ratio.toFixed(2)}`);
   }
+});
+
+test('the form label is the caption size, only bolder', () => {
+  assert.equal(typography.label.fontSize, typography.caption.fontSize);
+  assert.equal(typography.label.fontWeight, '600');
 });
 
 test('the control border has at least 3:1 against the background (WCAG 1.4.11)', () => {

@@ -11,7 +11,7 @@ import {
 import { Button } from '../components/Button';
 import { TextField } from '../components/TextField';
 import type { AuthResult } from '../services/credentials';
-import { colors, spacing, touch, typography } from '../theme';
+import { colors, radius, spacing, touch, typography } from '../theme';
 
 const UNEXPECTED = 'Não foi possível concluir agora. Tente de novo.';
 
@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
     color: colors.danger,
     backgroundColor: colors.dangerSurface,
     padding: spacing.md,
-    borderRadius: spacing.sm,
+    borderRadius: radius.md,
   },
   link: { minHeight: touch.min, alignItems: 'center', justifyContent: 'center' },
   linkText: { ...typography.body, color: colors.link, textDecorationLine: 'underline' },

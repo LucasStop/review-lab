@@ -23,6 +23,7 @@ export const textPairs = [
   ['textMuted', 'surface'],
   ['onPrimary', 'primary'],
   ['link', 'background'],
+  ['link', 'surface'],
   ['danger', 'dangerSurface'],
   ['onPrimary', 'danger'],
   ['star', 'background'],
@@ -41,6 +42,7 @@ export const typography = {
   heading: { fontSize: 18, fontWeight: '600' },
   body: { fontSize: 16, fontWeight: '400' },
   caption: { fontSize: 14, fontWeight: '400' },
+  label: { fontSize: 14, fontWeight: '600' },
   button: { fontSize: 16, fontWeight: '600' },
 } as const;
 

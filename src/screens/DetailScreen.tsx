@@ -134,6 +134,6 @@ const styles = StyleSheet.create({
   actionText: { ...typography.body, color: colors.text },
   savedText: { color: colors.star },
   rating: { gap: spacing.xs },
-  label: { ...typography.caption, fontWeight: '600', color: colors.text },
+  label: { ...typography.label, color: colors.text },
   meta: { ...typography.caption, color: colors.textMuted },
 });
