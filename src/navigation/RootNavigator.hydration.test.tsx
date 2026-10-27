@@ -97,7 +97,7 @@ test('C26: the gate waits for studied even after favorites loaded', async () => 
   const release = holdLists({ only: 'studied' });
   await renderApp();
 
-  expect(screen.getByTestId('loading')).toBeTruthy();
+  expect(screen.getByLabelText('Carregando')).toBeTruthy();
   expect(screen.queryByTestId('catalog.filter.saved')).toBeNull();
 
   await release();
@@ -108,7 +108,7 @@ test('C26: the gate waits for favorites even after studied loaded', async () => 
   const release = holdLists({ only: 'favorites' });
   await renderApp();
 
-  expect(screen.getByTestId('loading')).toBeTruthy();
+  expect(screen.getByLabelText('Carregando')).toBeTruthy();
   expect(screen.queryByTestId('catalog.filter.saved')).toBeNull();
 
   await release();
@@ -119,7 +119,7 @@ test('C26: Salvos never shows the empty state while favorites load, then lists t
   const release = holdLists();
   await renderApp();
 
-  expect(screen.getByTestId('loading')).toBeTruthy();
+  expect(screen.getByLabelText('Carregando')).toBeTruthy();
   // Sem o Catálogo montado não há chip para chegar ao vazio de Salvos.
   expect(screen.queryByTestId('catalog.filter.saved')).toBeNull();
   expect(screen.queryByTestId('catalog.empty')).toBeNull();
@@ -134,7 +134,7 @@ test('C26: Estudados never shows the empty state while studied loads, then lists
   const release = holdLists();
   await renderApp();
 
-  expect(screen.getByTestId('loading')).toBeTruthy();
+  expect(screen.getByLabelText('Carregando')).toBeTruthy();
   expect(screen.queryByTestId('catalog.filter.studied')).toBeNull();
   expect(screen.queryByTestId('catalog.empty')).toBeNull();
 
@@ -150,7 +150,7 @@ test('C26: the detail buttons never show off while the lists load', async () => 
     routes: [{ name: 'Catalog' }, { name: 'Detail', params: { number: 7 } }],
   });
 
-  expect(screen.getByTestId('loading')).toBeTruthy();
+  expect(screen.getByLabelText('Carregando')).toBeTruthy();
   expect(screen.queryByTestId('detail.save')).toBeNull();
   expect(screen.queryByTestId('detail.studied')).toBeNull();
 
@@ -168,7 +168,7 @@ test('C26: a failed read lets the gate open on the empty state instead of hangin
   const release = holdLists({ fail: true });
   await renderApp();
 
-  expect(screen.getByTestId('loading')).toBeTruthy();
+  expect(screen.getByLabelText('Carregando')).toBeTruthy();
 
   await release();
   await fireEvent.press(await screen.findByTestId('catalog.filter.saved'));
