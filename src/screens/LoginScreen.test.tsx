@@ -1,6 +1,7 @@
 import { beforeEach, expect, jest, test } from '@jest/globals';
 import type { ComponentProps } from 'react';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
+import { AccessibilityInfo } from 'react-native';
 
 import type { AuthResult } from '../services/credentials';
 import { LoginScreen } from './LoginScreen';
@@ -110,4 +111,24 @@ test('"Não tenho conta" opens the sign-up screen', async () => {
   await render(<LoginScreen {...props} />);
   await fireEvent.press(screen.getByTestId('login.signup'));
   expect(navigate).toHaveBeenCalledWith('SignUp');
+});
+
+test('C43: the error is announced once, without the Android live region', async () => {
+  const announce = jest.spyOn(AccessibilityInfo, 'announceForAccessibility').mockClear();
+  mockSignIn.mockResolvedValue({ ok: false, reason: 'invalid-credentials' });
+  await render(<LoginScreen {...props} />);
+
+  await fill('ana@exemplo.com', 'errada');
+
+  expect(await screen.findByTestId('login.error')).toBeTruthy();
+  expect(announce).toHaveBeenCalledTimes(1);
+  expect(announce).toHaveBeenCalledWith('E-mail ou senha incorretos.');
+  expect(screen.getByTestId('login.error').props.accessibilityLiveRegion).toBeUndefined();
+  announce.mockRestore();
+});
+
+test('C43: the switch link has its own label, the visible text', async () => {
+  await render(<LoginScreen {...props} />);
+
+  expect(screen.getByTestId('login.signup').props.accessibilityLabel).toBe('Não tenho conta');
 });

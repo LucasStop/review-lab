@@ -137,6 +137,7 @@ test('Excluir stays disabled while the password field is empty', async () => {
 });
 
 test('C59: a wrong password shows "Senha incorreta." and keeps the account', async () => {
+  const announce = jest.spyOn(AccessibilityInfo, 'announceForAccessibility').mockClear();
   mockAuth.deleteAccount.mockResolvedValue({ ok: false, reason: 'invalid-credentials' });
   await renderProfile();
   await openDelete('errada123');
@@ -146,6 +147,7 @@ test('C59: a wrong password shows "Senha incorreta." and keeps the account', asy
   expect(await screen.findByText('Senha incorreta.')).toBeTruthy();
   expect(mockAuth.deleteAccount).toHaveBeenCalledWith('u1', 'errada123');
   expect(screen.getByTestId('profile.error').props.accessibilityRole).toBe('alert');
+  expect(announce).toHaveBeenCalledWith('Senha incorreta.');
   expect(screen.getByTestId('profile.email')).toHaveTextContent('ana@exemplo.com');
 });
 
@@ -159,6 +161,7 @@ test('with the keyboard open, the first tap on Excluir confirms instead of only 
 });
 
 test('a rejected deleteAccount shows an error and frees the button instead of spinning forever', async () => {
+  const announce = jest.spyOn(AccessibilityInfo, 'announceForAccessibility').mockClear();
   mockAuth.deleteAccount.mockRejectedValue(new Error('secure store down'));
   await renderProfile();
   await openDelete('certa123');
@@ -166,6 +169,7 @@ test('a rejected deleteAccount shows an error and frees the button instead of sp
   await fireEvent.press(screen.getByTestId('profile.confirm'));
 
   expect(await screen.findByText('Não foi possível excluir agora. Tente de novo.')).toBeTruthy();
+  expect(announce).toHaveBeenCalledWith('Não foi possível excluir agora. Tente de novo.');
   expect(screen.getByTestId('profile.confirm').props.accessibilityState).toMatchObject({
     disabled: false,
     busy: false,

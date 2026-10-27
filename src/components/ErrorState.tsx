@@ -1,4 +1,5 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useEffect } from 'react';
+import { AccessibilityInfo, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { colors, radius, spacing, touch, typography } from '../theme';
 
@@ -8,6 +9,11 @@ type Props = {
 };
 
 export function ErrorState({ message, onRetry }: Props) {
+  // O role `alert` não anuncia nada no iOS.
+  useEffect(() => {
+    AccessibilityInfo.announceForAccessibility(message);
+  }, [message]);
+
   return (
     <View style={styles.container}>
       {/* No Text, não no View: View sem `accessible` não expõe o role, e com `accessible`
