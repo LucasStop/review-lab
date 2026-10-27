@@ -3,8 +3,9 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { storage } from '../services/appStorage';
 import { userKey } from '../services/storage';
 
-// Lista por usuário no AsyncStorage. `hydrated` só vira true depois da leitura: a tela mostra
-// loader até lá, nunca uma lista zerada (C26). Dado corrompido abre vazio (C25).
+// Lista por usuário no AsyncStorage. `hydrated` só vira true depois da leitura: o
+// `HydrationGate` do RootNavigator mostra loader até lá, nunca uma lista zerada (C26). Dado
+// corrompido abre vazio (C25).
 //
 // Antes de hidratar, e depois de uma leitura que falhou, `update` recusa: gravar partindo de
 // uma lista vazia apagaria o dado bom que está no disco. A lista só vale para a chave que a
