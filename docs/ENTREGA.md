@@ -9,7 +9,7 @@ Os dois integrantes (Lucas Stopinski e Lucas Bruno e Silva) aparecem e falam; ~1
 | Janela | Conteúdo | RF mostrado |
 |---|---|---|
 | 0:00-0:30 | Lucas Stopinski da Silva e Lucas Bruno e Silva dizem o nome completo, igual ao da capa | |
-| 0:30-2:00 | Demo: cadastro, login, grade com rolagem infinita, pull-to-refresh, detalhe, salvar, marcar estudado com nota, busca com e sem resultado, filtros Salvos e Estudados no Catálogo, fechar e reabrir o app (sessão e dados persistem), logout | RF01 a RF08 |
+| 0:30-2:00 | Demo: cadastro, login, grade com rolagem infinita, pull-to-refresh, detalhe, salvar, marcar estudado com nota, busca com e sem resultado, filtros Salvos e Estudados no Catálogo, fechar e reabrir o app (sessão e dados persistem), Perfil com os totais e Sair com confirmação | RF01 a RF08 |
 | 2:00-5:30 | Código por pessoa, cada um ligando o trecho ao RF: `services/github.ts` e `hooks/` (RF01, RF03), `navigation/` (RF02, RF07), `contexts/` (RF04, RF06), `screens/Catalog` com busca e filtros (RF05, RF08), `components/` e acessibilidade (RF09, RF10) | |
 | 5:30-8:00 | Explicação técnica (tema abaixo) ligada ao código | |
 | 8:00-8:30 | Fechamento e o que ficou de fora | |
