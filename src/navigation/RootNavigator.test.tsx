@@ -3,11 +3,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NavigationContainer } from '@react-navigation/native';
 import { fireEvent, render, screen, within } from '@testing-library/react-native';
 import { createHash } from 'node:crypto';
+import { StyleSheet } from 'react-native';
 
 import { AuthProvider } from '../contexts/AuthContext';
 import { createCredentials, type AuthResult } from '../services/credentials';
 import { createAuth, type Session } from '../services/session';
 import { removeUserKeys } from '../services/storage';
+import { touch } from '../theme';
 import { RootNavigator } from './RootNavigator';
 
 const mockAuth = {
@@ -114,6 +116,15 @@ test('C06: a stored session opens the catalog directly', async () => {
 
   expect(await screen.findByTestId('catalog.profile')).toBeTruthy();
   expect(screen.queryByTestId('login.screen')).toBeNull();
+});
+
+test('C45: the Profile button in the header is at least 44x44', async () => {
+  mockAuth.restore.mockResolvedValue({ userId: 'u1', email: 'ana@exemplo.com' });
+  await renderApp();
+
+  const style = StyleSheet.flatten((await screen.findByTestId('catalog.profile')).props.style);
+  expect(style.minWidth).toBeGreaterThanOrEqual(touch.min);
+  expect(style.minHeight).toBeGreaterThanOrEqual(touch.min);
 });
 
 test('C07: logging out from the Profile clears the session and shows the login without navigate()', async () => {

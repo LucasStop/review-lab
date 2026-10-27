@@ -1,9 +1,10 @@
 import { beforeEach, expect, jest, test } from '@jest/globals';
 import type { ComponentProps } from 'react';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
-import { AccessibilityInfo } from 'react-native';
+import { AccessibilityInfo, StyleSheet } from 'react-native';
 
 import type { AuthResult } from '../services/credentials';
+import { touch } from '../theme';
 import { LoginScreen } from './LoginScreen';
 
 const mockSignIn = jest.fn<(email: string, password: string) => Promise<AuthResult>>();
@@ -131,4 +132,12 @@ test('C43: the switch link has its own label, the visible text', async () => {
   await render(<LoginScreen {...props} />);
 
   expect(screen.getByTestId('login.signup').props.accessibilityLabel).toBe('Não tenho conta');
+});
+
+test('C45: the "Não tenho conta" link is at least 44x44', async () => {
+  await render(<LoginScreen {...props} />);
+
+  const style = StyleSheet.flatten(screen.getByTestId('login.signup').props.style);
+  expect(style.minWidth).toBeGreaterThanOrEqual(touch.min);
+  expect(style.minHeight).toBeGreaterThanOrEqual(touch.min);
 });
