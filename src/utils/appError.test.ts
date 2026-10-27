@@ -80,3 +80,16 @@ for (const status of [403, 429]) {
 test('403 without remaining 0 and without retry-after stays forbidden', () => {
   assert.equal(toAppError(withResponse(403)).kind, 'forbidden');
 });
+
+test('a reset of 0 gives the generic rate limit message, without a time', () => {
+  const err = toAppError(
+    withResponse(403, { 'x-ratelimit-remaining': '0', 'x-ratelimit-reset': '0' }),
+  );
+  assert.equal(err.kind, 'rate-limit');
+  assert.equal(err.resetAt, undefined);
+  assert.ok(!/\d\d:\d\d/.test(err.message), err.message);
+});
+
+test('401 is forbidden', () => {
+  assert.equal(toAppError(withResponse(401)).kind, 'forbidden');
+});

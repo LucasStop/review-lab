@@ -150,3 +150,7 @@ test('restore reads a session from the old format', async () => {
   data.set('rl.session', OLD_ID);
   assert.deepEqual(await auth.restore(), { userId: OLD_ID });
 });
+
+test('parseSession drops an email that is not a string', () => {
+  assert.deepEqual(parseSession(JSON.stringify({ userId: OLD_ID, email: 42 })), { userId: OLD_ID });
+});

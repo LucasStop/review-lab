@@ -26,3 +26,9 @@ test('malformed header does not throw', () => {
   assert.deepEqual(parseLinkHeader('<<<; rel=next'), {});
   assert.deepEqual(parseLinkHeader('<https://a.test/?page=abc>; rel="next"'), {});
 });
+
+test('a Link without a valid page number gives no page', () => {
+  assert.deepEqual(parseLinkHeader('<https://a.test/x>; rel="next"'), {});
+  assert.deepEqual(parseLinkHeader('<https://a.test/x?page=1.5>; rel="next"'), {});
+  assert.deepEqual(parseLinkHeader('<https://a.test/x?page=0>; rel="last"'), {});
+});

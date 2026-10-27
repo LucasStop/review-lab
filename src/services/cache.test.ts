@@ -120,3 +120,28 @@ test('concurrent saves of different keys both end up in the index', async () => 
   ]);
   assert.deepEqual(JSON.parse(data.get('rl.cache.index')!).sort(), ['a', 'b']);
 });
+
+test('an entry exactly at the TTL is fetched again', async () => {
+  const { cache, advance } = setup();
+  const f = counter('A');
+  await cache.get('k', { ttlMs: MIN }, f.fetch);
+  advance(MIN);
+  await cache.get('k', { ttlMs: MIN }, f.fetch);
+  assert.equal(f.calls.length, 2);
+});
+
+test('with exactly maxEntries nothing is dropped, and one more drops only the oldest', async () => {
+  const { cache, data } = setup(2);
+  for (const k of ['a', 'b']) await cache.get(k, { ttlMs: MIN }, counter(k).fetch);
+  assert.ok(data.has('rl.cache.a') && data.has('rl.cache.b'));
+  await cache.get('c', { ttlMs: MIN }, counter('c').fetch);
+  assert.ok(!data.has('rl.cache.a'));
+  assert.ok(data.has('rl.cache.b') && data.has('rl.cache.c'));
+});
+
+test('saving the same key again does not duplicate it in the index', async () => {
+  const { cache, data } = setup();
+  await cache.get('k', { ttlMs: MIN }, counter('A').fetch);
+  await cache.get('k', { ttlMs: MIN, force: true }, counter('B').fetch);
+  assert.deepEqual(JSON.parse(data.get('rl.cache.index')!), ['k']);
+});
