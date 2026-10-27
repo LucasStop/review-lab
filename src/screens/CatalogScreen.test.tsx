@@ -804,3 +804,20 @@ test('C64: in Salvos, unsaving a card moves the focus to the Salvos chip', async
   );
   expect(event).toBe('focus');
 });
+
+test('C64: in Todos, unsaving a card keeps the focus where it is', async () => {
+  const send = jest
+    .spyOn(AccessibilityInfo, 'sendAccessibilityEvent')
+    .mockClear()
+    .mockImplementation(() => {});
+  mockList.mockResolvedValue(page([3, 2, 1], false));
+  await renderCatalog();
+
+  await fireEvent.press(await screen.findByTestId('catalog.save.0'));
+  await fireEvent.press(screen.getByTestId('catalog.save.0'));
+
+  expect(screen.getByTestId('catalog.save.0').props.accessibilityState).toMatchObject({
+    selected: false,
+  });
+  expect(send).not.toHaveBeenCalled();
+});
