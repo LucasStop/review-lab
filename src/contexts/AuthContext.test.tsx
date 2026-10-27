@@ -58,3 +58,15 @@ test('C60: the right password deletes the account and drops the session', async 
 
   expect(result.current.user).toBeNull();
 });
+
+test('signing in keeps the email normalized, as the session stores it', async () => {
+  mockAuth.restore.mockResolvedValue(null);
+  mockAuth.signIn.mockResolvedValue({ ok: true, userId: 'u1' });
+  const { result } = await renderHook(() => useAuth(), { wrapper });
+
+  await act(async () => {
+    await result.current.signIn(' Ana@Exemplo.com ', 'segredo123');
+  });
+
+  expect(result.current.user).toEqual({ id: 'u1', email: 'ana@exemplo.com' });
+});
