@@ -1,4 +1,4 @@
-import { useRef, type ReactNode, type RefObject } from 'react';
+import { useEffect, useRef, type ReactNode, type RefObject } from 'react';
 import {
   AccessibilityInfo,
   KeyboardAvoidingView,
@@ -51,11 +51,17 @@ export function ConfirmDialog({
     if (ref.current) AccessibilityInfo.sendAccessibilityEvent(ref.current, 'focus');
   };
 
-  // Aqui e não no onDismiss: ele só existe no iOS. Durante a exclusão o Cancelar fica travado.
+  // O foco volta só depois que o Modal fecha: com ele ainda na tela, o VoiceOver ignora foco
+  // atrás dele. Aqui e não no onDismiss, que só existe no iOS.
+  const wasVisible = useRef(visible);
+  useEffect(() => {
+    if (wasVisible.current && !visible) focus(returnFocusTo);
+    wasVisible.current = visible;
+  }, [visible, returnFocusTo]);
+
+  // Durante a exclusão o Cancelar fica travado.
   const cancel = () => {
-    if (loading) return;
-    onCancel();
-    focus(returnFocusTo);
+    if (!loading) onCancel();
   };
 
   return (

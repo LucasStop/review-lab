@@ -172,7 +172,14 @@ test('a double tap on Excluir deletes only once', async () => {
 });
 
 test('C62: focus enters the dialog and returns to the button that opened it', async () => {
-  const send = jest.spyOn(AccessibilityInfo, 'sendAccessibilityEvent').mockImplementation(() => {});
+  // Guarda se algum diálogo ainda estava na tela a cada evento: o VoiceOver ignora foco atrás de
+  // um Modal aberto, então o foco só pode voltar depois que ele fecha.
+  const dialogOpen: boolean[] = [];
+  const send = jest
+    .spyOn(AccessibilityInfo, 'sendAccessibilityEvent')
+    .mockImplementation(
+      () => void dialogOpen.push(screen.queryByTestId('profile.cancel') !== null),
+    );
   // No jest a ref aponta para o View mockado, que guarda o testID nas props.
   const focused = () => {
     const [target, event] = send.mock.lastCall ?? [];
@@ -187,6 +194,7 @@ test('C62: focus enters the dialog and returns to the button that opened it', as
 
   await fireEvent.press(screen.getByTestId('profile.cancel'));
   expect(focused()).toBe('profile.logout focus');
+  expect(dialogOpen.at(-1)).toBe(false);
 
   // Esc (VoiceOver) e o voltar do Android também cancelam e devolvem o foco.
   send.mockClear();
@@ -194,11 +202,13 @@ test('C62: focus enters the dialog and returns to the button that opened it', as
   await fireEvent(screen.getByText('Sair da conta?'), 'accessibilityEscape');
   expect(screen.queryByText('Sair da conta?')).toBeNull();
   expect(focused()).toBe('profile.logout focus');
+  expect(dialogOpen.at(-1)).toBe(false);
 
   await openDelete();
   expect(screen.getByTestId('profile.password').props.autoFocus).toBe(true);
   await fireEvent(screen.getByText('Excluir conta?'), 'requestClose');
   expect(screen.queryByText('Excluir conta?')).toBeNull();
   expect(focused()).toBe('profile.delete focus');
+  expect(dialogOpen.at(-1)).toBe(false);
   expect(mockAuth.signOut).not.toHaveBeenCalled();
 });
