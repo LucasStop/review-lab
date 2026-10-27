@@ -105,3 +105,16 @@ test('empty, null-ish and whitespace input gives no blocks', () => {
   assert.deepEqual(sanitizeHtml(''), []);
   assert.deepEqual(sanitizeHtml('   \n '), []);
 });
+
+test('deeply nested hostile html does not blow the stack', () => {
+  const deep = 5000;
+  assert.ok(Array.isArray(sanitizeHtml('<b>'.repeat(deep) + 'x')));
+  assert.ok(Array.isArray(sanitizeHtml('<div>'.repeat(deep) + 'x')));
+  assert.ok(Array.isArray(sanitizeHtml('<pre>' + '<span>'.repeat(deep) + 'x</pre>')));
+});
+
+test('shallow content is unchanged by the depth limit', () => {
+  assert.deepEqual(sanitizeHtml('<div><div><p><b><i>x</i></b></p></div></div>'), [
+    { type: 'paragraph', content: [{ text: 'x', bold: true, italic: true }] },
+  ]);
+});

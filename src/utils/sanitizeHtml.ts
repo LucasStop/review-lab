@@ -68,7 +68,12 @@ const CONTAINERS = new Set([
 
 const SAFE_URL = /^https?:\/\//i;
 
-function inlineOf(nodes: ChildNode[], marks: Omit<Inline, 'text'>, out: Inline[]) {
+// Corpo de PR é dado hostil: milhares de tags aninhadas estourariam a pilha da recursão e o
+// Detalhe nunca abriria. Acima desta profundidade o nó é ignorado.
+const MAX_DEPTH = 64;
+
+function inlineOf(nodes: ChildNode[], marks: Omit<Inline, 'text'>, out: Inline[], depth = 0) {
+  if (depth > MAX_DEPTH) return;
   for (const node of nodes) {
     if (isText(node)) {
       const text = node.data.replace(/\s+/g, ' ');
@@ -79,17 +84,17 @@ function inlineOf(nodes: ChildNode[], marks: Omit<Inline, 'text'>, out: Inline[]
       if (name === 'br') {
         out.push({ text: '\n', ...marks });
       } else if (name === 'strong' || name === 'b') {
-        inlineOf(node.children, { ...marks, bold: true }, out);
+        inlineOf(node.children, { ...marks, bold: true }, out, depth + 1);
       } else if (name === 'em' || name === 'i') {
-        inlineOf(node.children, { ...marks, italic: true }, out);
+        inlineOf(node.children, { ...marks, italic: true }, out, depth + 1);
       } else if (name === 'code' || name === 'kbd' || name === 'samp') {
-        inlineOf(node.children, { ...marks, code: true }, out);
+        inlineOf(node.children, { ...marks, code: true }, out, depth + 1);
       } else if (name === 'a') {
         const href = node.attribs.href?.trim();
         const next = href && SAFE_URL.test(href) ? { ...marks, href } : marks;
-        inlineOf(node.children, next, out);
+        inlineOf(node.children, next, out, depth + 1);
       } else {
-        inlineOf(node.children, marks, out);
+        inlineOf(node.children, marks, out, depth + 1);
       }
     }
   }
@@ -108,16 +113,19 @@ function inlines(nodes: ChildNode[]): Inline[] {
   return clean(out);
 }
 
-function rawText(nodes: ChildNode[]): string {
+function rawText(nodes: ChildNode[], depth = 0): string {
+  if (depth > MAX_DEPTH) return '';
   let out = '';
   for (const node of nodes) {
     if (isText(node)) out += node.data;
-    else if (isTag(node) && !DROP.has(node.name.toLowerCase())) out += rawText(node.children);
+    else if (isTag(node) && !DROP.has(node.name.toLowerCase()))
+      out += rawText(node.children, depth + 1);
   }
   return out;
 }
 
-function blocksOf(nodes: ChildNode[], out: Block[]) {
+function blocksOf(nodes: ChildNode[], out: Block[], depth = 0) {
+  if (depth > MAX_DEPTH) return;
   let run: ChildNode[] = [];
   const flush = () => {
     const content = inlines(run);
@@ -159,7 +167,7 @@ function blocksOf(nodes: ChildNode[], out: Block[]) {
       if (items.length) out.push({ type: 'list', ordered: name === 'ol', items });
     } else if (CONTAINERS.has(name)) {
       flush();
-      blocksOf(node.children, out);
+      blocksOf(node.children, out, depth + 1);
     } else {
       run.push(node);
     }
