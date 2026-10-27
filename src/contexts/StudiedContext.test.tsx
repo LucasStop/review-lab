@@ -1,4 +1,4 @@
-import { beforeEach, expect, test } from '@jest/globals';
+import { beforeEach, expect, jest, test } from '@jest/globals';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { act, renderHook, waitFor } from '@testing-library/react-native';
 import type { ReactNode } from 'react';
@@ -25,6 +25,21 @@ async function open(userId = 'u1') {
 
 beforeEach(async () => {
   await AsyncStorage.clear();
+});
+
+test('C26: not hydrated and empty while storage is being read, then hydrated', async () => {
+  let release: (value: string | null) => void = () => {};
+  jest
+    .spyOn(AsyncStorage, 'getItem')
+    .mockReturnValueOnce(new Promise((resolve) => (release = resolve)));
+  const hook = await renderHook(() => useStudied(), { wrapper: as('u1') });
+
+  expect(hook.result.current.hydrated).toBe(false);
+  expect(hook.result.current.studied).toEqual([]);
+
+  await act(async () => release(JSON.stringify([{ ...pr(3), rating: 4 }])));
+  expect(hook.result.current.hydrated).toBe(true);
+  expect(hook.result.current.getRating(3)).toBe(4);
 });
 
 test('markStudied stores the rating and getRating returns it', async () => {

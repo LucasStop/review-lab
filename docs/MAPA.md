@@ -13,7 +13,7 @@ Legenda: **base** quer dizer que a lógica existe, mas falta a tela.
 | RF03 Detalhe | 10% com RF02 | estatísticas e corpo em blocos sanitizados ([screens/DetailScreen.tsx](../src/screens/DetailScreen.tsx), #36), com links só http(s) filtrados no `sanitizeHtml` e de novo no `BodyBlocks` | — | Luc-Bruno |
 | RF04 Favoritos (Context) | 15% com RF05 | `FavoritesContext` por usuário (#24); estrela no card e botão no detalhe, com o mesmo estado nas duas telas (#26) | — | Luc-Bruno |
 | RF05 Favoritos (filtro Salvos no Catálogo) | 15% com RF04 | filtro Salvos no Catálogo, com a busca filtrando a lista local e o vazio que explica como salvar (#38), sobre `useFavorites().favorites` e `EmptyState` (PR #99) | — | Luc-Bruno |
-| RF06 Persistência | 10% | `usePersistedList` no AsyncStorage com chave `rl.<userId>.<nome>`, que recusa gravar antes da hidratação (#24, #25) | #45 (sem dado zerado na carga) | Luc-Bruno |
+| RF06 Persistência | 10% | `usePersistedList` no AsyncStorage com chave `rl.<userId>.<nome>`, que recusa gravar antes da hidratação (#24, #25); portão no `RootNavigator` que segura as telas até favoritos e estudados saírem do disco, sem lista zerada na carga (#45) | — | Luc-Bruno |
 | RF07 Login, sessão, estudados | 10% | login e cadastro com hash e sal (#29 e #31), navegação condicional e Sair provisório no Catálogo (#32), exclusão de conta no serviço (#124), `StudiedContext` com nota de 1 a 5 (#25), marcar como estudado com a nota editável no detalhe (#27), filtro Estudados no Catálogo com a nota em estrelas (#39) | Perfil com Sair e Excluir conta (#125, além da rubrica) | LucasStop, Luc-Bruno |
 | RF08 Busca (campo e botão no Catálogo) | 10% | campo "Buscar PRs" e botão "Buscar" no Catálogo, com carregando, erro, limite com horário e "Nenhum resultado para" o termo (#37); `searchPullRequests` e `buildSearchQuery` (PR #106) | — | Luc-Bruno |
 | RF09 Feedback | 10% | `ActivityIndicator` e `ErrorState` com "Tentar novamente" no Catálogo e no detalhe; erro da página seguinte no rodapé; `AppError` com horário de volta do limite (PR #104); `useFetch` com teste próprio de carga, erro, retry, cancelamento e troca de fetcher (#41) | conferir cada fluxo no simulador com a rede lenta, no roteiro do #111 | Luc-Bruno |
@@ -52,7 +52,7 @@ Padrão do projeto: a lógica fica numa fábrica `create*` pura, que recebe as d
 | [src/contexts/StudiedContext.tsx](../src/contexts/StudiedContext.tsx) | `StudiedProvider` e `useStudied`, com nota de 1 a 5 | `StudiedContext.test.tsx` |
 | [src/components/](../src/components/) | `Avatar`, `BodyBlocks`, `Button`, `EmptyState`, `ErrorState`, `PullRequestCard`, `StarRating` e `TextField` | `ErrorState`, `PullRequestCard` e `StarRating`; os outros pelas telas |
 | [src/screens/](../src/screens/) | Login e Cadastro (com `AuthForm`), Catálogo e Detalhe | um arquivo por tela e `FavoritesFlow.test.tsx` |
-| [src/navigation/](../src/navigation/) | tipos de rota, `RootNavigator`, `AuthStack`, `AppStack` e `Placeholder` (Perfil até o #125) | `RootNavigator.test.tsx`; E2E em `.maestro/` |
+| [src/navigation/](../src/navigation/) | tipos de rota, `RootNavigator` (com o portão de hidratação), `AuthStack`, `AppStack` e `Placeholder` (Perfil até o #125) | `RootNavigator.test.tsx` e `RootNavigator.hydration.test.tsx`; E2E em `.maestro/` |
 
 Totais da última execução: tabela "Execuções" de [TESTES.md](TESTES.md).
 
@@ -66,7 +66,7 @@ Totais da última execução: tabela "Execuções" de [TESTES.md](TESTES.md).
 | `cat:entrega` | LucasStop | #46 | #47-#56, #111 (com Luc-Bruno) |
 | `cat:navegacao-telas` | Luc-Bruno | #33-#39 | #125, #140 |
 | `cat:estado` | Luc-Bruno | #23-#28 | — |
-| `cat:ux-acessibilidade` | Luc-Bruno | #40, #41, #114, #119, #123, #128, #130 | #42-#45 |
+| `cat:ux-acessibilidade` | Luc-Bruno | #40, #41, #45, #114, #119, #123, #128, #130 | #42-#44 |
 | `cat:nuvem-bonus` | a definir depois do MVP | — | #57-#59 |
 
 Lista viva: [issues](https://github.com/LucasStop/review-lab/issues), [PRs mergeados](https://github.com/LucasStop/review-lab/pulls?q=is%3Apr+is%3Amerged), [milestones](https://github.com/LucasStop/review-lab/milestones).

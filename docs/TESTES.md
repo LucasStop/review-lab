@@ -103,8 +103,8 @@ Níveis: **U** unitário, **C** componente, **I** integração, **E2E** Maestro,
 | ID | Cenário | Nível | Status |
 |---|---|---|---|
 | C24 | Salvos e estudados sobrevivem ao fechar e reabrir | I, E2E | I ok #24, #25 (`FavoritesContext.test.tsx`, `StudiedContext.test.tsx`); E2E ok #27 (`.maestro/studied.yaml` salva, marca, fecha e reabre o app) |
-| C25 | JSON corrompido no storage abre vazio, sem quebrar | U, I | U ok; I ok #24, #25 |
-| C26 | Durante a hidratação não aparece lista zerada (loader até carregar) | I | F2 #45 |
+| C25 | JSON corrompido no storage abre vazio, sem quebrar | U, I | U ok; I ok #24, #25; I ok #45 (`RootNavigator.hydration.test.tsx`, o portão libera) |
+| C26 | Durante a hidratação não aparece lista zerada (loader até carregar) | I | ok #45 (`RootNavigator.hydration.test.tsx`: loader no lugar do vazio de Salvos e de Estudados e dos botões do Detalhe, e leitura que falha abre vazia; `FavoritesContext.test.tsx` e `StudiedContext.test.tsx`: `hydrated` falso até a leitura) |
 | C27 | Dois usuários no mesmo aparelho não veem os dados um do outro | U, I | ok #24, #25 (U do `userKey`; I nos dois contextos) |
 
 ### Estudados com nota (RF07)
