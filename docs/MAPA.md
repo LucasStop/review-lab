@@ -17,7 +17,7 @@ Legenda: **base** quer dizer que a lógica existe, mas falta a tela.
 | RF07 Login, sessão, estudados | 10% | login e cadastro com hash e sal (#29 e #31), navegação condicional (#32), exclusão de conta no serviço (#124), `StudiedContext` com nota de 1 a 5 (#25), marcar como estudado com a nota editável no detalhe (#27), filtro Estudados no Catálogo com a nota em estrelas (#39), Perfil com e-mail, totais e nota média, e Sair e Excluir conta com confirmação (#125, além da rubrica) | — | LucasStop, Luc-Bruno |
 | RF08 Busca (campo e botão no Catálogo) | 10% | campo "Buscar PRs" e botão "Buscar" no Catálogo, com carregando, erro, limite com horário e "Nenhum resultado para" o termo (#37); `searchPullRequests` e `buildSearchQuery` (PR #106) | — | Luc-Bruno |
 | RF09 Feedback | 10% | `ActivityIndicator` e `ErrorState` com "Tentar novamente" no Catálogo e no detalhe; erro da página seguinte no rodapé; `AppError` com horário de volta do limite (PR #104); `useFetch` com teste próprio de carga, erro, retry, cancelamento e troca de fetcher (#41) | conferir cada fluxo no simulador com a rede lenta, no roteiro do #111 | Luc-Bruno |
-| RF10 Acessibilidade | 10% | tokens com contraste testado (#114); tema de navegação feito dos tokens, com o voltar do iOS em `link`, e `link` sobre `surface` no teste de contraste (#44); label, role e toque 44x44 nos componentes | #42 e #43 | Luc-Bruno |
+| RF10 Acessibilidade | 10% | tokens com contraste testado (#114); tema de navegação feito dos tokens, com o voltar do iOS em `link`, e `link` sobre `surface` no teste de contraste (#44); loaders com label, erros, busca, filtros e botão de colunas anunciados com `announceForAccessibility`, foco no chip Salvos depois de tirar um card, role `image` no `Avatar` e no `StarRating` só de leitura, e o label do `TextField` lido uma vez (#42); toque 44x44 nos componentes | #43; passada de VoiceOver no passo 10 do roteiro | Luc-Bruno |
 
 ## Módulos
 
@@ -51,7 +51,7 @@ Padrão do projeto: a lógica fica numa fábrica `create*` pura, que recebe as d
 | [src/contexts/FavoritesContext.tsx](../src/contexts/FavoritesContext.tsx) | `FavoritesProvider` e `useFavorites` | `FavoritesContext.test.tsx` |
 | [src/contexts/StudiedContext.tsx](../src/contexts/StudiedContext.tsx) | `StudiedProvider` e `useStudied`, com nota de 1 a 5 | `StudiedContext.test.tsx` |
 | [src/contexts/LayoutContext.tsx](../src/contexts/LayoutContext.tsx) | `LayoutProvider` e `useLayout`, com 1 ou 2 colunas (padrão 2) | `CatalogScreen.test.tsx` (C66) e `RootNavigator.hydration.test.tsx` |
-| [src/components/](../src/components/) | `Avatar`, `BodyBlocks`, `Button`, `ConfirmDialog`, `EmptyState`, `ErrorState`, `PullRequestCard`, `StarRating` e `TextField` | `ErrorState`, `PullRequestCard` e `StarRating`; os outros pelas telas |
+| [src/components/](../src/components/) | `Avatar`, `BodyBlocks`, `Button`, `ConfirmDialog`, `EmptyState`, `ErrorState`, `PullRequestCard`, `StarRating` e `TextField` | `Avatar`, `ErrorState`, `PullRequestCard`, `StarRating` e `TextField`; os outros pelas telas |
 | [src/screens/](../src/screens/) | Login e Cadastro (com `AuthForm`), Catálogo, Detalhe e Perfil | um arquivo por tela e `FavoritesFlow.test.tsx` |
 | [src/navigation/](../src/navigation/) | tipos de rota, `RootNavigator` (com o portão de hidratação), `AuthStack` e `AppStack` | `RootNavigator.test.tsx` e `RootNavigator.hydration.test.tsx`; E2E em `.maestro/` |
 
@@ -67,7 +67,7 @@ Totais da última execução: tabela "Execuções" de [TESTES.md](TESTES.md).
 | `cat:entrega` | LucasStop | #46 | #47-#56, #111 (com Luc-Bruno) |
 | `cat:navegacao-telas` | Luc-Bruno | #33-#39, #125, #140 | — |
 | `cat:estado` | Luc-Bruno | #23-#28 | — |
-| `cat:ux-acessibilidade` | Luc-Bruno | #40, #41, #44, #45, #114, #119, #123, #128, #130 | #42, #43 |
+| `cat:ux-acessibilidade` | Luc-Bruno | #40, #41, #42, #44, #45, #114, #119, #123, #128, #130 | #43 |
 | `cat:nuvem-bonus` | a definir depois do MVP | — | #57-#59 |
 
 Lista viva: [issues](https://github.com/LucasStop/review-lab/issues), [PRs mergeados](https://github.com/LucasStop/review-lab/pulls?q=is%3Apr+is%3Amerged), [milestones](https://github.com/LucasStop/review-lab/milestones).
