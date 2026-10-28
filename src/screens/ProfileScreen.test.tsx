@@ -297,6 +297,7 @@ function dismissHandler(title: string) {
 test('C62 (iOS): focus returns to the opener only after the Modal is dismissed', async () => {
   // Visto no VoiceOver do simulador: o foco dado quando o diálogo fecha se perde no fim do fade
   // e o VoiceOver vai para o voltar do header.
+  jest.replaceProperty(Platform, 'OS', 'ios');
   const send = jest
     .spyOn(AccessibilityInfo, 'sendAccessibilityEvent')
     .mockImplementation(() => undefined);

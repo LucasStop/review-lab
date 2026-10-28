@@ -97,6 +97,15 @@ test('C16: one comment and one file are written in the singular', async () => {
   );
 });
 
+test('C16: a review comment alone counts as one comment, and zero stays plural', async () => {
+  mockGet.mockResolvedValue(detail({ comments: 0, reviewComments: 1, changedFiles: 0 }));
+  await renderDetail();
+
+  expect(await screen.findByTestId('detail.stats')).toHaveTextContent(
+    /^1 comentário · 0 arquivos ·/,
+  );
+});
+
 test('C17: a PR without description shows "Sem descrição", not an error', async () => {
   mockGet.mockResolvedValue(detail({ blocks: [] }));
   await renderDetail();
