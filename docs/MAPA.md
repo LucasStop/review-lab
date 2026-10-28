@@ -1,6 +1,6 @@
 # Mapa do projeto
 
-Retrato da Fase 2 (aplicação), em andamento desde 26/10/2026. O PR que muda o estado de um RF atualiza este arquivo.
+Retrato da Fase 2 (aplicação), de 26/10/2026 até o MVP verificado em 28/10/2026 (#52). O PR que muda o estado de um RF atualiza este arquivo.
 
 ## Estado por RF
 
@@ -18,6 +18,24 @@ Legenda: **base** quer dizer que a lógica existe, mas falta a tela.
 | RF08 Busca (campo e botão no Catálogo) | 10% | campo "Buscar PRs" e botão "Buscar" no Catálogo, com carregando, erro, limite com horário e "Nenhum resultado para" o termo (#37); `searchPullRequests` e `buildSearchQuery` (PR #106) | — | Luc-Bruno |
 | RF09 Feedback | 10% | `ActivityIndicator` e `ErrorState` com "Tentar novamente" no Catálogo e no detalhe; erro da página seguinte no rodapé; `AppError` com horário de volta do limite (PR #104); `useFetch` com teste próprio de carga, erro, retry, cancelamento e troca de fetcher (#41); conferido no simulador sem rede e com o limite esgotado, com o horário de volta no detalhe e no rodapé da grade (roteiro, passos 7 e 8, #111). A rede lenta não foi simulada: o loader fica com o teste do C36 | — | Luc-Bruno |
 | RF10 Acessibilidade | 10% | tokens com contraste testado (#114); tema de navegação feito dos tokens, com o voltar do iOS em `link`, e `link` sobre `surface` no teste de contraste (#44); loaders com label, erros, busca, filtros e botão de colunas anunciados com `announceForAccessibility`, foco no chip Salvos depois de tirar um card, role `image` no `Avatar` e no `StarRating` só de leitura, e o label do `TextField` lido uma vez (#42); alvos de 44x44 nos dois eixos com teste de tamanho, tetos de fonte na inicial do `Avatar`, na estrela do card e no Perfil do header, e o varredor de `allowFontScaling={false}` (#43); passadas de fonte no máximo e de VoiceOver do simulador no roteiro (passos 9 a 11), com o foco que volta ao fechar o diálogo no iOS consertado (#111) | — | Luc-Bruno |
+
+## MVP verificado (#52)
+
+Verificado em 28/10/2026 no simulador iPhone 17, iOS 26.5, Expo Go, sobre a `main` em `c4c938f`, sem token. Uma conta nova percorreu o app do cadastro ao fim, e o app foi fechado e reaberto no meio, num fluxo Maestro escrito para o percurso (fora da suíte, porque cria uma conta a cada execução). Prints `mvp-rf*` em [execucoes/2026-10-28/](execucoes/2026-10-28/).
+
+| RF | Visto |
+|---|---|
+| RF01 | grade de 2 colunas, rolagem até a página 2, pull-to-refresh e 1 coluna (`mvp-rf01a` a `mvp-rf01c`) |
+| RF02, RF03 | card abre o Detalhe pelo número, com título, estatísticas e corpo em blocos (`mvp-rf03`) |
+| RF04 | salvar no Detalhe e na estrela do card, com o mesmo estado nas duas telas (`mvp-rf04`) |
+| RF05 | filtro Salvos com os 2 PRs depois de fechar e reabrir o app (`mvp-rf05`) |
+| RF06 | sessão, salvos, estudado e nota voltam do disco depois de fechar e reabrir (`mvp-rf05`, `mvp-rf07a`) |
+| RF07 | cadastro, estudado com nota 4 no filtro Estudados, Perfil com 2, 1 e 4,0, e sair e entrar de novo devolve os salvos da conta (`mvp-rf07a` a `mvp-rf07c`) |
+| RF08 | busca "router" no Catálogo com resultado e volta à lista com o campo vazio (`mvp-rf08`) |
+| RF09 | carregando e erro com "Tentar novamente" sem rede, e o horário de volta com o limite esgotado (roteiro, passos 7 e 8, prints `passo-07*` e `passo-08*`) |
+| RF10 | fonte no máximo e VoiceOver do simulador (roteiro, passos 9 a 11, [transcrição](execucoes/2026-10-28/voiceover.md)) |
+
+A suíte Maestro inteira passou no mesmo `c4c938f`: 9 de 9 em 17 min 24 s.
 
 ## Módulos
 
