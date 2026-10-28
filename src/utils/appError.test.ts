@@ -64,3 +64,32 @@ test('an AppError passes through and unknown values do not throw', () => {
   assert.equal(toAppError('boom').kind, 'unknown');
   assert.equal(toAppError(null).kind, 'unknown');
 });
+
+for (const status of [403, 429]) {
+  test(`${status} with retry-after is a rate limit that returns after that many seconds`, () => {
+    const before = Date.now();
+    const err = toAppError(
+      withResponse(status, { 'retry-after': '60', 'x-ratelimit-remaining': '5' }),
+    );
+    assert.equal(err.kind, 'rate-limit');
+    const wait = (err.resetAt!.getTime() - before) / 1000;
+    assert.ok(wait >= 59 && wait <= 61, String(wait));
+  });
+}
+
+test('403 without remaining 0 and without retry-after stays forbidden', () => {
+  assert.equal(toAppError(withResponse(403)).kind, 'forbidden');
+});
+
+test('a reset of 0 gives the generic rate limit message, without a time', () => {
+  const err = toAppError(
+    withResponse(403, { 'x-ratelimit-remaining': '0', 'x-ratelimit-reset': '0' }),
+  );
+  assert.equal(err.kind, 'rate-limit');
+  assert.equal(err.resetAt, undefined);
+  assert.ok(!/\d\d:\d\d/.test(err.message), err.message);
+});
+
+test('401 is forbidden', () => {
+  assert.equal(toAppError(withResponse(401)).kind, 'forbidden');
+});

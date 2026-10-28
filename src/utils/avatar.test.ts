@@ -28,3 +28,11 @@ test('initialOf uppercases the first letter and survives an empty name', () => {
   assert.equal(initialOf('  zed'), 'Z');
   assert.equal(initialOf(''), '?');
 });
+
+test('a known name keeps its color, and a long name still gets one from the palette', () => {
+  assert.equal(avatarColor('ana'), '#be123c');
+  assert.equal(avatarColor('octocat'), '#a21caf');
+  const long = avatarColor('a'.repeat(200));
+  assert.equal(long, '#1d4ed8');
+  assert.ok((AVATAR_COLORS as readonly string[]).includes(long));
+});

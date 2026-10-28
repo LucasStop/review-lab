@@ -48,7 +48,7 @@ Alvo de toque e fonte grande (RF10, #43):
 
 ## Componentes
 
-`StarRating`, `ErrorState` e `EmptyState` já existem em [src/components/](../../src/components/). O resto entra na Fase 2, no PR da primeira tela que o usa. O contrato abaixo é o que o PR tem que entregar, e todo componente usa os tokens.
+Todos os componentes abaixo já existem em [src/components/](../../src/components/). O contrato é o que cada um entrega, e todo componente usa os tokens.
 
 | Componente | Props | Acessibilidade | Estado |
 |---|---|---|---|
@@ -58,23 +58,25 @@ Alvo de toque e fonte grande (RF10, #43):
 | `PullRequestCard` | `pr: PullRequestSummary`, `saved`, `onPress`, `onToggleSave`, `rating?` (só em Estudados; entra no label do card como "nota N de 5" e aparece como estrelas ★ e ☆ em `typography.caption` com `colors.star`, testID `<testID>.rating`; o protótipo usa 18px, e o app fica no token da linha de meta do card, com o número no label), `testID`, `saveTestID` | o card inteiro é um botão com label "PR #n: título, de autor"; o ícone de salvar é outro botão com `accessibilityState={{ selected: saved }}` e label que muda ("Salvar para estudar" e "Remover dos salvos"); `hitSlop` no ícone | feito #34; estrelas no #39 |
 | `ErrorState` | `message`, `onRetry` | `accessibilityRole="alert"` no texto da mensagem (no `View` o role não é exposto); a mensagem é anunciada com `announceForAccessibility` ao aparecer e ao mudar, porque o role `alert` não anuncia no iOS; botão "Tentar novamente" 44x44 | feito (#99, role corrigido no #117, anúncio no #42) |
 | `EmptyState` | `title`, `text?` | só texto; a tela decide se há ação | feito (#99) |
-| `ConfirmDialog` | `visible`, `title`, `message`, `confirmLabel`, `onConfirm`, `onCancel`, `returnFocusTo` (ref do botão que abriu), `testIDPrefix`, `danger?`, `confirmDisabled?`, `loading?`, `children?` (campo de senha e erro) | `accessibilityRole="alert"` no texto; título com role `header`; o foco entra no diálogo e volta ao botão de origem (`sendAccessibilityEvent` num efeito que roda quando `visible` passa a `false`, para o Modal já ter saído da tela; não no `onDismiss`, que só existe no iOS); fundo inerte (o RN `Modal` prende o foco, `accessibilityViewIsModal`; o protótipo usa `inert`); Esc cancela (`onAccessibilityEscape` e `onRequestClose`); ação de perigo usa `danger` com `onPrimary`; o foco inicial vai para Cancelar em Sair e para o campo de senha (`autoFocus`) em Excluir; o conteúdo sobe com o teclado; durante a exclusão o Cancelar trava; alvo 44x44 | feito #125 |
+| `ConfirmDialog` | `visible`, `title`, `message`, `confirmLabel`, `onConfirm`, `onCancel`, `returnFocusTo` (ref do botão que abriu), `testIDPrefix`, `danger?`, `confirmDisabled?`, `loading?`, `children?` (campo de senha e erro) | `accessibilityRole="alert"` no texto; título com role `header`; o foco entra no diálogo e volta ao botão de origem (`sendAccessibilityEvent` depois que o Modal sai da tela: no iOS no `onDismiss`, porque o foco dado quando `visible` passa a `false` se perde no fim do fade e o VoiceOver vai para o voltar do header; no Android, que não tem `onDismiss`, num efeito que roda quando `visible` passa a `false`); fundo inerte (o RN `Modal` prende o foco, `accessibilityViewIsModal`; o protótipo usa `inert`); Esc cancela (`onAccessibilityEscape` e `onRequestClose`); ação de perigo usa `danger` com `onPrimary`; o foco inicial vai para Cancelar em Sair e para o campo de senha (`autoFocus`) em Excluir; o conteúdo sobe com o teclado; durante a exclusão o Cancelar trava; alvo 44x44 | feito #125 |
 | `StarRating` | `value`, `onChange?` | editável: 5 botões "Dar nota N de 5" com `selected`; somente leitura: um único elemento "Nota N de 5" com `accessibilityRole="image"` (#42); alvo 44x44; as estrelas quebram linha com a fonte do sistema no máximo | feito (#98), tokens e teste no #27 |
 
 Todos os componentes feitos já usam os tokens; o último a migrar foi o `StarRating`, no #27.
 
 ## Convenção de testID
 
-Formato `tela.elemento`, em minúsculas, para o Maestro e para os testes de componente. Item de lista leva o número do PR.
+Formato `tela.elemento`, em minúsculas, para o Maestro e para os testes de componente. Item de lista leva o índice do card na lista (`<n>`, a partir de 0), não o número do PR.
 
 | Tela | testIDs |
 |---|---|
-| Login | `login.email`, `login.password`, `login.submit`, `login.signup`, `login.error` |
-| Cadastro | `signup.email`, `signup.password`, `signup.submit`, `signup.login`, `signup.error` |
-| Catálogo | `catalog.list`, `catalog.card.<n>`, `catalog.card.<n>.rating`, `catalog.save.<n>`, `catalog.search-input`, `catalog.search-submit`, `catalog.filter.all`, `catalog.filter.saved`, `catalog.filter.studied`, `catalog.layout-toggle`, `catalog.profile`, `catalog.footer-loader`, `catalog.empty` |
-| Detalhe | `detail.title`, `detail.body`, `detail.save`, `detail.studied`, `detail.rating`, `detail.error` |
+| Login | `login.screen`, `login.email`, `login.password`, `login.submit`, `login.signup`, `login.error` |
+| Cadastro | `signup.screen`, `signup.email`, `signup.password`, `signup.submit`, `signup.login`, `signup.error` |
+| Catálogo | `catalog.list`, `catalog.card.<n>`, `catalog.card.<n>.rating`, `catalog.save.<n>`, `catalog.search-input`, `catalog.search-submit`, `catalog.filter.all`, `catalog.filter.saved`, `catalog.filter.studied`, `catalog.layout-toggle`, `catalog.profile`, `catalog.footer-loader`, `catalog.footer-error`, `catalog.error`, `catalog.empty` |
+| Detalhe | `detail.title`, `detail.stats`, `detail.body`, `detail.save`, `detail.studied`, `detail.rating`, `detail.error` |
 | Perfil | `profile.email`, `profile.saved-count`, `profile.studied-count`, `profile.avg`, `profile.logout`, `profile.delete`, `profile.password`, `profile.confirm`, `profile.cancel`, `profile.error`; `profile.confirm` e `profile.cancel` existem nos dois diálogos, mas só o aberto é renderizado; os três blocos de totais são um elemento acessível cada, lido pelo label ("Salvos: 0", "Estudados: 0", "Nota média: nenhuma") |
-| Comum | `error.retry`, `loading` |
+| Comum | `loading` (o `ActivityIndicator` do catálogo, do detalhe, da sessão e do `Button` em `loading`), `avatar.image` e `avatar.placeholder` (o `Avatar` com foto ou com a inicial) |
+
+O `ErrorState` não tem `testID`: o botão se acha pelo texto "Tentar novamente", e a tela dona leva o seu (`catalog.error`, `detail.error`). O `ConfirmDialog` monta `<testIDPrefix>.cancel` e `<testIDPrefix>.confirm`, e o Perfil o usa com o prefixo `profile`.
 
 ## Telas e estados
 

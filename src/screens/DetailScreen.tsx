@@ -19,6 +19,8 @@ type Props = NativeStackScreenProps<AppStackParamList, 'Detail'>;
 // do protótipo.
 const FIRST_RATING = 4;
 
+const count = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
+
 export function DetailScreen({ navigation, route }: Props) {
   const { number } = route.params;
   const fetcher = useCallback((signal: AbortSignal) => getPullRequest(number, signal), [number]);
@@ -76,8 +78,8 @@ export function DetailScreen({ navigation, route }: Props) {
         {data.title}
       </Text>
       <Text style={styles.meta} testID="detail.stats">
-        {data.comments + data.reviewComments} comentários · {data.changedFiles} arquivos · +
-        {data.additions} −{data.deletions}
+        {count(data.comments + data.reviewComments, 'comentário', 'comentários')} ·{' '}
+        {count(data.changedFiles, 'arquivo', 'arquivos')} · +{data.additions} −{data.deletions}
       </Text>
       <View style={styles.actions}>
         <Pressable

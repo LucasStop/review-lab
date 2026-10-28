@@ -52,10 +52,12 @@ export function ConfirmDialog({
   };
 
   // O foco volta só depois que o Modal fecha: com ele ainda na tela, o VoiceOver ignora foco
-  // atrás dele. Aqui e não no onDismiss, que só existe no iOS.
+  // atrás dele. No iOS isso é o onDismiss: visto no VoiceOver do simulador, o foco dado quando
+  // `visible` vira false se perde no fim do fade, e o VoiceOver vai para o voltar do header.
+  // O onDismiss só existe no iOS; no Android o foco volta aqui.
   const wasVisible = useRef(visible);
   useEffect(() => {
-    if (wasVisible.current && !visible) focus(returnFocusTo);
+    if (Platform.OS !== 'ios' && wasVisible.current && !visible) focus(returnFocusTo);
     wasVisible.current = visible;
   }, [visible, returnFocusTo]);
 
@@ -72,6 +74,7 @@ export function ConfirmDialog({
       onShow={() => {
         if (!children) focus(cancelRef);
       }}
+      onDismiss={() => focus(returnFocusTo)}
       onRequestClose={cancel}
     >
       <View style={styles.scrim} />

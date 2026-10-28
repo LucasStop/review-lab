@@ -212,6 +212,19 @@ test('a failure on page 2 keeps the list and shows the error in the footer', asy
   expect(screen.queryByTestId('catalog.footer-error')).toBeNull();
 });
 
+test('after a page 2 error, reaching the end again does not repeat the request', async () => {
+  mockList
+    .mockResolvedValueOnce(page([2], true))
+    .mockRejectedValueOnce(new AppError('network', 'Sem conexão. Confira a internet.'));
+  await renderCatalog();
+  await screen.findByTestId('catalog.card.0');
+  await reachEnd();
+  await screen.findByTestId('catalog.footer-error');
+
+  await reachEnd();
+  expect(mockList).toHaveBeenCalledTimes(2);
+});
+
 test('a failed pull-to-refresh keeps the list and its retry reloads page 1, not page 2', async () => {
   mockList
     .mockResolvedValueOnce(page([2, 1], true))

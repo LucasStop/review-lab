@@ -94,3 +94,23 @@ test('buildSearchQuery turns the boolean operators typed by the user into plain 
     'type:pr repo:o/r a and b or c not d and e and f and g',
   );
 });
+
+test('toDetail says merged only when merged_at is filled', () => {
+  const pr = {
+    ...base,
+    user: null,
+    body_html: null,
+    comments: 0,
+    review_comments: 0,
+    changed_files: 0,
+    additions: 0,
+    deletions: 0,
+  };
+  assert.equal(toDetail({ ...pr, merged_at: '2026-01-02T00:00:00Z' }).merged, true);
+  assert.equal(toDetail({ ...pr, merged_at: null }).merged, false);
+});
+
+test('buildSearchQuery cuts the term at 100 characters', () => {
+  const query = buildSearchQuery('o/r', 'a'.repeat(101));
+  assert.equal(query, `type:pr repo:o/r ${'a'.repeat(100)}`);
+});

@@ -111,3 +111,39 @@ test('verify checks the password for a userId and remove drops the credential', 
   assert.equal(store.has(`rl.cred.${userId}`), false);
   assert.deepEqual(await credentials.register('a@x.com', 'segredo1'), { ok: true, userId });
 });
+
+test('a password of exactly 6 characters is accepted and 5 is refused', async () => {
+  const { credentials } = setup();
+  assert.equal((await credentials.register('a@x.com', '123456')).ok, true);
+  assert.deepEqual(await credentials.register('b@x.com', '12345'), {
+    ok: false,
+    reason: 'invalid-input',
+  });
+});
+
+test('a truncated stored hash does not pass the login', async () => {
+  const { credentials, store } = setup();
+  await credentials.register('a@x.com', 'segredo');
+  const [key, raw] = [...store.entries()][0];
+  const saved = JSON.parse(raw);
+  store.set(key, JSON.stringify({ ...saved, hash: saved.hash.slice(0, 32) }));
+  assert.equal((await credentials.login('a@x.com', 'segredo')).ok, false);
+});
+
+test('a stored hash that extends the real one does not pass the login', async () => {
+  const { credentials, store } = setup();
+  await credentials.register('a@x.com', 'segredo');
+  const [key, raw] = [...store.entries()][0];
+  const saved = JSON.parse(raw);
+  store.set(key, JSON.stringify({ ...saved, hash: `${saved.hash}00` }));
+  assert.equal((await credentials.login('a@x.com', 'segredo')).ok, false);
+});
+
+test('the stored hash is the known vector for 2000 iterations', async () => {
+  const { credentials, store } = setup();
+  await credentials.register('a@x.com', 'segredo');
+  const saved = JSON.parse([...store.values()][0]);
+  assert.equal(saved.iterations, 2000);
+  assert.equal(saved.salt, 'salt-0');
+  assert.equal(saved.hash, 'a98baac0c5fe7a4bc08a0ed1345fb40ae8ddba092bf026aaa8123c60375e8005');
+});

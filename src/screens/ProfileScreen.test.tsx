@@ -1,7 +1,7 @@
-import { beforeEach, expect, jest, test } from '@jest/globals';
+import { afterEach, beforeEach, expect, jest, test } from '@jest/globals';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { act, fireEvent, render, screen, within } from '@testing-library/react-native';
-import { AccessibilityInfo } from 'react-native';
+import { AccessibilityInfo, Platform } from 'react-native';
 
 import { AuthProvider, useAuth } from '../contexts/AuthContext';
 import { FavoritesProvider } from '../contexts/FavoritesContext';
@@ -53,6 +53,10 @@ async function openDelete(password?: string) {
     await fireEvent.changeText(screen.getByTestId('profile.password'), password);
   }
 }
+
+afterEach(() => {
+  jest.restoreAllMocks();
+});
 
 beforeEach(async () => {
   await AsyncStorage.clear();
@@ -236,7 +240,9 @@ test('while the account is being deleted, Cancelar, Esc and back do not close th
   });
 });
 
-test('C62: focus enters the dialog and returns to the button that opened it', async () => {
+test('C62 (Android): focus enters the dialog and returns to the button that opened it', async () => {
+  // Sem onDismiss no Android: o foco volta quando o diálogo fecha.
+  jest.replaceProperty(Platform, 'OS', 'android');
   // Guarda se algum diálogo ainda estava na tela a cada evento: o VoiceOver ignora foco atrás de
   // um Modal aberto, então o foco só pode voltar depois que ele fecha.
   const dialogOpen: boolean[] = [];
@@ -276,4 +282,42 @@ test('C62: focus enters the dialog and returns to the button that opened it', as
   expect(focused()).toBe('profile.delete focus');
   expect(dialogOpen.at(-1)).toBe(false);
   expect(mockAuth.signOut).not.toHaveBeenCalled();
+});
+
+type Node = { props: { onDismiss?: () => void }; parent: Node | null };
+
+// O mock do Modal some com `visible` false e nunca dispara onDismiss: guarda o handler antes.
+function dismissHandler(title: string) {
+  let node: Node | null = screen.getByText(title) as unknown as Node;
+  while (node && !node.props.onDismiss) node = node.parent;
+  if (!node?.props.onDismiss) throw new Error('Modal sem onDismiss');
+  return node.props.onDismiss;
+}
+
+test('C62 (iOS): focus returns to the opener only after the Modal is dismissed', async () => {
+  // Visto no VoiceOver do simulador: o foco dado quando o diálogo fecha se perde no fim do fade
+  // e o VoiceOver vai para o voltar do header.
+  jest.replaceProperty(Platform, 'OS', 'ios');
+  const send = jest
+    .spyOn(AccessibilityInfo, 'sendAccessibilityEvent')
+    .mockImplementation(() => undefined);
+  await renderProfile();
+
+  for (const [opener, title] of [
+    ['profile.logout', 'Sair da conta?'],
+    ['profile.delete', 'Excluir conta?'],
+  ] as const) {
+    await fireEvent.press(screen.getByTestId(opener));
+    const onDismiss = dismissHandler(title);
+    send.mockClear();
+    await fireEvent.press(screen.getByTestId('profile.cancel'));
+    expect(screen.queryByText(title)).toBeNull();
+    expect(send).not.toHaveBeenCalled();
+
+    await act(async () => onDismiss());
+    const [target, event] = send.mock.lastCall ?? [];
+    expect(
+      `${(target as { props?: { testID?: string } } | undefined)?.props?.testID} ${event}`,
+    ).toBe(`${opener} focus`);
+  }
 });

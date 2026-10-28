@@ -88,6 +88,24 @@ test('C16, C53: shows title, stats and body from the PR fetched by number', asyn
   expect(screen.getByTestId('detail.body')).toHaveTextContent('Veja aqui');
 });
 
+test('C16: one comment and one file are written in the singular', async () => {
+  mockGet.mockResolvedValue(detail({ comments: 1, reviewComments: 0, changedFiles: 1 }));
+  await renderDetail();
+
+  expect(await screen.findByTestId('detail.stats')).toHaveTextContent(
+    /^1 comentário · 1 arquivo ·/,
+  );
+});
+
+test('C16: a review comment alone counts as one comment, and zero stays plural', async () => {
+  mockGet.mockResolvedValue(detail({ comments: 0, reviewComments: 1, changedFiles: 0 }));
+  await renderDetail();
+
+  expect(await screen.findByTestId('detail.stats')).toHaveTextContent(
+    /^1 comentário · 0 arquivos ·/,
+  );
+});
+
 test('C17: a PR without description shows "Sem descrição", not an error', async () => {
   mockGet.mockResolvedValue(detail({ blocks: [] }));
   await renderDetail();

@@ -24,13 +24,16 @@ const pad = (n: number) => String(n).padStart(2, '0');
 
 function rateLimit(headers: Record<string, unknown> = {}): AppError {
   const reset = Number(headers['x-ratelimit-reset']);
-  if (!Number.isFinite(reset) || reset <= 0) {
+  // Limite secundário do GitHub: não manda x-ratelimit-reset, só retry-after (segundos).
+  const retryAfter = Number(headers['retry-after']);
+  const hasReset = Number.isFinite(reset) && reset > 0;
+  if (!hasReset && !(Number.isFinite(retryAfter) && retryAfter > 0)) {
     return new AppError(
       'rate-limit',
       'Limite de requisições do GitHub atingido. Tente em alguns minutos.',
     );
   }
-  const resetAt = new Date(reset * 1000);
+  const resetAt = new Date(hasReset ? reset * 1000 : Date.now() + retryAfter * 1000);
   const time = `${pad(resetAt.getHours())}:${pad(resetAt.getMinutes())}`;
   return new AppError(
     'rate-limit',
@@ -58,7 +61,12 @@ export function toAppError(error: unknown): AppError {
   }
 
   const { status, headers } = response;
-  if (status === 429 || (status === 403 && String(headers?.['x-ratelimit-remaining']) === '0')) {
+  if (
+    status === 429 ||
+    (status === 403 &&
+      (String(headers?.['x-ratelimit-remaining']) === '0' ||
+        headers?.['retry-after'] !== undefined))
+  ) {
     return rateLimit(headers);
   }
   if (status === 403 || status === 401) {
