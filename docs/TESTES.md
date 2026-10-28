@@ -71,6 +71,7 @@ Aceitos, sem teste:
 
 | PR | Sintoma | Teste que prende |
 |---|---|---|
+| #111 | no iOS o foco caía no voltar do header ao fechar o diálogo, visto com o VoiceOver do simulador no roteiro, passo 11 | `ProfileScreen.test.tsx` C62 (iOS) |
 | #153 | texto do botão Perfil do header cortado com a fonte no máximo | `RootNavigator.test.tsx` C47 |
 | #150 | primeiro toque no diálogo só fechava o teclado | `ProfileScreen.test.tsx`, "with the keyboard open" |
 | #150 | foco voltava antes de o diálogo fechar | `ProfileScreen.test.tsx` C62 |
