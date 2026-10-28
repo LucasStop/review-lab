@@ -1,0 +1,172 @@
+# #52: percurso RF01-RF10 com uma conta nova, fechando e reabrindo o app no meio. Fica fora da
+# suíte porque cria uma conta a cada execução. Rodar da raiz do repo:
+# maestro test docs/execucoes/2026-10-28/mvp-rf.yaml
+appId: host.exp.Exponent
+name: mvp-rf
+---
+# Sai da conta, se houver sessão, para começar pelo cadastro.
+- runFlow: ../../../.maestro/subflows/open-app.yaml
+- extendedWaitUntil:
+    visible:
+      id: 'login\.screen|catalog\.profile'
+    timeout: 90000
+- runFlow:
+    when:
+      visible:
+        id: 'catalog.profile'
+    commands:
+      - tapOn:
+          id: 'catalog.profile'
+      - tapOn:
+          id: 'profile.logout'
+      - tapOn:
+          id: 'profile.confirm'
+# RF07: cadastro de conta nova cai no Catálogo.
+- runFlow: ../../../.maestro/subflows/session.yaml
+- tapOn:
+    text: 'Not Now'
+    optional: true
+# RF01: grade de 2 colunas, rolagem infinita até a página 2, pull-to-refresh e 1 coluna.
+- extendedWaitUntil:
+    visible:
+      id: 'catalog.card.0'
+    timeout: 30000
+- assertVisible:
+    id: 'catalog.card.1'
+- takeScreenshot: mvp-rf01a-grade
+- scrollUntilVisible:
+    element:
+      id: 'catalog.card.34'
+    direction: DOWN
+    timeout: 90000
+    speed: 60
+- takeScreenshot: mvp-rf01b-pagina-2
+- tapOn:
+    id: 'catalog.layout-toggle'
+- swipe:
+    start: '50%,40%'
+    end: '50%,90%'
+- extendedWaitUntil:
+    visible:
+      id: 'catalog.card.0'
+    timeout: 30000
+- takeScreenshot: mvp-rf01c-refresh-1-coluna
+- tapOn:
+    id: 'catalog.layout-toggle'
+# RF02, RF03, RF04: abre o detalhe, salva e marca como estudado com nota 4.
+- tapOn:
+    id: 'catalog.card.0'
+- extendedWaitUntil:
+    visible:
+      id: 'detail.studied'
+    timeout: 30000
+- tapOn:
+    id: 'detail.save'
+- tapOn:
+    id: 'detail.studied'
+- tapOn: 'Dar nota 4 de 5'
+- assertVisible:
+    id: 'detail.save'
+    selected: true
+- takeScreenshot: mvp-rf03-detalhe-salvo-estudado
+- tapOn:
+    point: '9%,9%'
+# RF04: salva um segundo PR pela estrela do card.
+- extendedWaitUntil:
+    visible:
+      id: 'catalog.card.1'
+    timeout: 15000
+- tapOn:
+    id: 'catalog.save.1'
+- assertVisible:
+    id: 'catalog.save.1'
+    selected: true
+- assertVisible:
+    id: 'catalog.save.0'
+    selected: true
+- takeScreenshot: mvp-rf04-estrela-card
+# RF08: busca com resultado e abre um item.
+- tapOn:
+    id: 'catalog.search-input'
+- inputText: 'router'
+- tapOn:
+    id: 'catalog.search-submit'
+- extendedWaitUntil:
+    visible:
+      id: 'catalog.card.0'
+    timeout: 30000
+- takeScreenshot: mvp-rf08-busca
+- tapOn:
+    id: 'catalog.search-input'
+- eraseText:
+    charactersToErase: 10
+- tapOn:
+    id: 'catalog.search-submit'
+# RF06: fecha o app e reabre; a sessão e as listas voltam do disco.
+- stopApp
+- runFlow: ../../../.maestro/subflows/open-app.yaml
+- extendedWaitUntil:
+    visible:
+      id: 'catalog.profile'
+    timeout: 90000
+# RF05: filtro Salvos depois de reabrir.
+- tapOn:
+    id: 'catalog.filter.saved'
+- extendedWaitUntil:
+    visible:
+      id: 'catalog.card.0'
+    timeout: 15000
+- takeScreenshot: mvp-rf05-salvos-reaberto
+# RF07: filtro Estudados com a nota.
+- tapOn:
+    id: 'catalog.filter.studied'
+- extendedWaitUntil:
+    visible:
+      id: 'catalog.card.0'
+    timeout: 15000
+- takeScreenshot: mvp-rf07a-estudados-reaberto
+- tapOn:
+    id: 'catalog.filter.all'
+# RF07: Perfil com os totais.
+- tapOn:
+    id: 'catalog.profile'
+- extendedWaitUntil:
+    visible:
+      id: 'profile.email'
+    timeout: 15000
+- assertVisible:
+    id: 'profile.studied-count'
+- takeScreenshot: mvp-rf07b-perfil
+# RF07: sair e entrar de novo devolve as listas da conta.
+- tapOn:
+    id: 'profile.logout'
+- tapOn:
+    id: 'profile.confirm'
+- extendedWaitUntil:
+    visible:
+      id: 'login.screen'
+    timeout: 15000
+- tapOn:
+    id: 'login.email'
+- inputText: ${output.email}
+- tapOn:
+    id: 'login.password'
+- inputText: 'segredo123'
+- tapOn:
+    id: 'login.submit'
+- tapOn:
+    text: 'Not Now'
+    optional: true
+- extendedWaitUntil:
+    visible:
+      id: 'catalog.profile'
+    timeout: 20000
+- tapOn:
+    id: 'catalog.filter.saved'
+- extendedWaitUntil:
+    visible:
+      id: 'catalog.card.0'
+    timeout: 15000
+- takeScreenshot: mvp-rf07c-salvos-depois-de-entrar
+- tapOn:
+    id: 'catalog.filter.all'
