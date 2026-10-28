@@ -21,19 +21,21 @@ Legenda: **base** quer dizer que a lógica existe, mas falta a tela.
 
 ## MVP verificado (#52)
 
-Verificado em 28/10/2026 no simulador iPhone 17, iOS 26.5, Expo Go, sobre a `main` em `c4c938f`, sem token. Uma conta nova percorreu o app do cadastro ao fim, e o app foi fechado e reaberto no meio, num fluxo Maestro escrito para o percurso (fora da suíte, porque cria uma conta a cada execução). Prints `mvp-rf*` em [execucoes/2026-10-28/](execucoes/2026-10-28/).
+Verificado em 28/10/2026 no simulador iPhone 17, iOS 26.5, Expo Go, sem token, sobre a `main` em `c4c938f`. Uma conta nova percorreu o app do cadastro ao fim, e o app foi fechado e reaberto no meio. O fluxo é [execucoes/2026-10-28/mvp-rf.yaml](execucoes/2026-10-28/mvp-rf.yaml), fora da suíte porque cria uma conta a cada execução. Cada linha separa o que o fluxo conferiu do que o print mostra (`mvp-rf*` em [execucoes/2026-10-28/](execucoes/2026-10-28/)).
 
-| RF | Visto |
-|---|---|
-| RF01 | grade de 2 colunas, rolagem até a página 2, pull-to-refresh e 1 coluna (`mvp-rf01a` a `mvp-rf01c`) |
-| RF02, RF03 | card abre o Detalhe pelo número, com título, estatísticas e corpo em blocos (`mvp-rf03`) |
-| RF04 | salvar no Detalhe e na estrela do card, com o mesmo estado nas duas telas (`mvp-rf04`) |
-| RF05 | filtro Salvos com os 2 PRs depois de fechar e reabrir o app (`mvp-rf05`) |
-| RF06 | sessão, salvos, estudado e nota voltam do disco depois de fechar e reabrir (`mvp-rf05`, `mvp-rf07a`) |
-| RF07 | cadastro, estudado com nota 4 no filtro Estudados, Perfil com 2, 1 e 4,0, e sair e entrar de novo devolve os salvos da conta (`mvp-rf07a` a `mvp-rf07c`) |
-| RF08 | busca "router" no Catálogo com resultado e volta à lista com o campo vazio (`mvp-rf08`) |
-| RF09 | carregando e erro com "Tentar novamente" sem rede, e o horário de volta com o limite esgotado (roteiro, passos 7 e 8, prints `passo-07*` e `passo-08*`) |
-| RF10 | fonte no máximo e VoiceOver do simulador (roteiro, passos 9 a 11, [transcrição](execucoes/2026-10-28/voiceover.md)) |
+| RF | Fluxo | Print |
+|---|---|---|
+| RF01 | grade de 2 colunas; rolagem até o `catalog.card.34`, que já é da página 2 (20 por página); 1 coluna; puxar para atualizar | grade (`mvp-rf01a`), grade rolada (`mvp-rf01b`), 1 coluna no topo (`mvp-rf01c`) |
+| RF02, RF03 | card abre o Detalhe | título, estatísticas e corpo em blocos (`mvp-rf03`) |
+| RF04 | salvar no Detalhe e depois pela estrela do card de outro PR, com as duas estrelas marcadas | estrelas cheias no card (`mvp-rf04`) |
+| RF05, RF06 | fechar o app (`stopApp`) e reabrir com a sessão | Salvos com os 2 PRs (`mvp-rf05`) |
+| RF07 | cadastro; estudado com nota 4; Perfil; sair e entrar de novo devolve os salvos | Estudados com 4 estrelas (`mvp-rf07a`), Perfil 2, 1 e 4,0 (`mvp-rf07b`), Salvos depois de entrar (`mvp-rf07c`) |
+| RF08 | busca "router" com resultado; Buscar com o campo vazio volta à lista | resultado da busca (`mvp-rf08`) |
+
+RF09 e RF10 vêm do roteiro do #111, feito na branch `feat/111-test-suite` antes do merge (passo 7 na noite de 27/10, passos 8, 10 e 11 em 28/10). Depois disso, o código do app não mudou até o `c4c938f`; só testes e docs:
+
+- **RF09:** "Sem conexão" e "Tentar novamente" sem rede (`passo-07*`), e o horário de volta no Detalhe e no rodapé da grade com o limite esgotado (`passo-08*`). O loader é coberto pelo teste do C36, porque a rede lenta não foi simulada.
+- **RF10:** fonte no máximo (`passo-09*` em [execucoes/2026-10-27/](execucoes/2026-10-27/)) e VoiceOver do simulador ([transcrição](execucoes/2026-10-28/voiceover.md)).
 
 A suíte Maestro inteira passou no mesmo `c4c938f`: 9 de 9 em 17 min 24 s.
 
