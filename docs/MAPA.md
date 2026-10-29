@@ -84,7 +84,7 @@ Totais da última execução: tabela "Execuções" de [TESTES.md](TESTES.md).
 | `cat:fundacao` | LucasStop | #5-#14, #68, #94, #113, #115, #121 | — |
 | `cat:dados` | LucasStop | #15-#22 | — |
 | `cat:auth` | LucasStop | #29-#32, #124 | — |
-| `cat:entrega` | LucasStop | #46, #111 | #47-#56 |
+| `cat:entrega` | LucasStop | #46, #47-#50, #53-#55, #111 | #51, #56 |
 | `cat:navegacao-telas` | Luc-Bruno | #33-#39, #125, #140 | — |
 | `cat:estado` | Luc-Bruno | #23-#28 | — |
 | `cat:ux-acessibilidade` | Luc-Bruno | #40, #41, #42, #43, #44, #45, #114, #119, #123, #128, #130 | — |
