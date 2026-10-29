@@ -23,7 +23,7 @@ Roteiro de gravação: ensaiar com cronômetro, gravar a demo antes com o cache 
 Todo item abaixo ausente custa -20%.
 
 1. **Capa**: disciplina (Desenvolvimento Mobile Híbrido), turma, data de entrega, nome do projeto (Review Lab) e tema, **nome completo de todos os integrantes** (quem faltar leva zero).
-2. **Seção 1, links**: repositório GitHub **público** (README com `npx expo start`) e vídeo YouTube **público**. O repositório hoje é privado; tornar público antes de entregar (decisão do Lucas).
+2. **Seção 1, links**: repositório GitHub **público** (README com `npx expo start`; o `yarn start` do README é equivalente) e vídeo YouTube **público**. O repositório é público desde antes de 29/10/2026; conferir em janela anônima antes de enviar (#54, #55).
 3. **Seção 2, tema e configuração**: tema (catálogo de PRs para estudar code review) e API (GitHub REST); persistência Local (AsyncStorage); login Local (hash + expo-secure-store), ou o serviço de nuvem se houver bônus.
 4. **Seção 3, autoavaliação**: tabela RF | Sim/Não/Parcial | arquivo principal, de RF01 a RF10.
 5. **Seção 4, Flutter x React Native**: meia página sobre Provider x Context, GridView x FlatList, FutureBuilder x useEffect/useState, hot reload x Fast Refresh/Expo Go.
