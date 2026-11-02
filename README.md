@@ -4,7 +4,7 @@ App React Native (Expo) que cataloga pull requests reais de repositórios open s
 
 Projeto do Somativo 2 de Desenvolvimento Mobile Híbrido (PUCPR, 2026/2). Fonte de dados: API REST do GitHub, somente leitura.
 
-> Estado atual: Fase 2 (aplicação) em andamento. Estado por RF em [docs/MAPA.md](docs/MAPA.md), plano em [docs/PLAN.md](docs/PLAN.md), design em [docs/SDD.md](docs/SDD.md).
+> Estado atual: aplicação completa (RF01 a RF10) e verificada em 28/10/2026. Estado por RF em [docs/MAPA.md](docs/MAPA.md), autoavaliação em [docs/entrega/autoavaliacao.md](docs/entrega/autoavaliacao.md), plano em [docs/PLAN.md](docs/PLAN.md), design em [docs/SDD.md](docs/SDD.md).
 
 ## Como rodar
 
@@ -56,7 +56,7 @@ Estratégia, cenários C01-C66 e roteiro manual em [docs/TESTES.md](docs/TESTES.
 
 ## Documentação
 
-[Protótipo clicável das 5 telas](docs/design/prototype.html) (também em [Artifact privado](https://claude.ai/artifact/6uCQVjVTGqNDPBBU4VMqTs)) e [design system](docs/design/DESIGN-SYSTEM.md).
+[Protótipo clicável das 5 telas](docs/design/prototype.html) e [design system](docs/design/DESIGN-SYSTEM.md).
 
 [docs/ENUNCIADO.md](docs/ENUNCIADO.md) (rubrica), [docs/PRD.md](docs/PRD.md), [docs/SDD.md](docs/SDD.md), [docs/adr/](docs/adr/) (decisões), [docs/ENTREGA.md](docs/ENTREGA.md) (vídeo e PDF), [docs/MAPA.md](docs/MAPA.md) (estado), [docs/TESTES.md](docs/TESTES.md) (testes).
 
