@@ -28,11 +28,11 @@ Abrir cada arquivo na linha certa, fonte grande.
 
 **Stopinski:** Começando pelos dados. Em `services/github.ts` está o cliente axios. A paginação lê o header `Link` da resposta, em vez de eu calcular o número da página, e a busca usa o endpoint de search da API.
 
-No `cache.ts`, as respostas ficam guardadas com um tempo de validade. Isso importa porque, sem token, a API do GitHub libera só 60 requisições por hora. Com o cache, voltar para uma tela não gasta requisição.
+No `cache.ts`, as respostas ficam guardadas com um tempo de validade e com o etag do GitHub: quando nada mudou, a API responde 304, que não gasta o limite. Isso importa porque, sem token, a API libera só 60 requisições por hora. Se a rede falha, a cópia vencida ainda serve de reserva.
 
 O `sanitizeHtml.ts` trata a descrição do pull request como dado não confiável: o HTML vira texto, e nunca é executado.
 
-Agora o login. O `AuthContext` guarda a sessão. Em `credentials.ts`, a senha passa por um hash com sal, e o que persiste fica no secure-store, não em texto puro. E o `RootNavigator` decide qual pilha de telas aparece, conforme existe sessão ou não. Esse ponto eu explico melhor mais adiante.
+Agora o login. O `AuthContext` guarda a sessão. Em `credentials.ts`, a senha passa por um hash com sal, SHA-256 repetido 2000 vezes. Em `secureCredentials.ts`, o que persiste vai para o secure-store, nunca em texto puro. E o `RootNavigator` decide qual pilha de telas aparece, conforme existe sessão ou não. Esse ponto eu explico melhor mais adiante.
 
 ## 3:45-5:30 Código, parte 2 (Bruno)
 
@@ -54,7 +54,7 @@ No Flutter, o jeito comum é chamar uma navegação para a tela de login ao sair
 
 Tem um detalhe que dá problema. Quando o app abre, a sessão ainda está sendo lida do secure-store. Se o `RootNavigator` decidisse nesse instante, mostraria o Login por um piscar mesmo para quem já está logado. Por isso o contexto tem o estado `hydrated`. Enquanto ele é falso, o app mostra só o loader. Só depois da leitura as telas aparecem. O mesmo vale para as listas de salvos e estudados: nunca aparece uma lista zerada por um instante.
 
-Este teste cobre exatamente isso. Ele verifica que, antes de hidratar, não aparece nem Login nem lista, e que depois aparece a pilha certa.
+Dois testes cobrem isso. O `RootNavigator.test.tsx` garante que, enquanto a sessão é lida, só aparece o loader, nunca o Login. Este aqui, o `RootNavigator.hydration.test.tsx`, garante o mesmo para as listas e o layout: o portão espera as duas listas e o layout antes de abrir, e Salvos e Estudados nunca mostram o vazio enquanto carregam. Se a leitura falha, o portão abre no padrão em vez de travar.
 
 Isso liga o RF07, o login com sessão, ao RF06, a persistência: os dois dependem de ler o armazenamento antes de decidir o que mostrar.
 
