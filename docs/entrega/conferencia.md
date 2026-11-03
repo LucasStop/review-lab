@@ -15,7 +15,7 @@ Feita em 29/10/2026 sobre a `main` `4a42e0d` mais os arquivos de `docs/entrega/`
 | `.env` fora do repositório e do histórico | Ok | `gitleaks detect`: 228 commits, nenhum achado; só `.env.example` foi versionado (`git log --all --diff-filter=A`); sem `ghp_` nem `github_pat_` no histórico. |
 | `.env.example` só com nomes | Ok | README e [AGENTS.md](../../AGENTS.md) exigem; o arquivo é o único `.env*` versionado. |
 | Declaração de uso de IA no README | Ok | Seção "Uso de IA" do README. |
-| Enviado antes de 02/11 23:59, pelo campo oficial do Canvas | Aberto | #56, só com aprovação do Lucas. Comentário em vez do campo custa -30%. |
+| Enviado antes de 02/11 23:59, pelo campo oficial do Canvas | Ok | Enviado em 02/11/2026 às 23:03, pelo campo de envio da tarefa 365836, com aprovação do Lucas (#56). |
 | Revogar o token fino do GitHub usado em desenvolvimento | Aberto | A linha já saiu do `.env`; o Lucas revoga o token no GitHub. |
 
-Antes de enviar: preencher turma e link do vídeo, rodar `docs/entrega/build-pdf.sh`, abrir o PDF e conferir as 6 seções e os 2 nomes.
+Enviado: turma e link do vídeo preenchidos, PDF gerado por `docs/entrega/build-pdf.sh`, 6 seções e 2 nomes conferidos.
