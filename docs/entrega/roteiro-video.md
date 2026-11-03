@@ -20,7 +20,7 @@ Dupla: **Lucas Stopinski da Silva** (LucasStop) e **Lucas Bruno e Silva** (Luc-B
 | 5:30-8:00 | Stopinski | **Explicação técnica: navegação condicional com `AuthContext`.** Por que o logout só limpa a sessão e o `RootNavigator` troca AuthStack por AppStack, em vez de `navigate('Login')`: a AppStack deixa de existir, não há tela para voltar. Mostrar a hidratação do Context: o loader segura as telas até `hydrated`, então nunca aparece Login nem lista zerada por um instante. Mostrar o teste que cobre isso. Ligar ao RF07 e ao RF06. | RF07 |
 | 8:00-8:30 | os dois | Fechamento: o que ficou de fora (nuvem e auth real, bônus); VoiceOver conferido só no simulador. | |
 
-O minuto da explicação técnica no PDF (seção 5) é **5:30**; ajustar depois da edição.
+O minuto da explicação técnica no PDF (seção 5) é **5:48** no vídeo publicado.
 
 ## Checklist de ensaio e gravação
 

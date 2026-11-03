@@ -18,7 +18,7 @@ cat <<'HEAD'
 # 1. Links
 
 - Repositório (público): <https://github.com/LucasStop/review-lab>. O README tem como rodar: `yarn start` (equivale a `npx expo start`).
-- Vídeo (YouTube, público): **[PREENCHER LINK DO VÍDEO]**
+- Vídeo (YouTube, público): **<https://youtu.be/a3q_lNzumb8>**
 
 # 2. Tema e configuração
 
@@ -36,7 +36,7 @@ cat <<'TEC'
 
 # 5. Explicação técnica
 
-Tema: **navegação condicional com `AuthContext`**: o `RootNavigator` escolhe a AuthStack ou a AppStack pelo estado do contexto, e o logout só limpa a sessão, sem `navigate('Login')`. Aparece no vídeo a partir de **5:30**.
+Tema: **navegação condicional com `AuthContext`**: o `RootNavigator` escolhe a AuthStack ou a AppStack pelo estado do contexto, e o logout só limpa a sessão, sem `navigate('Login')`. Aparece no vídeo a partir de **5:48**.
 
 # 6. Screenshots
 
